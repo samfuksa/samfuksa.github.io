@@ -36,7 +36,7 @@
       <h2 class="text-center mb-4 ">Počítadlo Normostran</h2>
       <div class="mb-3">
         <label for="charCount" class="form-label fw-bold">Zadej počet znaků:</label>
-        <input type="number" class="form-control" id="charCount" placeholder="Např. 3600">
+        <input type="number" pattern="\d*" inputmode="numeric" class="form-control" id="charCount" placeholder="Např. 3600">
       </div>
       <div class="d-grid mb-3">
         <button class="btn btn-custom" onclick="calculate()">Spočítat</button>
