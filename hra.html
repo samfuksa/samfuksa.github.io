@@ -1,101 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Smash or Pass: Italian Brainrot Edition</title>
+  <title>Italian Brainrot Versus</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #f8f9fa;
-    }
     .character-img {
       max-width: 100%;
       height: auto;
       border-radius: 10px;
     }
-    .btn-group {
-      margin-top: 20px;
+    .character-card {
+      cursor: pointer;
+      transition: transform 0.2s;
     }
-    .result {
-      margin-top: 20px;
-      font-weight: bold;
+    .character-card:hover {
+      transform: scale(1.05);
     }
   </style>
 </head>
-<body>
+<body class="bg-light">
   <div class="container text-center mt-5">
-    <h1>Smash or Pass: Italian Brainrot Edition</h1>
-    <div id="game" class="mt-4">
-      <h2 id="character-name"></h2>
-      <img id="character-img" class="character-img" src="" alt="Character Image">
-      <div class="btn-group">
-        <button id="smash-btn" class="btn btn-success">Smash</button>
-        <button id="pass-btn" class="btn btn-danger">Pass</button>
-      </div>
-      <div id="result" class="result"></div>
+    <h1 class="mb-4">🧠 Italian Brainrot Versus</h1>
+    <div class="row" id="game-area">
+      <!-- Karty postav budou vloženy zde -->
+    </div>
+    <div class="mt-4">
+      <button class="btn btn-secondary" onclick="resetGame()">Resetovat hru</button>
     </div>
   </div>
 
   <script>
     const characters = [
       {
-        name: "Bombardiro Crocodilo",
-        image: "https://example.com/bombardiro_crocodilo.jpg"
-      },
-      {
         name: "Tralalero Tralala",
-        image: "https://example.com/tralalero_tralala.jpg"
+        image: "https://i.kym-cdn.com/entries/icons/original/000/047/473/italian_brainrot_memes_cover.jpg"
       },
       {
-        name: "Lirili Larila",
-        image: "https://example.com/lirili_larila.jpg"
-      },
-      {
-        name: "Bombombini Gusini",
-        image: "https://example.com/bombombini_gusini.jpg"
+        name: "Bombardiro Crocodilo",
+        image: "https://i.kym-cdn.com/entries/icons/original/000/047/473/bombardiro_crocodilo.jpg"
       },
       {
         name: "Brr Brr Patapim",
-        image: "https://example.com/brr_brr_patapim.jpg"
+        image: "https://i.kym-cdn.com/entries/icons/original/000/047/473/brr_brr_patapim.jpg"
+      },
+      {
+        name: "Frigo Camelo",
+        image: "https://i.kym-cdn.com/entries/icons/original/000/047/473/frigo_camelo.jpg"
+      },
+      {
+        name: "Chimpanzini Bananini",
+        image: "https://i.kym-cdn.com/entries/icons/original/000/047/473/chimpanzini_bananini.jpg"
       }
-      // Add more characters as needed
+      // Přidejte další postavy podle potřeby
     ];
 
-    let currentIndex = 0;
+    let currentIndex = 2;
+    let currentWinner = characters[0];
+    let currentChallenger = characters[1];
 
-    const characterName = document.getElementById('character-name');
-    const characterImg = document.getElementById('character-img');
-    const resultDiv = document.getElementById('result');
-    const smashBtn = document.getElementById('smash-btn');
-    const passBtn = document.getElementById('pass-btn');
+    function renderCharacters() {
+      const gameArea = document.getElementById('game-area');
+      gameArea.innerHTML = '';
 
-    function showCharacter(index) {
-      if (index < characters.length) {
-        characterName.textContent = characters[index].name;
-        characterImg.src = characters[index].image;
-        resultDiv.textContent = '';
-      } else {
-        characterName.textContent = "No more characters!";
-        characterImg.src = "";
-        smashBtn.disabled = true;
-        passBtn.disabled = true;
-      }
+      [currentWinner, currentChallenger].forEach((char, index) => {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 mb-4';
+
+        const card = document.createElement('div');
+        card.className = 'card character-card';
+        card.onclick = () => handleSelection(index === 0 ? currentWinner : currentChallenger);
+
+        const img = document.createElement('img');
+        img.src = char.image;
+        img.alt = char.name;
+        img.className = 'card-img-top character-img';
+
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body';
+
+        const title = document.createElement('h5');
+        title.className = 'card-title';
+        title.textContent = char.name;
+
+        cardBody.appendChild(title);
+        card.appendChild(img);
+        card.appendChild(cardBody);
+        col.appendChild(card);
+        gameArea.appendChild(col);
+      });
     }
 
-    smashBtn.addEventListener('click', () => {
-      resultDiv.textContent = `You chose to SMASH ${characters[currentIndex].name}!`;
+    function handleSelection(selectedCharacter) {
+      if (currentIndex >= characters.length) {
+        alert(`${selectedCharacter.name} je konečný vítěz!`);
+        return;
+      }
+      currentWinner = selectedCharacter;
+      currentChallenger = characters[currentIndex];
       currentIndex++;
-      setTimeout(() => showCharacter(currentIndex), 1000);
-    });
+      renderCharacters();
+    }
 
-    passBtn.addEventListener('click', () => {
-      resultDiv.textContent = `You chose to PASS on ${characters[currentIndex].name}.`;
-      currentIndex++;
-      setTimeout(() => showCharacter(currentIndex), 1000);
-    });
+    function resetGame() {
+      currentIndex = 2;
+      currentWinner = characters[0];
+      currentChallenger = characters[1];
+      renderCharacters();
+    }
 
-    // Initialize the game
-    showCharacter(currentIndex);
+    // Inicializace hry
+    renderCharacters();
   </script>
 </body>
 </html>
