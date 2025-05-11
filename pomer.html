@@ -4,65 +4,107 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ředění přípravku</title>
-  <!-- Bootstrap CSS -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet"
-    integrity="sha384-ENjdO4Dr2bkBIFxQpeoYz1GX/+" crossorigin="anonymous"
   />
+  <style>
+    body {
+      background: #f8f9fa;
+    }
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .form-label span {
+      font-weight: bold;
+      color: #0d6efd;
+    }
+    h1 {
+      font-weight: 700;
+      color: #0d6efd;
+    }
+  </style>
 </head>
 <body>
-  <div class="container py-4">
-    <h1 class="text-center mb-4">Kalkulačka ředění</h1>
+  <div class="container py-5">
+    <h1 class="text-center mb-5">Kalkulačka ředění</h1>
     <div class="row g-4">
-      <!-- Slider pro objem -->
+      <!-- Objem nádoby -->
       <div class="col-12 col-md-6">
-        <label for="volumeSlider" class="form-label">
-          Objem nádoby: <span id="volumeValue">1000</span> ml
-        </label>
-        <input
-          type="range"
-          class="form-range"
-          min="100"
-          max="5000"
-          step="50"
-          id="volumeSlider"
-        />
+        <div class="card p-4">
+          <label for="volumeSlider" class="form-label">
+            Objem nádoby: <span id="volumeValue">1000</span> ml
+          </label>
+          <input
+            type="range"
+            class="form-range"
+            min="100"
+            max="5000"
+            step="50"
+            id="volumeSlider"
+          />
+        </div>
       </div>
-      <!-- Slider pro poměr 1:x -->
+      <!-- Poměr ředění -->
       <div class="col-12 col-md-6">
-        <label for="ratioSlider" class="form-label">
-          Pomer ředění (1 : <span id="ratioValue">5</span>)
-        </label>
-        <input
-          type="range"
-          class="form-range"
-          min="1"
-          max="100"
-          step="1"
-          id="ratioSlider"
-        />
+        <div class="card p-4">
+          <label for="ratioSlider" class="form-label">
+            Poměr ředění (1 : <span id="ratioValue">5</span>)
+          </label>
+          <input
+            type="range"
+            class="form-range"
+            min="1"
+            max="100"
+            step="1"
+            id="ratioSlider"
+          />
+        </div>
       </div>
       <!-- Výsledky -->
       <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Výsledné množství</h5>
-            <p class="card-text">
-              Koncentrát: <strong><span id="concAmount">166.67</span> ml</strong><br />
-              Voda: <strong><span id="waterAmount">833.33</span> ml</strong>
-            </p>
-          </div>
+        <div class="card p-4 text-center">
+          <h4 class="card-title mb-3">Výsledné množství</h4>
+          <p class="lead mb-1">
+            Koncentrát: <strong><span id="concAmount">166.67</span> ml</strong>
+          </p>
+          <p class="lead">
+            Voda: <strong><span id="waterAmount">833.33</span> ml</strong>
+          </p>
         </div>
       </div>
     </div>
   </div>
-  <!-- Bootstrap JS (volitelně, pokud budete používat komponenty) -->
+
+  <!-- Bootstrap Bundle JS -->
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+"
-    crossorigin="anonymous"
   ></script>
-  <script src="pomer_script.js"></script>
+  <script>
+    const volumeSlider = document.getElementById("volumeSlider");
+    const ratioSlider = document.getElementById("ratioSlider");
+    const volumeValue = document.getElementById("volumeValue");
+    const ratioValue = document.getElementById("ratioValue");
+    const concAmount = document.getElementById("concAmount");
+    const waterAmount = document.getElementById("waterAmount");
+
+    function updateValues() {
+      const volume = parseInt(volumeSlider.value);
+      const ratio = parseInt(ratioSlider.value);
+      const concentrate = volume / (ratio + 1);
+      const water = volume - concentrate;
+
+      volumeValue.textContent = volume;
+      ratioValue.textContent = ratio;
+      concAmount.textContent = concentrate.toFixed(2);
+      waterAmount.textContent = water.toFixed(2);
+    }
+
+    volumeSlider.addEventListener("input", updateValues);
+    ratioSlider.addEventListener("input", updateValues);
+
+    updateValues();
+  </script>
 </body>
 </html>
