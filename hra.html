@@ -54,35 +54,51 @@
       }
       // Přidejte další postavy podle potřeby
     ];
-
-    let currentIndex = 2;
-    let currentWinner = characters[0];
-    let currentChallenger = characters[1];
-
+  
+    let shuffledCharacters = [];
+    let currentIndex = 0;
+    let currentWinner;
+    let currentChallenger;
+  
+    function shuffleArray(array) {
+      return array
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value);
+    }
+  
+    function resetGame() {
+      shuffledCharacters = shuffleArray([...characters]);
+      currentWinner = shuffledCharacters[0];
+      currentChallenger = shuffledCharacters[1];
+      currentIndex = 2;
+      renderCharacters();
+    }
+  
     function renderCharacters() {
       const gameArea = document.getElementById('game-area');
       gameArea.innerHTML = '';
-
+  
       [currentWinner, currentChallenger].forEach((char, index) => {
         const col = document.createElement('div');
         col.className = 'col-md-6 mb-4';
-
+  
         const card = document.createElement('div');
         card.className = 'card character-card';
         card.onclick = () => handleSelection(index === 0 ? currentWinner : currentChallenger);
-
+  
         const img = document.createElement('img');
         img.src = char.image;
         img.alt = char.name;
         img.className = 'card-img-top character-img';
-
+  
         const cardBody = document.createElement('div');
         cardBody.className = 'card-body';
-
+  
         const title = document.createElement('h5');
         title.className = 'card-title';
         title.textContent = char.name;
-
+  
         cardBody.appendChild(title);
         card.appendChild(img);
         card.appendChild(cardBody);
@@ -90,27 +106,21 @@
         gameArea.appendChild(col);
       });
     }
-
+  
     function handleSelection(selectedCharacter) {
-      if (currentIndex >= characters.length) {
+      if (currentIndex >= shuffledCharacters.length) {
         alert(`${selectedCharacter.name} je konečný vítěz!`);
         return;
       }
       currentWinner = selectedCharacter;
-      currentChallenger = characters[currentIndex];
+      currentChallenger = shuffledCharacters[currentIndex];
       currentIndex++;
       renderCharacters();
     }
-
-    function resetGame() {
-      currentIndex = 2;
-      currentWinner = characters[0];
-      currentChallenger = characters[1];
-      renderCharacters();
-    }
-
+  
     // Inicializace hry
-    renderCharacters();
+    resetGame();
   </script>
+  
 </body>
 </html>
