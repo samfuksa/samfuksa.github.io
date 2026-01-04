@@ -80,45 +80,23 @@
         @media print {
             @page {
                 size: A4;
-                margin: 10mm 15mm; /* Horní/Spodní, Pravý/Levý */
+                margin: 10mm 15mm; 
             }
-            
             body { 
                 background-color: white; 
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact; 
                 font-size: 11pt;
             }
-            
             .no-print { display: none !important; }
-            
             .print-area { 
-                box-shadow: none; 
-                margin: 0; 
-                width: 100%; 
-                padding: 0; 
-                border: none;
-                min-height: auto;
+                box-shadow: none; margin: 0; width: 100%; padding: 0; border: none; min-height: auto;
             }
-            
-            /* Zabránění rozdělení prvků na dvě stránky */
-            .break-inside-avoid, 
-            .grid > div, /* Jednotlivé karty v gridu */
-            .bg-white, 
-            .bg-slate-50,
-            table,
-            figure,
-            .mb-8 { 
-                break-inside: avoid;
-                page-break-inside: avoid;
+            .break-inside-avoid, .grid > div, .bg-white, .bg-slate-50, table, figure, .mb-8 { 
+                break-inside: avoid; page-break-inside: avoid;
             }
-
             canvas { max-width: 100% !important; }
-            
-            /* Skrýt detaily při tisku pro čistší vzhled, nebo je nechat otevřené pokud uživatel chce */
             details:not([open]) { display: none; }
-            
-            /* Resetovat stíny pro tisk */
             .shadow-sm, .shadow-xl { box-shadow: none !important; }
             .border-slate-800 { border-color: #000; }
         }
@@ -202,7 +180,6 @@
             
             <!-- KARTA 1: Battery Score -->
             <div class="bg-white rounded-2xl p-6 border-2 border-emerald-500/20 shadow-sm relative overflow-hidden flex flex-col items-center justify-start text-center break-inside-avoid">
-                <!-- Obsah -->
                 <div class="score-circle-container mb-2 mt-2">
                     <div class="score-circle-bg-blur bg-emerald-400" id="scoreBlur"></div>
                     <div class="score-circle" id="scoreCircleBorder">
@@ -210,10 +187,8 @@
                         <span class="text-[10px] uppercase font-bold text-slate-400 mt-[-5px]">Bodů</span>
                     </div>
                 </div>
-                
                 <div class="text-base font-bold text-slate-800 uppercase tracking-wide">Battery Health Score</div>
                 
-                <!-- Vysvětlivka (Details) -->
                 <details class="w-full mt-4 text-left group">
                     <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-center gap-1 hover:text-emerald-600 transition-colors">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -241,7 +216,6 @@
                      <div class="text-[10px] text-slate-400 mt-2 truncate font-mono" id="sohSource">Zdroj: -</div>
                  </div>
                  
-                 <!-- Vysvětlivka -->
                  <details class="w-full mt-4 text-left group">
                     <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-emerald-600 transition-colors">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -267,7 +241,6 @@
                     </div>
                 </div>
 
-                <!-- Vysvětlivka -->
                 <details class="w-full mt-4 text-left group">
                     <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-emerald-600 transition-colors">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -292,7 +265,6 @@
                     <!-- Pie Chart -->
                     <div class="h-40 relative flex justify-center md:justify-start">
                         <canvas id="chargePieChart"></canvas>
-                        <!-- Center Label -->
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <div class="text-center">
                                 <div class="text-[10px] text-slate-400 uppercase">DC Ratio</div>
@@ -304,14 +276,11 @@
                     <!-- Data Table -->
                     <div class="col-span-2">
                         <div class="grid grid-cols-2 gap-x-12 gap-y-6">
-                            <!-- AC -->
                             <div class="relative pl-4 border-l-2 border-emerald-500">
                                 <span class="text-xs text-slate-500 uppercase font-semibold">AC (Pomalé)</span>
                                 <div class="text-2xl font-bold text-slate-800 mt-1" id="valAcCharge">--</div>
                                 <div class="text-xs text-emerald-600 mt-0.5 font-medium">Šetrné k chemii baterie</div>
                             </div>
-
-                            <!-- DC -->
                             <div class="relative pl-4 border-l-2 border-blue-500">
                                 <span class="text-xs text-slate-500 uppercase font-semibold">DC (Rychlé)</span>
                                 <div class="text-2xl font-bold text-slate-800 mt-1" id="valDcCharge">--</div>
@@ -319,7 +288,6 @@
                             </div>
                         </div>
 
-                         <!-- Vysvětlivka (Full Width) -->
                          <details class="w-full mt-6 text-left group border-t border-slate-100 pt-3">
                             <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-blue-600 transition-colors">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -332,7 +300,6 @@
                     </div>
                 </div>
 
-                <!-- No Data Overlay -->
                 <div id="noChargeData" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-center hidden z-10 backdrop-blur-[2px]">
                     <div class="bg-slate-100 p-4 rounded-full mb-3 text-slate-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -398,21 +365,13 @@
                                 <th class="px-4 py-2.5 font-medium text-right">Teplota</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-200">
-                            <tr>
-                                <td class="px-4 py-3 text-slate-600">Průměrná teplota</td>
-                                <td class="px-4 py-3 text-right font-bold text-slate-800 font-mono" id="tempAvg">-- °C</td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 text-slate-600">Maximální teplota</td>
-                                <td class="px-4 py-3 text-right font-bold text-red-600 font-mono" id="tempMax">-- °C</td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 text-slate-600">Minimální teplota</td>
-                                <td class="px-4 py-3 text-right font-bold text-blue-600 font-mono" id="tempMin">-- °C</td>
-                            </tr>
+                        <tbody class="divide-y divide-slate-200" id="tempTableBody">
+                            <!-- Dynamicky plněné -->
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-2 text-[10px] text-slate-400">
+                    * Zobrazují se klíčové teplotní senzory nalezené v diagnostice.
                 </div>
             </div>
         </div>
@@ -452,35 +411,34 @@
         </div>
         <h2 class="text-3xl font-bold text-slate-800 mb-3">Analýza Baterie</h2>
         <p class="text-slate-500 mb-8 text-lg">Nahrajte <code>.csv</code> export z aplikace Car Scanner a získejte profesionální report.</p>
-        <div class="text-xs text-slate-400">Podporuje data (vyzkoušeno) pro Hyundai/Kia.</div>
+        <div class="text-xs text-slate-400">Podporuje data pro VW ID, Enyaq, Hyundai/Kia, Tesla a další.</div>
     </div>
 
     <script>
         const EXPECTED_DELIMITER = ';';
         const REGEX_CELL = /cell\s*voltage\s*(\d+)/i;
-        const REGEX_TEMP = /(bat|bms).*temp/i;
+        const REGEX_MODULE_TEMP = /(?:battery|bms)\s*module\s*(\d+)\s*temp/i;
 
         // PID Dictionary
-        // UPDATED WITH USER PROVIDED STRINGS
         const PIDS = {
             SOH: ['soh', 'state of health', 'health', 'kondice', 'zdraví'],
             ODO: ['odometer', 'distance', 'najeto', 'vzdálenost', 'celková', 'km'],
             AUX_12V: ['12v', 'aux', 'module voltage', 'napětí modulu', 'supply', 'modulu obd'],
             
-            // ENERGY (kWh / Ah)
+            // ENERGY
             CHARGE_TOTAL: [
                 'total energy charged', 'cec', 'cumulative energy charged', 'celkem nabito', 
                 'total charge', 'nabíjení celkem', 'cumulative charge energy',
                 'celková nabitá energie', 'množství nabité energie', 'nabito celkem', 'energy charged total'
             ],
             CHARGE_DC: [
-                'accumulated quick charging energy', // User provided
+                'accumulated quick charging energy',
                 'total dc charge', 'fast charge energy', 'dc energy', 'cumulative energy charged dc', 
                 'rychlé nabíjení', 'dc charge total', 'dc charge', 'cumulative energy charged (dc)',
                 'nabitá energie (dc)', 'nabíjení dc', 'dc celkem', 'fast charge total'
             ],
             CHARGE_AC: [
-                'accumulated normal charging energy', // User provided
+                'accumulated normal charging energy',
                 'total ac charge', 'slow charge energy', 'ac energy', 'cumulative energy charged ac', 
                 'pomalé nabíjení', 'ac charge total', 'ac charge', 'cumulative energy charged (ac)',
                 'nabitá energie (ac)', 'nabíjení ac', 'ac celkem', 'slow charge total'
@@ -488,16 +446,21 @@
             
             // COUNTS
             COUNT_DC: [
-                'number of quick charging', // User provided
+                'number of quick charging',
                 'number of fast charges', 'dc charge count', 'fast charges', 'počet rychlých', 'dc charges', 'počet nabíjení dc'
             ],
             COUNT_AC: [
-                'number of standard charging', // User provided
+                'number of standard charging',
                 'number of slow charges', 'ac charge count', 'slow charges', 'počet pomalých', 'ac charges', 'počet nabíjení ac'
             ],
             
             // RATIO
-            RATIO_DC: ['dc charge ratio', 'poměr dc', 'fast charge ratio', 'dc %']
+            RATIO_DC: ['dc charge ratio', 'poměr dc', 'fast charge ratio', 'dc %'],
+
+            // TEMPS (Specific)
+            TEMP_INLET: ['battery inlet temperature', 'teplota vstupu', 'inlet temp'],
+            TEMP_MAX: ['battery max temperature', 'max cell temp', 'maximální teplota', 'max temperature'],
+            TEMP_MIN: ['battery min temperature', 'min cell temp', 'minimální teplota', 'min temperature']
         };
 
         let chartVoltage = null;
@@ -565,7 +528,6 @@
                 const cols = parseCSVLine(line);
                 if (cols.length < 3) continue;
 
-                // Time check
                 const t = parseFloat(cols[0]);
                 if(!isNaN(t)) {
                     if (startTime === null) startTime = t;
@@ -586,10 +548,8 @@
 
             if (dataMap.size === 0) { alert("Žádná data."); return; }
 
-            // Duration
             const duration = (endTime && startTime) ? (endTime - startTime) : 0;
 
-            // Debug
             const debugContainer = document.getElementById('debugPidList');
             debugContainer.innerHTML = Array.from(lastValues.keys()).sort().map(k => `<div>${k}: ${lastValues.get(k)}</div>`).join('');
 
@@ -599,23 +559,13 @@
         function analyze(dataMap, lastValues, duration) {
             // 1. Cells
             let cellVoltages = [];
-            let temperatures = [];
-
             dataMap.forEach((values, key) => {
                 const cellMatch = key.match(REGEX_CELL);
                 if (cellMatch) {
                     const avg = values.reduce((a,b)=>a+b,0) / values.length;
                     cellVoltages.push({ id: parseInt(cellMatch[1]), avg: avg, name: key });
                 }
-                
-                if (REGEX_TEMP.test(key) && !key.toLowerCase().includes('ref')) {
-                    const avg = values.reduce((a,b)=>a+b,0) / values.length;
-                    let cleanName = key.replace(/\[.*?\]/g, '').replace(/(Battery|Module|Temp|Temperature)/gi, '').trim();
-                    if(cleanName === '') cleanName = key;
-                    temperatures.push({ name: cleanName, val: avg });
-                }
             });
-            
             cellVoltages.sort((a,b) => a.id - b.id);
             if (cellVoltages.length === 0) { alert("Chybí data napětí článků."); return; }
 
@@ -637,7 +587,7 @@
             if (deltaMv > 30) calcScore -= (deltaMv - 30) * 1.5;
             calcScore = Math.max(0, Math.min(100, Math.round(calcScore)));
 
-            // 4. Charging Logic (FIXED & IMPROVED)
+            // 4. Charging Logic
             let chargeData = null;
             let chargeSource = "-";
             
@@ -645,54 +595,30 @@
             const dDc = findPidValue(lastValues, PIDS.CHARGE_DC);
             const dAc = findPidValue(lastValues, PIDS.CHARGE_AC);
             
-            // Check if we have ANY energy data
             if ( (dTotal && dTotal.val > 0) || (dDc && dDc.val > 0) || (dAc && dAc.val > 0) ) {
                 chargeSource = "Energie (kWh)";
-                
                 let total = dTotal ? dTotal.val : 0;
                 let dc = dDc ? dDc.val : 0;
                 let ac = dAc ? dAc.val : 0;
 
-                // If Total is missing but we have components, sum them
-                if (total === 0 && (dc > 0 || ac > 0)) {
-                    total = dc + ac;
-                }
-                
-                // If we have Total and one component, calc the other
+                if (total === 0 && (dc > 0 || ac > 0)) total = dc + ac;
                 if (total > 0) {
                     if (dc > 0 && ac === 0) ac = total - dc;
                     if (ac > 0 && dc === 0) dc = total - ac;
                 }
-                
-                // Sanity check
-                if (ac < 0) ac = 0;
-                if (dc < 0) dc = 0;
-                
-                // If sum of components > total (update total)
+                if (ac < 0) ac = 0; if (dc < 0) dc = 0;
                 if (total < (dc + ac)) total = dc + ac;
 
-                chargeData = {
-                    total: total, dc: dc, ac: ac,
-                    dcRatio: (total > 0) ? (dc/total)*100 : 0,
-                    unit: "kWh"
-                };
-            } 
-            // Fallback to Counts
-            else {
+                chargeData = { total, dc, ac, dcRatio: (total > 0) ? (dc/total)*100 : 0, unit: "kWh" };
+            } else {
                 const cDc = findPidValue(lastValues, PIDS.COUNT_DC);
                 const cAc = findPidValue(lastValues, PIDS.COUNT_AC);
-                
                 if ((cDc && cDc.val > 0) || (cAc && cAc.val > 0)) {
                     chargeSource = "Počet Cyklů";
                     let dc = cDc ? cDc.val : 0;
                     let ac = cAc ? cAc.val : 0;
                     let total = dc + ac;
-                    
-                    chargeData = {
-                        total: total, dc: dc, ac: ac,
-                        dcRatio: (total > 0) ? (dc/total)*100 : 0,
-                        unit: "x"
-                    };
+                    chargeData = { total, dc, ac, dcRatio: (total > 0) ? (dc/total)*100 : 0, unit: "x" };
                 }
             }
 
@@ -700,50 +626,75 @@
             const odoData = findPidValue(lastValues, PIDS.ODO);
             const auxData = findPidValue(lastValues, PIDS.AUX_12V);
 
-            // 6. Temps
-            let tempStats = null;
-            if (temperatures.length > 0) {
-                temperatures.sort((a,b) => a.val - b.val);
-                tempStats = {
-                    min: temperatures[0],
-                    max: temperatures[temperatures.length-1],
-                    avg: temperatures.reduce((a,b)=>a+b.val,0) / temperatures.length
-                };
+            // 6. Temps - VYLEPŠENÁ LOGIKA
+            // Najít explicitní senzory
+            const tInlet = findPidValue(lastValues, PIDS.TEMP_INLET);
+            const tMax = findPidValue(lastValues, PIDS.TEMP_MAX);
+            const tMin = findPidValue(lastValues, PIDS.TEMP_MIN);
+            
+            // Najít moduly dynamicky
+            const moduleTemps = [];
+            lastValues.forEach((val, key) => {
+                const match = key.match(REGEX_MODULE_TEMP);
+                if (match) {
+                    moduleTemps.push({ id: parseInt(match[1]), val: val, name: key });
+                }
+            });
+            moduleTemps.sort((a,b) => a.id - b.id);
+
+            // Fallback kalkulace pro min/max/avg, pokud nejsou přímé senzory
+            let calcTMax = tMax ? tMax.val : null;
+            let calcTMin = tMin ? tMin.val : null;
+            let calcTAvg = null;
+
+            if (moduleTemps.length > 0) {
+                const vals = moduleTemps.map(m => m.val);
+                if (calcTMax === null) calcTMax = Math.max(...vals);
+                if (calcTMin === null) calcTMin = Math.min(...vals);
+                calcTAvg = vals.reduce((a,b)=>a+b,0) / vals.length;
+            }
+
+            // Příprava dat pro tabulku
+            const tempsOutput = [];
+            
+            if (tInlet) tempsOutput.push({ label: "Vstupní teplota (Inlet)", val: tInlet.val });
+            
+            if (calcTMax !== null) tempsOutput.push({ label: "Maximální teplota", val: calcTMax, highlight: 'red' });
+            if (calcTMin !== null) tempsOutput.push({ label: "Minimální teplota", val: calcTMin, highlight: 'blue' });
+            
+            if (calcTAvg !== null) tempsOutput.push({ label: "Průměrná teplota modulů", val: calcTAvg });
+            else if (moduleTemps.length === 0) {
+                // Pokud nemáme ani moduly, zkusíme najít obecný "Battery Temperature"
+                const genericTemp = findPidValue(lastValues, ['battery temperature', 'teplota baterie']);
+                if (genericTemp) tempsOutput.push({ label: "Teplota Baterie", val: genericTemp.val });
             }
 
             renderUI({
-                bmsSoh, sohSource,
-                calcScore, deltaMv,
+                bmsSoh, sohSource, calcScore, deltaMv,
                 charge: chargeData, chargeSource,
                 odo: odoData ? odoData.val : null,
                 aux: auxData ? auxData.val : null,
                 cells: cellVoltages,
                 stats: { min: globalMin, max: globalMax, avg: globalAvg },
-                temps: tempStats,
+                temps: tempsOutput,
                 duration: duration
             });
         }
 
         function renderUI(data) {
-            // Header
             document.getElementById('testDuration').textContent = formatDuration(data.duration);
-
-            // BMS SOH
             document.getElementById('sohValue').textContent = (data.bmsSoh > 0) ? data.bmsSoh + "%" : "N/A";
             document.getElementById('sohSource').textContent = data.sohSource;
             document.getElementById('sohBar').style.width = data.bmsSoh + "%";
             
-            // Custom Score
             const elScore = document.getElementById('calcScoreValue');
             const elCircle = document.getElementById('scoreCircleBorder');
             const elBlur = document.getElementById('scoreBlur');
-            
             elScore.textContent = data.calcScore;
             
             let colorClass = "text-emerald-600";
             let borderColor = "#10b981";
             let blurColorClass = "bg-emerald-400";
-            
             if(data.calcScore < 90) { colorClass = "text-yellow-500"; borderColor = "#eab308"; blurColorClass = "bg-yellow-400"; }
             if(data.calcScore < 75) { colorClass = "text-red-600"; borderColor = "#dc2626"; blurColorClass = "bg-red-400"; }
             
@@ -751,60 +702,51 @@
             elCircle.style.borderColor = borderColor;
             elBlur.className = `score-circle-bg-blur ${blurColorClass}`;
 
-            // Delta
-            const elVerd = document.getElementById('deltaVerdict');
             const elVerdText = document.getElementById('deltaVerdictText');
             document.getElementById('maxDelta').textContent = data.deltaMv.toFixed(1);
-            
-            if(data.deltaMv < 15) { 
-                elVerdText.textContent = "Vynikající"; 
-                elVerd.className = "inline-flex items-center gap-1.5 mt-3 text-xs font-bold px-3 py-1.5 rounded bg-emerald-100 text-emerald-800"; 
-            } else if(data.deltaMv < 30) { 
-                elVerdText.textContent = "Dobrý"; 
-                elVerd.className = "inline-flex items-center gap-1.5 mt-3 text-xs font-bold px-3 py-1.5 rounded bg-blue-100 text-blue-800"; 
-            } else { 
-                elVerdText.textContent = "Pozor: Imbalance"; 
-                elVerd.className = "inline-flex items-center gap-1.5 mt-3 text-xs font-bold px-3 py-1.5 rounded bg-red-100 text-red-800"; 
-            }
+            if(data.deltaMv < 15) elVerdText.textContent = "Vynikající"; 
+            else if(data.deltaMv < 30) elVerdText.textContent = "Dobrý"; 
+            else elVerdText.textContent = "Pozor: Imbalance"; 
 
-            // Charging
             if (data.charge) {
                 document.getElementById('noChargeData').classList.add('hidden');
                 document.getElementById('chargeSourceTag').textContent = "Zdroj: " + data.chargeSource;
-                
                 document.getElementById('valAcCharge').textContent = Math.round(data.charge.ac).toLocaleString() + " " + data.charge.unit;
                 document.getElementById('valDcCharge').textContent = Math.round(data.charge.dc).toLocaleString() + " " + data.charge.unit;
-                
                 const ratio = data.charge.dcRatio.toFixed(1);
                 document.getElementById('valDcRatioCenter').textContent = ratio + "%";
-
                 renderPieChart(data.charge);
             } else {
                 document.getElementById('noChargeData').classList.remove('hidden');
             }
 
-            // Specs
             document.getElementById('valOdo').textContent = data.odo ? Math.round(data.odo).toLocaleString() + " km" : "-";
             document.getElementById('val12v').textContent = data.aux ? data.aux.toFixed(1) + " V" : "-";
             document.getElementById('valAvgPack').textContent = data.stats.avg.toFixed(3) + " V";
             document.getElementById('valCellCount').textContent = data.cells.length;
-
             document.getElementById('chartMin').textContent = data.stats.min.toFixed(3) + " V";
             document.getElementById('chartMax').textContent = data.stats.max.toFixed(3) + " V";
 
-            // Temps
-            if(data.temps) {
-                document.getElementById('tempAvg').textContent = data.temps.avg.toFixed(1) + " °C";
-                document.getElementById('tempMin').textContent = data.temps.min.val.toFixed(1) + " °C";
-                document.getElementById('tempMax').textContent = data.temps.max.val.toFixed(1) + " °C";
+            // Render Temps Table
+            const tbody = document.getElementById('tempTableBody');
+            tbody.innerHTML = '';
+            if (data.temps && data.temps.length > 0) {
+                data.temps.forEach(t => {
+                    let valClass = "text-slate-800";
+                    if (t.highlight === 'red') valClass = "text-red-600";
+                    if (t.highlight === 'blue') valClass = "text-blue-600";
+                    
+                    const row = `<tr>
+                        <td class="px-4 py-3 text-slate-600">${t.label}</td>
+                        <td class="px-4 py-3 text-right font-bold ${valClass} font-mono">${t.val.toFixed(1)} °C</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
             } else {
-                 document.getElementById('tempAvg').textContent = "-";
-                 document.getElementById('tempMin').textContent = "-";
-                 document.getElementById('tempMax').textContent = "-";
+                tbody.innerHTML = `<tr><td colspan="2" class="px-4 py-3 text-center text-slate-400">Teplotní data nenalezena</td></tr>`;
             }
 
             renderVoltageBarChart(data.cells, data.stats.avg);
-
             document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('reportContainer').classList.remove('hidden');
         }
@@ -812,7 +754,6 @@
         function renderPieChart(data) {
             const ctx = document.getElementById('chargePieChart').getContext('2d');
             if (chartPie) chartPie.destroy();
-
             chartPie = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -820,33 +761,24 @@
                     datasets: [{
                         data: [data.ac, data.dc],
                         backgroundColor: ['#10b981', '#3b82f6'],
-                        borderWidth: 0,
-                        hoverOffset: 4
+                        borderWidth: 0, hoverOffset: 4
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: { legend: { display: false }, tooltip: { enabled: true } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: true } } }
             });
         }
 
         function renderVoltageBarChart(cells, globalAvg) {
             const ctx = document.getElementById('voltageBarChart').getContext('2d');
             if (chartVoltage) chartVoltage.destroy();
-
             const labels = cells.map(c => c.id);
             const dataVals = cells.map(c => c.avg);
-            
             const colors = cells.map(c => {
                 const diff = Math.abs(c.avg - globalAvg);
                 if (diff > 0.030) return '#ef4444'; 
                 if (diff > 0.015) return '#f59e0b';
                 return '#10b981';
             });
-
             const minVal = Math.min(...dataVals) - 0.01; 
             const maxVal = Math.max(...dataVals) + 0.01;
 
@@ -858,43 +790,28 @@
                         label: 'Napětí (V)',
                         data: dataVals,
                         backgroundColor: colors,
-                        barPercentage: 0.9,
-                        categoryPercentage: 1.0,
-                        borderRadius: 2
+                        barPercentage: 0.9, categoryPercentage: 1.0, borderRadius: 2
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                            padding: 12,
-                            titleFont: { size: 13 },
-                            bodyFont: { size: 13 },
-                            displayColors: false,
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)', padding: 12, titleFont: { size: 13 }, bodyFont: { size: 13 }, displayColors: false,
                             callbacks: {
                                 label: function(context) {
                                     const val = context.raw;
                                     const diff = (val - globalAvg) * 1000;
                                     const sign = diff > 0 ? "+" : "";
-                                    return [
-                                        `Napětí: ${val.toFixed(3)} V`,
-                                        `Delta: ${sign}${diff.toFixed(1)} mV`
-                                    ];
+                                    return [`Napětí: ${val.toFixed(3)} V`, `Delta: ${sign}${diff.toFixed(1)} mV`];
                                 }
                             }
                         },
                         annotation: {
                             annotations: {
                                 line1: {
-                                    type: 'line',
-                                    yMin: globalAvg,
-                                    yMax: globalAvg,
-                                    borderColor: 'rgba(0,0,0,0.5)',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5],
+                                    type: 'line', yMin: globalAvg, yMax: globalAvg, borderColor: 'rgba(0,0,0,0.5)', borderWidth: 1, borderDash: [5, 5],
                                     label: { content: 'Průměr', enabled: true, position: 'start', backgroundColor: 'rgba(0,0,0,0.7)', color: 'white', font: {size: 10} }
                                 }
                             }
@@ -907,7 +824,6 @@
                 }
             });
         }
-
     </script>
 </body>
 </html>
