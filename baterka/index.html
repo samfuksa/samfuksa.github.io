@@ -335,6 +335,10 @@
                 <table class="w-full text-sm">
                     <tbody class="divide-y divide-slate-100">
                         <tr>
+                            <td class="py-2.5 text-slate-500">Stav nabití (SOC)</td>
+                            <td class="py-2.5 text-right font-bold text-slate-800 font-mono" id="valSoc">-- %</td>
+                        </tr>
+                        <tr>
                             <td class="py-2.5 text-slate-500">Stav Tachometru</td>
                             <td class="py-2.5 text-right font-bold text-slate-800 font-mono" id="valOdo">-- km</td>
                         </tr>
@@ -422,6 +426,7 @@
         // PID Dictionary
         const PIDS = {
             SOH: ['soh', 'state of health', 'health', 'kondice', 'zdraví'],
+            SOC: ['state of charge', 'soc', 'nabití', 'charge level', 'display state of charge', 'state of charge display'],
             ODO: ['odometer', 'distance', 'najeto', 'vzdálenost', 'celková', 'km'],
             AUX_12V: ['12v', 'aux', 'module voltage', 'napětí modulu', 'supply', 'modulu obd'],
             
@@ -621,10 +626,10 @@
                     chargeData = { total, dc, ac, dcRatio: (total > 0) ? (dc/total)*100 : 0, unit: "x" };
                 }
             }
-
-            // 5. ODO & 12V
+            // 5. ODO & 12V & SOC
             const odoData = findPidValue(lastValues, PIDS.ODO);
             const auxData = findPidValue(lastValues, PIDS.AUX_12V);
+            const socData = findPidValue(lastValues, PIDS.SOC);
 
             // 6. Temps - VYLEPŠENÁ LOGIKA
             // Najít explicitní senzory
@@ -674,6 +679,7 @@
                 charge: chargeData, chargeSource,
                 odo: odoData ? odoData.val : null,
                 aux: auxData ? auxData.val : null,
+                soc: socData ? socData.val : null,
                 cells: cellVoltages,
                 stats: { min: globalMin, max: globalMax, avg: globalAvg },
                 temps: tempsOutput,
@@ -720,6 +726,7 @@
                 document.getElementById('noChargeData').classList.remove('hidden');
             }
 
+            document.getElementById('valSoc').textContent = data.soc ? Math.round(data.soc) + " %" : "-";
             document.getElementById('valOdo').textContent = data.odo ? Math.round(data.odo).toLocaleString() + " km" : "-";
             document.getElementById('val12v').textContent = data.aux ? data.aux.toFixed(1) + " V" : "-";
             document.getElementById('valAvgPack').textContent = data.stats.avg.toFixed(3) + " V";
