@@ -8,72 +8,119 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
         
-        /* Tisková oblast - A4 layout */
+        /* Tisková oblast */
         .print-area { 
             background: white; 
             width: 210mm; 
             min-height: 297mm; 
             margin: 20px auto; 
             padding: 15mm; 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
             position: relative;
         }
 
+        /* Interaktivní detaily (Accordion) */
+        details > summary { 
+            list-style: none; 
+            cursor: pointer; 
+            outline: none; 
+            transition: color 0.2s;
+        }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        details[open] summary ~ * { 
+            animation: slideDown 0.3s ease-out forwards; 
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); max-height: 0; }
+            to { opacity: 1; transform: translateY(0); max-height: 200px; }
+        }
+
         /* Formuláře */
-        .input-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem; font-weight: 600; }
+        .input-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem; font-weight: 600; uppercase; letter-spacing: 0.05em; }
         .input-group input { 
             width: 100%; 
             background: #0f172a; 
             border: 1px solid #334155; 
-            padding: 0.5rem 0.75rem; 
+            padding: 0.6rem 0.8rem; 
             color: white; 
-            border-radius: 0.375rem; 
+            border-radius: 0.5rem; 
             font-size: 0.875rem; 
             transition: all 0.2s;
         }
-        .input-group input:focus { outline: none; border-color: #10b981; ring: 2px solid #10b981; }
+        .input-group input:focus { outline: none; border-color: #10b981; ring: 2px solid rgba(16, 185, 129, 0.2); }
 
         /* Custom Gauge Circle */
-        .score-circle-container {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            margin: 0 auto;
-        }
+        .score-circle-container { position: relative; width: 140px; height: 140px; margin: 0 auto; }
         .score-circle {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             border: 8px solid #e2e8f0;
             z-index: 10;
             background: white;
             position: relative;
         }
         .score-circle-bg-blur {
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             width: 100%; height: 100%;
             border-radius: 50%;
-            filter: blur(15px);
-            opacity: 0.2;
+            filter: blur(20px);
+            opacity: 0.25;
             z-index: 0;
         }
 
         @media print {
-            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            @page {
+                size: A4;
+                margin: 10mm 15mm; /* Horní/Spodní, Pravý/Levý */
+            }
+            
+            body { 
+                background-color: white; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+                font-size: 11pt;
+            }
+            
             .no-print { display: none !important; }
-            .print-area { box-shadow: none; margin: 0; width: 100%; padding: 10mm 15mm; border: none; }
-            .break-inside-avoid { page-break-inside: avoid; }
+            
+            .print-area { 
+                box-shadow: none; 
+                margin: 0; 
+                width: 100%; 
+                padding: 0; 
+                border: none;
+                min-height: auto;
+            }
+            
+            /* Zabránění rozdělení prvků na dvě stránky */
+            .break-inside-avoid, 
+            .grid > div, /* Jednotlivé karty v gridu */
+            .bg-white, 
+            .bg-slate-50,
+            table,
+            figure,
+            .mb-8 { 
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
             canvas { max-width: 100% !important; }
+            
+            /* Skrýt detaily při tisku pro čistší vzhled, nebo je nechat otevřené pokud uživatel chce */
+            details:not([open]) { display: none; }
+            
+            /* Resetovat stíny pro tisk */
+            .shadow-sm, .shadow-xl { box-shadow: none !important; }
+            .border-slate-800 { border-color: #000; }
         }
     </style>
 </head>
@@ -88,7 +135,7 @@
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         EV Battery Report
                     </h1>
-                    <p class="text-slate-400 text-sm mt-1">Generátor profesionálního protokolu pro ojeté elektromobily</p>
+                    <p class="text-slate-400 text-sm mt-1">Nástroj pro analýzu ojetých elektromobilů</p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -126,38 +173,37 @@
     <div id="reportContainer" class="print-area hidden">
         
         <!-- 1. HEADER -->
-        <div class="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-8">
+        <div class="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-8 break-inside-avoid">
             <div class="w-2/3">
-                <h1 class="text-4xl font-extrabold text-slate-900 uppercase tracking-tight">Certifikát Baterie</h1>
+                <h1 class="text-4xl font-black text-slate-900 uppercase tracking-tighter">Certifikát Baterie</h1>
                 <div class="mt-3 space-y-1">
                     <div class="text-2xl font-bold text-emerald-700" id="displayModel">Neznámý Model</div>
-                    <div class="flex gap-6 text-sm text-slate-500 mt-2">
-                        <span class="bg-slate-100 px-2 py-1 rounded">VIN: <strong id="displayVin" class="text-slate-900 font-mono">-</strong></span>
-                        <span class="bg-slate-100 px-2 py-1 rounded">SPZ: <strong id="displaySpz" class="text-slate-900 font-mono">-</strong></span>
+                    <div class="flex gap-4 text-sm text-slate-500 mt-2">
+                        <span class="bg-slate-100 px-3 py-1 rounded font-mono border border-slate-200">VIN: <strong id="displayVin" class="text-slate-900">-</strong></span>
+                        <span class="bg-slate-100 px-3 py-1 rounded font-mono border border-slate-200">SPZ: <strong id="displaySpz" class="text-slate-900">-</strong></span>
                     </div>
                 </div>
             </div>
             <div class="text-right w-1/3 flex flex-col items-end">
-                <div class="inline-block bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded mb-2 uppercase tracking-wider">Flash Test</div>
+                <div class="inline-block bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded mb-2 uppercase tracking-widest">Flash Test</div>
                 <div class="text-right">
-                    <div class="text-xs text-slate-500 uppercase font-semibold">Datum měření</div>
-                    <div class="font-bold text-slate-900 text-lg" id="reportDate">-</div>
+                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Datum měření</div>
+                    <div class="font-bold text-slate-900 text-lg leading-none" id="reportDate">-</div>
                 </div>
-                <div class="text-right mt-2">
-                    <div class="text-xs text-slate-500 uppercase font-semibold">Doba testu</div>
-                    <div class="font-bold text-slate-900 text-lg" id="testDuration">--:--</div>
+                <div class="text-right mt-3">
+                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Doba testu</div>
+                    <div class="font-bold text-slate-900 text-lg leading-none" id="testDuration">--:--</div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. METRIKY ZDRAVÍ -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- 2. HLAVNÍ METRIKY (Karty) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 break-inside-avoid">
             
-            <!-- Vlastní Metrika: Battery Score -->
-            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-500/30 shadow-sm relative overflow-hidden flex flex-col items-center justify-center text-center">
-                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
-                
-                <div class="score-circle-container mb-3">
+            <!-- KARTA 1: Battery Score -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-500/20 shadow-sm relative overflow-hidden flex flex-col items-center justify-start text-center break-inside-avoid">
+                <!-- Obsah -->
+                <div class="score-circle-container mb-2 mt-2">
                     <div class="score-circle-bg-blur bg-emerald-400" id="scoreBlur"></div>
                     <div class="score-circle" id="scoreCircleBorder">
                         <span class="text-5xl font-black text-slate-800 tracking-tighter" id="calcScoreValue">--</span>
@@ -166,55 +212,76 @@
                 </div>
                 
                 <div class="text-base font-bold text-slate-800 uppercase tracking-wide">Battery Health Score</div>
-                <div class="text-xs text-slate-400 mt-1 px-4 leading-tight">
-                    Komplexní index vypočtený z imbalance článků a napěťové stability.
-                </div>
+                
+                <!-- Vysvětlivka (Details) -->
+                <details class="w-full mt-4 text-left group">
+                    <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-center gap-1 hover:text-emerald-600 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Co to znamená?
+                    </summary>
+                    <div class="mt-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
+                        Toto je nezávislý index kondice baterie (0-100) vypočítaný naším algoritmem. Bere v úvahu především <strong>rozdíl napětí mezi články (imbalance)</strong> a jejich stabilitu. Skóre nad 90 značí excelentní stav.
+                    </div>
+                </details>
             </div>
 
-            <!-- BMS SOH -->
-            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between relative">
+            <!-- KARTA 2: BMS SOH -->
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between relative break-inside-avoid">
                  <div>
                      <div class="flex justify-between items-center mb-1">
                         <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">BMS State of Health</div>
-                        <div class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded" id="sohSourceBadge">ECU</div>
+                        <div class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-mono" id="sohSourceBadge">ECU</div>
                      </div>
                      <div class="flex items-baseline gap-1 mb-3">
                         <span class="text-5xl font-bold text-slate-700" id="sohValue">--%</span>
                      </div>
-                 </div>
-                 
-                 <div>
                      <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
                         <div id="sohBar" class="bg-slate-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
                      </div>
-                     <div class="text-xs text-slate-400 mt-2 truncate" id="sohSource">Zdroj: -</div>
+                     <div class="text-[10px] text-slate-400 mt-2 truncate font-mono" id="sohSource">Zdroj: -</div>
                  </div>
+                 
+                 <!-- Vysvětlivka -->
+                 <details class="w-full mt-4 text-left group">
+                    <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-emerald-600 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Metrika výrobce
+                    </summary>
+                    <div class="mt-2 text-xs text-slate-500 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed">
+                        SOH (State of Health) je odhad zbývající kapacity baterie vůči nové, reportovaný řídící jednotkou (BMS). Pozor: Někteří výrobci používají "buffer", takže hodnota může zůstat dlouho na 100 %.
+                    </div>
+                </details>
             </div>
 
-            <!-- Imbalance Stat -->
-            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between">
+            <!-- KARTA 3: Imbalance (Delta) -->
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between break-inside-avoid">
                 <div>
                     <div class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Max Delta (Imbalance)</div>
                     <div class="flex items-baseline gap-2">
                         <span class="text-4xl font-bold text-slate-900" id="maxDelta">--</span>
                         <span class="text-xl text-slate-500 font-medium">mV</span>
                     </div>
-                </div>
-
-                <div>
                     <div id="deltaVerdict" class="inline-flex items-center gap-1.5 mt-3 text-xs font-bold px-3 py-1.5 rounded bg-slate-200 text-slate-600">
                         <span class="w-2 h-2 rounded-full bg-current"></span>
                         <span id="deltaVerdictText">-</span>
                     </div>
-                    <div class="text-xs text-slate-400 mt-2">
-                        Klíčový ukazatel zdraví. Čím menší hodnota, tím lépe vybalancovaná baterie.
-                    </div>
                 </div>
+
+                <!-- Vysvětlivka -->
+                <details class="w-full mt-4 text-left group">
+                    <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-emerald-600 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Proč je to důležité?
+                    </summary>
+                    <div class="mt-2 text-xs text-slate-500 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed">
+                        Rozdíl napětí mezi nejsilnějším a nejslabším článkem. Ideální je <strong>do 10 mV</strong>. Vysoká hodnota (>30 mV) značí, že jeden článek degraduje rychleji a omezuje dojezd celého auta.
+                    </div>
+                </details>
             </div>
         </div>
 
         <!-- 3. CHARGING HISTORY -->
-        <div class="mb-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="mb-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden break-inside-avoid">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Historie Nabíjení (AC vs DC)</h3>
                 <span class="text-[10px] text-slate-400 font-mono bg-white px-2 py-1 rounded border border-slate-200" id="chargeSourceTag">Zdroj: -</span>
@@ -235,22 +302,33 @@
                     </div>
 
                     <!-- Data Table -->
-                    <div class="col-span-2 grid grid-cols-2 gap-x-12 gap-y-6">
-                        <!-- AC -->
-                        <div class="relative pl-4">
-                            <div class="absolute left-0 top-1 bottom-1 w-1 bg-emerald-500 rounded-full"></div>
-                            <span class="text-xs text-slate-500 uppercase font-semibold">AC (Pomalé)</span>
-                            <div class="text-2xl font-bold text-slate-800 mt-1" id="valAcCharge">--</div>
-                            <div class="text-xs text-emerald-600 mt-0.5">Domácí / Veřejné AC</div>
+                    <div class="col-span-2">
+                        <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+                            <!-- AC -->
+                            <div class="relative pl-4 border-l-2 border-emerald-500">
+                                <span class="text-xs text-slate-500 uppercase font-semibold">AC (Pomalé)</span>
+                                <div class="text-2xl font-bold text-slate-800 mt-1" id="valAcCharge">--</div>
+                                <div class="text-xs text-emerald-600 mt-0.5 font-medium">Šetrné k chemii baterie</div>
+                            </div>
+
+                            <!-- DC -->
+                            <div class="relative pl-4 border-l-2 border-blue-500">
+                                <span class="text-xs text-slate-500 uppercase font-semibold">DC (Rychlé)</span>
+                                <div class="text-2xl font-bold text-slate-800 mt-1" id="valDcCharge">--</div>
+                                <div class="text-xs text-blue-600 mt-0.5 font-medium">Zvyšuje tepelné namáhání</div>
+                            </div>
                         </div>
 
-                        <!-- DC -->
-                        <div class="relative pl-4">
-                            <div class="absolute left-0 top-1 bottom-1 w-1 bg-blue-500 rounded-full"></div>
-                            <span class="text-xs text-slate-500 uppercase font-semibold">DC (Rychlé)</span>
-                            <div class="text-2xl font-bold text-slate-800 mt-1" id="valDcCharge">--</div>
-                            <div class="text-xs text-blue-600 mt-0.5">High Power Charging</div>
-                        </div>
+                         <!-- Vysvětlivka (Full Width) -->
+                         <details class="w-full mt-6 text-left group border-t border-slate-100 pt-3">
+                            <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-blue-600 transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Vliv rychlonabíjení
+                            </summary>
+                            <div class="mt-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
+                                Časté rychlonabíjení (DC) výrazně zahřívá články a urychluje degradaci elektrolytu. U ojetého vozu preferujte nižší podíl DC nabíjení (ideálně pod 30 %). Vysoký podíl DC může znamenat, že vůz sloužil jako taxi nebo na dálkové trasy.
+                            </div>
+                        </details>
                     </div>
                 </div>
 
@@ -269,7 +347,7 @@
         <div class="mb-8 break-inside-avoid">
             <div class="flex justify-between items-end mb-4 px-1">
                 <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Detail Napětí článků</h3>
-                <div class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-600">
+                <div class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-600 border border-slate-200">
                     Min: <span id="chartMin" class="font-bold text-red-600">--</span> 
                     <span class="text-slate-300 mx-2">|</span> 
                     Max: <span id="chartMax" class="font-bold text-emerald-600">--</span>
@@ -340,10 +418,10 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="mt-12 border-t-2 border-slate-100 pt-6 flex justify-between items-end">
+        <div class="mt-12 border-t-2 border-slate-100 pt-6 flex justify-between items-end break-inside-avoid">
             <div class="text-[10px] text-slate-400 leading-relaxed max-w-lg">
                 <p class="mb-1"><strong>Disclaimer:</strong> Tento report je generován automaticky z poskytnutých dat. Hodnoty SOH a kondice baterie jsou orientační. Pro uplatnění záruky vždy kontaktujte autorizovaný servis.</p>
-                <p>Data Source: Car Scanner ELM OBD2 (.csv) | Algorithm Version: 2.1 (EV Check)</p>
+                <p>Data Source: Car Scanner ELM OBD2 (.csv) | Algorithm Version: 2.2 (EV Check)</p>
             </div>
             <div class="text-right">
                  <div class="text-slate-300 font-black text-2xl tracking-widest uppercase">EV Check</div>
