@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi QR Generátor</title>
+    <!-- Tailwind CSS pro stylování -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome pro ikony -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QRCode.js knihovna pro generování QR kódu -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* Vlastní font a jemné ladění */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Styl pro tisk - skryje vše kromě výsledného QR kódu */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid #000;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .qr-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+
+    <div class="max-w-4xl w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl flex flex-col md:flex-row gap-8">
+        
+        <!-- Levá část: Formulář -->
+        <div class="flex-1 space-y-6">
+            <div class="border-b pb-4">
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <i class="fa-solid fa-wifi text-blue-600"></i>
+                    WiFi QR
+                </h1>
+                <p class="mt-2 text-sm text-gray-600">
+                    Vygenerujte si QR kód pro snadné připojení hostů k vaší WiFi. 
+                    <span class="block mt-1 text-xs text-green-600 font-semibold"><i class="fa-solid fa-shield-halved"></i> Bezpečné: Data se generují ve vašem prohlížeči.</span>
+                </p>
+            </div>
+
+            <form id="wifiForm" class="space-y-4" onsubmit="event.preventDefault(); generateQR();">
+                <!-- SSID -->
+                <div>
+                    <label for="ssid" class="block text-sm font-medium text-gray-700">Název sítě (SSID)</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-signal text-gray-400"></i>
+                        </div>
+                        <input type="text" name="ssid" id="ssid" required class="pl-10 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2.5 border" placeholder="Např. Moje_WiFi">
+                    </div>
+                </div>
+
+                <!-- Heslo -->
+                <div id="password-container">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Heslo</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-key text-gray-400"></i>
+                        </div>
+                        <input type="password" name="password" id="password" class="pl-10 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2.5 border" placeholder="Vaše tajné heslo">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <button type="button" onclick="togglePassword()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <i class="fa-solid fa-eye" id="eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zabezpečení a Skrytá síť -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="encryption" class="block text-sm font-medium text-gray-700">Zabezpečení</label>
+                        <select id="encryption" name="encryption" onchange="handleEncryptionChange()" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border">
+                            <option value="WPA">WPA/WPA2/WPA3</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">Žádné (Otevřená)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center pt-6">
+                        <input id="hidden" name="hidden" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="hidden" class="ml-2 block text-sm text-gray-900">
+                            Skrytá síť
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Tlačítko Generovat -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        <i class="fa-solid fa-qrcode mr-2 mt-0.5"></i> Vytvořit QR kód
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Pravá část: Výsledek -->
+        <div class="flex-1 bg-gray-50 rounded-xl p-6 flex flex-col items-center justify-center border border-gray-200" id="result-container">
+            
+            <!-- Placeholder -->
+            <div id="placeholder" class="text-center text-gray-400">
+                <i class="fa-solid fa-arrow-left text-4xl mb-4 md:hidden"></i>
+                <i class="fa-solid fa-arrow-left text-4xl mb-4 hidden md:inline-block transform rotate-180 md:rotate-0" style="display: none;"></i> <!-- Logic handled by layout -->
+                <i class="fa-solid fa-qrcode text-6xl mb-4 opacity-20"></i>
+                <p>Vyplňte údaje a klikněte na "Vytvořit"</p>
+            </div>
+
+            <!-- QR Výsledek (Skrytý defaultně) -->
+            <div id="qr-result" class="hidden flex-col items-center w-full">
+                
+                <!-- Tisková oblast -->
+                <div id="print-area" class="bg-white p-6 rounded-lg qr-shadow mb-6 text-center w-full max-w-[300px]">
+                    <div class="text-lg font-bold text-gray-800 mb-2 border-b pb-2">Wi-Fi Připojení</div>
+                    <div class="text-sm text-gray-600 mb-4 font-mono break-all" id="print-ssid">SSID: -</div>
+                    
+                    <div id="qrcode" class="flex justify-center mb-4"></div>
+                    
+                    <div class="text-xs text-gray-400 mt-2">Naskenujte fotoaparátem</div>
+                </div>
+
+                <!-- Akční tlačítka -->
+                <div class="flex gap-3 w-full no-print">
+                    <button onclick="downloadQR()" class="flex-1 items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                        <i class="fa-solid fa-download mr-2 text-blue-500"></i> Stáhnout
+                    </button>
+                    <button onclick="window.print()" class="flex-1 items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                        <i class="fa-solid fa-print mr-2 text-gray-600"></i> Tisk
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logika pro přepínání viditelnosti hesla
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Logika pro typ zabezpečení
+        function handleEncryptionChange() {
+            const encryption = document.getElementById('encryption').value;
+            const passContainer = document.getElementById('password-container');
+            const passInput = document.getElementById('password');
+
+            if (encryption === 'nopass') {
+                passContainer.style.opacity = '0.5';
+                passContainer.style.pointerEvents = 'none';
+                passInput.value = '';
+            } else {
+                passContainer.style.opacity = '1';
+                passContainer.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Pomocná funkce pro escape znaků (důležité pro WIFI schéma)
+        function escapeWiFiString(str) {
+            if (!str) return "";
+            return str.replace(/\\/g, '\\\\')
+                      .replace(/"/g, '\\"')
+                      .replace(/;/g, '\\;')
+                      .replace(/:/g, '\\:')
+                      .replace(/,/g, '\\,');
+        }
+
+        let qrcodeObj = null;
+
+        // Hlavní funkce generování
+        function generateQR() {
+            const ssid = document.getElementById('ssid').value;
+            const password = document.getElementById('password').value;
+            const encryption = document.getElementById('encryption').value;
+            const hidden = document.getElementById('hidden').checked;
+
+            if (!ssid) {
+                alert("Prosím vyplňte název sítě (SSID).");
+                return;
+            }
+
+            if (encryption !== 'nopass' && password.length < 1) {
+                alert("Pro zabezpečenou síť je vyžadováno heslo.");
+                return;
+            }
+
+            // Konstrukce WIFI String schématu
+            // Formát: WIFI:T:WPA;S:MyNetwork;P:MyPassword;H:false;;
+            let wifiString = `WIFI:T:${encryption};S:${escapeWiFiString(ssid)};`;
+            
+            if (encryption !== 'nopass') {
+                wifiString += `P:${escapeWiFiString(password)};`;
+            }
+            
+            if (hidden) {
+                wifiString += `H:true;`;
+            }
+            
+            wifiString += `;`;
+
+            // UI Update
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('qr-result').classList.remove('hidden');
+            document.getElementById('qr-result').classList.add('flex');
+            document.getElementById('print-ssid').textContent = `SSID: ${ssid}`;
+
+            // Vyčištění předchozího kódu
+            const container = document.getElementById("qrcode");
+            container.innerHTML = "";
+
+            // Generování nového
+            try {
+                qrcodeObj = new QRCode(container, {
+                    text: wifiString,
+                    width: 200,
+                    height: 200,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H // Vysoká korekce chyb pro lepší čitelnost
+                });
+            } catch (e) {
+                console.error(e);
+                alert("Chyba při generování kódu. Zkuste zkrátit název nebo heslo.");
+            }
+        }
+
+        // Funkce pro stáhnutí obrázku
+        function downloadQR() {
+            const qrDiv = document.getElementById('qrcode');
+            const img = qrDiv.querySelector('img');
+            
+            if (img && img.src) {
+                // Vytvoříme canvas pro přidání bílého okraje (aby byl QR čitelný i na tmavém pozadí)
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const padding = 20;
+                
+                canvas.width = img.naturalWidth + (padding * 2);
+                canvas.height = img.naturalHeight + (padding * 2);
+                
+                // Bílé pozadí
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Vykreslení obrázku
+                ctx.drawImage(img, padding, padding);
+                
+                const link = document.createElement('a');
+                link.download = 'wifi-qrcode.png';
+                link.href = canvas.toDataURL("image/png");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                // Fallback pokud se obrázek ještě nenačetl (někdy QRCode.js používá canvas přímo)
+                const canvasSrc = qrDiv.querySelector('canvas');
+                if(canvasSrc) {
+                     const link = document.createElement('a');
+                    link.download = 'wifi-qrcode.png';
+                    link.href = canvasSrc.toDataURL("image/png");
+                    link.click();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
