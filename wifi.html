@@ -20,27 +20,50 @@
             background-color: #f3f4f6;
         }
 
-        /* Styl pro tisk - skryje vše kromě výsledného QR kódu */
+        /* Styl pro tisk - vycentruje kartičku na střed stránky A4 */
         @media print {
+            @page {
+                margin: 0;
+                size: auto;
+            }
+            body {
+                background-color: #fff;
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Skryjeme vše */
             body * {
                 visibility: hidden;
             }
+
+            /* Zobrazíme jen tiskovou oblast a její obsah */
             #print-area, #print-area * {
                 visibility: visible;
             }
+
             #print-area {
                 position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 350px !important; /* Pevná šířka pro tisk */
                 margin: 0;
-                padding: 20px;
+                padding: 30px;
+                border: 2px solid #000;
+                border-radius: 12px;
+                box-shadow: none; /* Stíny se netisknou dobře */
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                border: 2px solid #000;
             }
+
             .no-print {
                 display: none !important;
             }
@@ -155,6 +178,9 @@
                     <button onclick="window.print()" class="flex-1 items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
                         <i class="fa-solid fa-print mr-2 text-gray-600"></i> Tisk
                     </button>
+                </div>
+                <div class="mt-4 text-xs text-gray-400 text-center no-print">
+                    Tip: iOS (iPhone) i Android fotoaparáty umí tento QR kód načíst přímo, není potřeba Apple Wallet.
                 </div>
             </div>
         </div>
