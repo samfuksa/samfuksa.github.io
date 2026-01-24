@@ -163,7 +163,8 @@
                 <!-- Tisková oblast -->
                 <div id="print-area" class="bg-white p-6 rounded-lg qr-shadow mb-6 text-center w-full max-w-[300px]">
                     <div class="text-lg font-bold text-gray-800 mb-2 border-b pb-2">Wi-Fi Připojení</div>
-                    <div class="text-sm text-gray-600 mb-4 font-mono break-all" id="print-ssid">SSID: -</div>
+                    <div class="text-sm text-gray-600 mb-1 font-mono break-all" id="print-ssid">SSID: -</div>
+                    <div class="text-sm text-gray-600 mb-4 font-mono break-all" id="print-password">Heslo: -</div>
                     
                     <div id="qrcode" class="flex justify-center mb-4"></div>
                     
@@ -180,7 +181,7 @@
                     </button>
                 </div>
                 <div class="mt-4 text-xs text-gray-400 text-center no-print">
-                    
+                    Tip: iOS (iPhone) i Android fotoaparáty umí tento QR kód načíst přímo, není potřeba Apple Wallet.
                 </div>
             </div>
         </div>
@@ -266,6 +267,13 @@
             document.getElementById('qr-result').classList.remove('hidden');
             document.getElementById('qr-result').classList.add('flex');
             document.getElementById('print-ssid').textContent = `SSID: ${ssid}`;
+            
+            const printPassEl = document.getElementById('print-password');
+            if (encryption === 'nopass') {
+                printPassEl.textContent = 'Heslo: (bez hesla)';
+            } else {
+                printPassEl.textContent = `Heslo: ${password}`;
+            }
 
             // Vyčištění předchozího kódu
             const container = document.getElementById("qrcode");
