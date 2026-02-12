@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homo Digitalis - Formáty souborů</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome pro ikony -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Knihovna pro export HTML do obrázku -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts z Design Manuálu -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-yellow': '#FFE600',
+                        'brand-black': '#000000',
+                        'brand-white': '#FFFFFF',
+                        'brand-gray': '#F4F4F4',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'brutal': '6px 6px 0px 0px #000000',
+                        'brutal-yellow': '6px 6px 0px 0px #FFE600',
+                        'brutal-sm': '3px 3px 0px 0px #000000',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F4F4F4;
+            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Zajištění správného vykreslení ohraničení v html2canvas */
+        .export-mode {
+            background-image: none !important;
+            background-color: #FFFFFF !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-10 px-4 font-sans text-brand-black">
+
+    <!-- Ovládací panel (Není součástí exportu) -->
+    <div class="mb-8 w-full max-w-5xl flex justify-between items-center bg-brand-white p-4 border-4 border-brand-black shadow-brutal">
+        <div class="font-mono font-bold text-sm uppercase hidden md:block">
+            Modul: Sdílení materiálů
+        </div>
+        <button onclick="downloadImage()" class="bg-brand-black text-brand-white font-mono uppercase text-sm font-bold py-3 px-6 hover:bg-brand-yellow hover:text-brand-black transition-colors border-2 border-brand-black flex items-center gap-2 w-full md:w-auto justify-center cursor-pointer">
+            <i class="fa-solid fa-download"></i>
+            Stáhnout Infografiku
+        </button>
+    </div>
+
+    <!-- Samotná infografika, která se bude exportovat -->
+    <div id="infographic" class="bg-brand-white w-full max-w-5xl border-4 border-brand-black p-8 md:p-14 relative shadow-brutal export-mode">
+        
+        <!-- Hlavička -->
+        <header class="border-b-4 border-brand-black pb-10 mb-12">
+            <!-- Logo Badge vycházející z manuálu -->
+            <div class="inline-flex flex-col font-black uppercase text-2xl text-brand-black bg-brand-yellow px-3 py-1 -skew-x-2 leading-none mb-8 border-2 border-brand-black shadow-brutal-sm">
+                <span class="tracking-tighter">HOMO</span>
+                <span class="text-brand-white bg-brand-black px-1 -ml-1 tracking-tighter">DIGITALIS</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6 leading-tight">
+                Sdílení <span class="bg-brand-black text-brand-white px-2">materiálů</span>
+            </h1>
+            
+            <p class="font-mono text-lg max-w-3xl border-l-8 border-brand-yellow pl-4 text-gray-800 leading-relaxed">
+                V rámci procesu sdílení materiálů je nezbytné dbát na to, aby byly soubory distribuovány v otevřených či standardizovaných formátech pro zajištění kompatibility.
+            </p>
+        </header>
+
+        <!-- Hlavní grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+            
+            <!-- Levý sloupec (Doporučené) -->
+            <div>
+                <!-- H2 nadpis podle manuálu -->
+                <h2 class="text-xl md:text-2xl font-bold uppercase border-t-2 border-brand-black pt-5 mb-6 flex items-center">
+                    <span class="bg-brand-black text-brand-yellow w-8 h-8 flex items-center justify-center mr-3 text-lg shrink-0">→</span>
+                    01 Doporučené formáty
+                </h2>
+                
+                <p class="font-mono text-sm text-gray-600 mb-8 h-12">
+                    Zajišťují kompatibilitu napříč OS (Windows, macOS, ChromeOS). Nevyžadují speciální placený software.
+                </p>
+
+                <!-- Ikonky formátů -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <div class="border-2 border-brand-black bg-brand-white p-6 flex flex-col items-center justify-center shadow-brutal-yellow hover:-translate-y-1 transition-transform">
+                        <i class="fa-solid fa-file-word text-4xl mb-3 text-brand-black"></i>
+                        <span class="font-mono font-bold text-lg">.docx</span>
+                    </div>
+                    <div class="border-2 border-brand-black bg-brand-white p-6 flex flex-col items-center justify-center shadow-brutal-yellow hover:-translate-y-1 transition-transform">
+                        <i class="fa-solid fa-file-pdf text-4xl mb-3 text-brand-black"></i>
+                        <span class="font-mono font-bold text-lg">.pdf</span>
+                    </div>
+                    <div class="border-2 border-brand-black bg-brand-white p-6 flex flex-col items-center justify-center shadow-brutal-yellow hover:-translate-y-1 transition-transform">
+                        <i class="fa-solid fa-file-powerpoint text-4xl mb-3 text-brand-black"></i>
+                        <span class="font-mono font-bold text-lg">.pptx</span>
+                    </div>
+                    <div class="border-2 border-brand-black bg-brand-white p-6 flex flex-col items-center justify-center shadow-brutal-yellow hover:-translate-y-1 transition-transform">
+                        <i class="fa-solid fa-file-image text-4xl mb-3 text-brand-black"></i>
+                        <span class="font-mono font-bold text-lg">.png</span>
+                    </div>
+                    <div class="border-2 border-brand-black bg-brand-yellow p-6 flex flex-col items-center justify-center shadow-brutal-sm sm:col-span-2 hover:-translate-y-1 transition-transform">
+                        <i class="fa-solid fa-file-zipper text-4xl mb-3 text-brand-black"></i>
+                        <span class="font-mono font-bold text-lg">.zip</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pravý sloupec (Nevhodné) -->
+            <div>
+                <!-- H2 nadpis podle manuálu -->
+                <h2 class="text-xl md:text-2xl font-bold uppercase border-t-2 border-brand-black pt-5 mb-6 flex items-center">
+                    <span class="bg-brand-black text-brand-white w-8 h-8 flex items-center justify-center mr-3 text-lg shrink-0 font-mono">!</span>
+                    02 Proprietární formáty
+                </h2>
+                
+                <p class="font-mono text-sm text-gray-600 mb-8 h-12">
+                    Často chybí jistota nativní podpory v OS, případně vyžadují instalaci konkrétního drahého softwaru.
+                </p>
+
+                <!-- Tabulka / Seznam porovnání -->
+                <div class="flex flex-col gap-4">
+                    
+                    <!-- Radek 1 -->
+                    <div class="border-2 border-brand-black bg-brand-gray p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 w-full sm:w-1/3">
+                            <i class="fa-solid fa-file-zipper text-2xl"></i>
+                            <span class="font-bold font-mono text-xl">.rar</span>
+                        </div>
+                        <div class="text-center w-full sm:w-1/3 text-xs font-mono uppercase text-gray-500 leading-tight">
+                            WinRAR<br>7-Zip
+                        </div>
+                        <div class="flex items-center gap-3 w-full sm:w-1/3 justify-end">
+                            <i class="fa-solid fa-arrow-right text-brand-black"></i>
+                            <span class="font-mono font-bold bg-brand-yellow border-2 border-brand-black py-1 px-3 shadow-brutal-sm text-lg">.zip</span>
+                        </div>
+                    </div>
+
+                    <!-- Radek 2 -->
+                    <div class="border-2 border-brand-black bg-brand-gray p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 w-full sm:w-1/3">
+                            <i class="fa-solid fa-file-image text-2xl"></i>
+                            <span class="font-bold font-mono text-xl">.psd</span>
+                        </div>
+                        <div class="text-center w-full sm:w-1/3 text-xs font-mono uppercase text-gray-500 leading-tight">
+                            Adobe<br>Photoshop
+                        </div>
+                        <div class="flex items-center gap-3 w-full sm:w-1/3 justify-end">
+                            <i class="fa-solid fa-arrow-right text-brand-black"></i>
+                            <span class="font-mono font-bold bg-brand-yellow border-2 border-brand-black py-1 px-3 shadow-brutal-sm text-lg">.pdf</span>
+                        </div>
+                    </div>
+
+                    <!-- Radek 3 -->
+                    <div class="border-2 border-brand-black bg-brand-gray p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 w-full sm:w-1/3">
+                            <i class="fa-solid fa-file-lines text-2xl"></i>
+                            <span class="font-bold font-mono text-xl">.pages</span>
+                        </div>
+                        <div class="text-center w-full sm:w-1/3 text-xs font-mono uppercase text-gray-500 leading-tight">
+                            Apple<br>Pages
+                        </div>
+                        <div class="flex items-center gap-3 w-full sm:w-1/3 justify-end">
+                            <i class="fa-solid fa-arrow-right text-brand-black"></i>
+                            <span class="font-mono font-bold bg-brand-yellow border-2 border-brand-black py-1 px-3 shadow-brutal-sm text-lg">.pdf</span>
+                        </div>
+                    </div>
+
+                    <!-- Radek 4 -->
+                    <div class="border-2 border-brand-black bg-brand-gray p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 w-full sm:w-1/3">
+                            <i class="fa-solid fa-pen-ruler text-2xl"></i>
+                            <span class="font-bold font-mono text-xl">.dwg</span>
+                        </div>
+                        <div class="text-center w-full sm:w-1/3 text-xs font-mono uppercase text-gray-500 leading-tight">
+                            AutoCAD
+                        </div>
+                        <div class="flex items-center gap-3 w-full sm:w-1/3 justify-end">
+                            <i class="fa-solid fa-arrow-right text-brand-black"></i>
+                            <span class="font-mono font-bold bg-brand-yellow border-2 border-brand-black py-1 px-3 shadow-brutal-sm text-lg">.pdf</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Patička -->
+        <footer class="mt-16 pt-6 border-t-2 border-gray-200 text-center font-mono text-xs text-gray-500 uppercase tracking-widest">
+            Homo Digitalis • Edukační Materiál • 2026
+        </footer>
+    </div>
+
+    <!-- Script pro stažení infografiky s OPRAVOU fontů a layoutu -->
+    <script>
+        async function downloadImage() {
+            const infographicElement = document.getElementById('infographic');
+            const button = document.querySelector('button');
+            
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Zpracovávám...';
+            button.disabled = true;
+
+            try {
+                // 1. ZÁSADNÍ OPRAVA: Počkat na stažení a aplikaci webových fontů
+                await document.fonts.ready;
+
+                // 2. Vynutit šířku pro generování (zabrání zalomení textů a mobilnímu layoutu)
+                const canvas = await html2canvas(infographicElement, {
+                    scale: 2, 
+                    backgroundColor: '#FFFFFF', 
+                    useCORS: true,
+                    windowWidth: 1200, // Simuluje velký monitor pro vyhodnocení Tailwind tříd
+                    onclone: function(clonedDoc) {
+                        // Klonovaný dokument dostane fixní šířku
+                        const clonedEl = clonedDoc.getElementById('infographic');
+                        clonedEl.style.width = '1024px';
+                        clonedEl.style.maxWidth = '1024px';
+                        clonedEl.style.margin = '0';
+                    }
+                });
+                
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.href = image;
+                link.download = 'homo-digitalis-formaty.png';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (err) {
+                console.error("Chyba při stahování obrázku:", err);
+                alert("Omlouváme se, při generování obrázku došlo k chybě.");
+            } finally {
+                // Obnovit původní stav tlačítka
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
