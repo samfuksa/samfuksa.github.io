@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Portfolio | Bc. Samuel Fuksa</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #212529;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-color);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            line-height: 1.3;
+        }
+
+        /* --- Hero Section & Responsive Typography --- */
+        .hero-section {
+            background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.8)), url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            /* Zde nastavujeme barvu, ale h1 ji může přebít, proto viz níže specifické pravidlo */
+            color: white;
+            padding: 120px 0;
+            text-align: center;
+        }
+
+        /* OPRAVA ČITELNOSTI HERO SEKCE */
+        .hero-section h1 {
+            color: white !important; /* Vynutíme bílou barvu */
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Přidáme stín pro lepší kontrast */
+        }
+        
+        .hero-section .lead {
+            color: rgba(255, 255, 255, 0.9) !important;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Mobilní optimalizace pro Hero */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            h1.display-3 {
+                font-size: 2.5rem;
+            }
+            .lead {
+                font-size: 1.1rem;
+            }
+        }
+
+        .section-padding {
+            padding: 80px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .section-padding {
+                padding: 50px 0;
+            }
+        }
+
+        /* --- Cards Design --- */
+        .card-custom {
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .badge-hour {
+            background-color: var(--primary-color);
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Reflection Blocks --- */
+        .reflection-block {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .reflection-positive {
+            border-left: 5px solid #28a745;
+            background-color: #f1fff4;
+        }
+
+        .reflection-improve {
+            border-left: 5px solid #ffc107;
+            background-color: #fff9e6;
+        }
+
+        /* --- Navigation --- */
+        .nav-link {
+            font-weight: 500;
+            color: var(--primary-color) !important;
+            padding: 10px 15px !important;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+
+        .navbar-toggler {
+            border: none;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 40px 0;
+        }
+
+        /* --- Buttons --- */
+        .btn-custom-outline {
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        
+        .btn-custom-outline:hover, .btn-custom-outline.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbarNav" data-bs-offset="100">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4" href="#"><i class="bi bi-person-workspace me-2 text-primary"></i>Samuel Fuksa</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#about">O mně & Kontext</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#philosophy">Filozofie</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#repository">Repozitář reflexí</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Kontakt</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <h1 class="display-3 fw-bold mb-3">Reflektivní E-Portfolio</h1>
+                    <p class="lead mb-4">Učitel informatiky | Student FAI UTB | Nadšenec do moderních technologií</p>
+                    <a href="#repository" class="btn btn-outline-light btn-lg px-4 py-2 mt-2">Prohlédnout reflexe výuky</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Bio in Context Section -->
+    <section id="about" class="section-padding bg-white">
+        <div class="container">
+            <div class="row align-items-center gy-5">
+                <div class="col-lg-5 order-lg-1 order-2">
+                    <div class="p-4 bg-light rounded-4 shadow-sm">
+                        <h3 class="h4 mb-4 border-bottom pb-2">Základní profil</h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-person-badge fs-4 me-3 text-primary"></i> <div><strong>Bc. Samuel Fuksa</strong><br><small class="text-muted">Autor portfolia</small></div></li>
+                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-mortarboard fs-4 me-3 text-primary"></i> <div>Student <strong>FAI UTB</strong><br><small class="text-muted">Softwarové inženýrství</small></div></li>
+                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-building fs-4 me-3 text-primary"></i> <div>Praxe: <strong>SŠTD Gustava Habrmana</strong><br><small class="text-muted">Česká Třebová</small></div></li>
+                            <li class="mb-3 d-flex align-items-center"><i class="bi bi-pc-display fs-4 me-3 text-primary"></i> <div>Předměty<br><small class="text-muted">Operační systémy, Počítačové sítě</small></div></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-7 order-lg-2 order-1">
+                    <h2 class="mb-4 display-6 fw-bold">Životopis v kontextu</h2>
+                    <p class="lead text-muted">Dualita role studenta a učitele</p>
+                    <p>
+                        Moje cesta k učitelství vede přes studium softwarového inženýrství na UTB. Tato pozice – být zároveň studentem i učitelem – mi dává unikátní perspektivu. Rozumím tomu, jaké to je sedět v lavici, a zároveň vnímám tlak a odpovědnost na "druhé straně katedry".
+                    </p>
+                    <p>
+                        Na SŠTD vyučuji budoucí IT odborníky. Moje třídy jsou často početné (až 30 žáků) a heterogenní, což přináší výzvy v individualizaci výuky. Setkávám se s žáky nadanými, kteří potřebují rychlejší postup, i s těmi, kteří potřebují více podpory.
+                    </p>
+                    <div class="alert alert-info mt-4 border-0 shadow-sm d-flex">
+                        <i class="bi bi-info-circle-fill fs-4 me-3 mt-1"></i>
+                        <div>
+                            <strong>Klíčová výzva:</strong> Adaptace na "novou generaci" žáků. Pasivita a rychlé tempo doby vyžadují hledání nových, aktivizujících metod (gamifikace, praktické ukázky), abych udržel jejich pozornost.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section id="philosophy" class="section-padding" style="background-color: #f1f3f5;">
+        <div class="container">
+            <div class="text-center mb-5 mw-100" style="max-width: 800px; margin: 0 auto;">
+                <h2 class="display-6 fw-bold">Edukační filozofie</h2>
+                <p class="text-muted mt-3">Můj přístup k výuce stojí na třech pilířích. Odpověď na otázku "proč a jak učím".</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 text-center bg-white border-0">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 80px; height: 80px;">
+                                <i class="bi bi-bricks fs-2 text-primary"></i>
+                            </div>
+                        </div>
+                        <h4 class="h5 fw-bold">Teorie vs. Praxe</h4>
+                        <p class="small text-muted mb-0">Nejtěžší je odhadnout správný poměr. Teorie je nutná pro základy, ale samotná je nudná. Mým cílem je <strong>maximalizovat praktické ukázky</strong> na úkor suché teorie. Učím to, co žáci reálně využijí.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 text-center bg-white border-0">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 80px; height: 80px;">
+                                <i class="bi bi-question-circle fs-2 text-primary"></i>
+                            </div>
+                        </div>
+                        <h4 class="h5 fw-bold">Kritické myšlení</h4>
+                        <p class="small text-muted mb-0">Nechtěj jen definice. Ptám se <strong>"PROČ?"</strong>. Proč je iOS bezpečnější? Proč oddělit disk? Žáci musí chápat souvislosti, nejen memorovat postupy. Chyba není selhání, ale proces učení.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 text-center bg-white border-0">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 80px; height: 80px;">
+                                <i class="bi bi-rocket-takeoff fs-2 text-primary"></i>
+                            </div>
+                        </div>
+                        <h4 class="h5 fw-bold">Držet krok</h4>
+                        <p class="small text-muted mb-0">Nejhorší, co se učiteli IT může stát, je, že mu "ujede vlak". Neustále se vzdělávám a do výuky zavádím moderní nástroje (PowerToys, Virtualizace, Cloud), aby byli žáci připraveni na trh práce.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <figure class="text-center">
+                    <blockquote class="blockquote fs-4 fst-italic">
+                        <p>"Nejhorší co se učitelovi IT může stát, je to, že mu ujede vlak."</p>
+                    </blockquote>
+                    <figcaption class="blockquote-footer mt-2">
+                        Z mé závěrečné reflexe praxe
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <!-- Repository Section -->
+    <section id="repository" class="section-padding bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-6 fw-bold">Repozitář reflexí</h2>
+                <p class="text-muted">Chronologický záznam realizovaných hodin, úspěchů a poučení</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
+                <button type="button" class="btn btn-custom-outline px-4 rounded-pill active" onclick="filterReflections('all', this)">Vše</button>
+                <button type="button" class="btn btn-custom-outline px-4 rounded-pill" onclick="filterReflections('os', this)">Operační systémy</button>
+                <button type="button" class="btn btn-custom-outline px-4 rounded-pill" onclick="filterReflections('siete', this)">Sítě</button>
+                <button type="button" class="btn btn-custom-outline px-4 rounded-pill" onclick="filterReflections('users', this)">Správa uživatelů</button>
+            </div>
+
+            <div class="row g-4" id="reflections-container">
+                <!-- Content will be loaded via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container text-center">
+            <h3 class="mb-4 h4">Kontakt</h3>
+            <div class="d-flex justify-content-center flex-wrap gap-3 gap-md-5 mb-4">
+                <a href="mailto:s_fuksa@utb.cz" class="text-white text-decoration-none d-flex align-items-center"><i class="bi bi-envelope me-2"></i>s_fuksa@utb.cz</a>
+                <span class="text-white-50 d-none d-md-inline">|</span>
+                <span class="text-white d-flex align-items-center"><i class="bi bi-geo-alt me-2"></i>SŠTD Gustava Habrmana</span>
+            </div>
+            <hr class="border-secondary opacity-25 mx-auto" style="max-width: 200px;">
+            <p class="small text-white-50 mt-4">&copy; 2026 Samuel Fuksa. Vytvořeno pro účely pedagogické praxe.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Data & Logic -->
+    <script>
+        // Data parsed from the user's uploaded documents
+        const reflectionsData = [
+            {
+                id: 1,
+                hours: "01-06",
+                category: "os",
+                topic: "Úvod do OS a seznámení",
+                goals: [
+                    "Žák rozumí pojmu operační systém",
+                    "Žák umí rozlišit typy OS (iOS vs Android atd.)",
+                    "Výběr vhodného OS dle požadavků"
+                ],
+                methods: "Výklad, Brainstorming (Slido), Demonstrační metoda (ukázky z praxe)",
+                success: "Podařilo se motivovat žáky ukázkami technologií, se kterými budeme pracovat. Dobrá diskuze o bezpečnosti (iOS sandbox).",
+                improve: "Více gamifikovat výuku a ukazovat případy využití bližší studentům.",
+                details: "První kontakt s třídou. Heterogenní skupiny (bez větších rozdílů ve znalostech)."
+            },
+            {
+                id: 2,
+                hours: "07-12",
+                category: "os",
+                topic: "Bezpečnost hesel a Edice Windows",
+                goals: [
+                    "Tvorba bezpečného hesla",
+                    "Využití Password Managerů",
+                    "Analýza edicí Windows a licencování"
+                ],
+                methods: "Demonstrace (Password Manager), Diskuze (Cena licencí), Samostatná práce",
+                success: "Žáci pochopili správce hesel a někteří je začali používat. Úspěšné vysvětlení problematiky druhotných licencí.",
+                improve: "Mít připravené praktické ukázky omezených verzí Windows (např. Home S mód).",
+                details: "Žáci porovnávali ceny licencí. Důraz na kritické myšlení při nákupu SW."
+            },
+            {
+                id: 3,
+                hours: "07-12",
+                category: "os",
+                topic: "Virtualizace a Historie MS",
+                goals: [
+                    "Vysvětlení principu virtualizace",
+                    "Instalace Windows 11 EDU ve VM Ware",
+                    "Historie Microsoftu"
+                ],
+                methods: "Demonstrace (krok za krokem instalace), Výklad, Praktická činnost",
+                success: "Žáci jsou schopni sami nainstalovat OS. Téma je bavilo, viděli praktický smysl (serverová řešení).",
+                improve: "U některých kroků instalace jít více do hloubky (limitováno časem).",
+                details: "Paralelní téma k licencování. Zaměřeno na technické dovednosti."
+            },
+            {
+                id: 4,
+                hours: "19-20",
+                category: "siete",
+                topic: "Úvod do počítačových sítí",
+                goals: [
+                    "Typy sítí (PAN, LAN, WAN)",
+                    "Síťová zařízení (Router, Switch)",
+                    "Adresace (IP, MAC) a protokoly"
+                ],
+                methods: "Cisco Packet Tracer (simulace), Fyzická ukázka HW, Brainstorming",
+                success: "Fyzická ukázka zařízení zaujala. Žáci umí zjistit svou IP/MAC adresu a chápou rozdíl mezi veřejnou a privátní IP.",
+                improve: "Více praktických ukázek na úkor teorie (u sítí je to ale náročné na realizaci).",
+                details: "Návrh sítě pro malou kancelář. Propojení teorie (Bluetooth = PAN) s praxí."
+            },
+            {
+                id: 5,
+                hours: "21-26",
+                category: "os",
+                topic: "Souborové systémy a Disky",
+                goals: [
+                    "Pochopení souborových systémů",
+                    "Prvotní nastavení Windows",
+                    "Tvorba svazku na novém disku"
+                ],
+                methods: "Výklad s demonstrací, Praktická činnost (správa disků)",
+                success: "Předání praktické dovednosti (co dělat s novým diskem po koupi). Společná tvorba 'ideálního nastavení' OS.",
+                improve: "Hodina proběhla bez větších problémů, nenapadá mě konkrétní zlepšení.",
+                details: "Propojení teorie (NTFS/FAT32) s reálnou instalací disku."
+            },
+            {
+                id: 6,
+                hours: "27-32",
+                category: "os",
+                topic: "PowerToys a Správa disků (Praxe)",
+                goals: [
+                    "Teoretický test",
+                    "Instalace a využití PowerToys",
+                    "Rozdělení svazku (zmenšení/zvětšení)"
+                ],
+                methods: "Samostatná práce, Ukázka 'Use-case' scénářů",
+                success: "PowerToys žáky velmi zaujal (FancyZones, Color Picker). Pochopili důležitost rozdělení disků pro zálohování/systém.",
+                improve: "Žádné zásadní připomínky. Test motivoval k zamyšlení.",
+                details: "Ukázka nástrojů pro zvýšení produktivity."
+            },
+            {
+                id: 7,
+                hours: "33-38",
+                category: "users",
+                topic: "Uživatelé a Skupiny",
+                goals: [
+                    "Systémové složky",
+                    "Tvorba uživatele a přiřazení do skupiny",
+                    "Význam oddělených účtů"
+                ],
+                methods: "Výklad, Diskuze o bezpečnosti, Samostatná práce",
+                success: "Žáci pochopili bezpečnostní rizika sdílení jednoho účtu. Zvládli technickou správu uživatelů.",
+                improve: "Ukázat více alternativních způsobů přihlášení (biometrika, tokeny).",
+                details: "Důraz na individualizaci a bezpečnost."
+            },
+            {
+                id: 8,
+                hours: "39-44",
+                category: "users",
+                topic: "Oprávnění a NTFS",
+                goals: [
+                    "Nastavení oprávnění složek/souborů",
+                    "Dědičnost a odepření přístupu",
+                    "Spolupráce více uživatelů"
+                ],
+                methods: "Aplikační úlohy (nastavte čtení pro skupinu X), Diskuze (důsledky odepření)",
+                success: "Demonstrace důsledků špatného nastavení. Vysvětlení principu 'Odepřít'.",
+                improve: "Nastaly problémy s 'Vlastníkem souboru', což zmátlo nastavení oprávnění. Musel jsem to vysvětlit až další hodinu (přiznání chyby).",
+                details: "Pokročilá administrativa. Ukázka lidského faktoru při chybě učitele."
+            }
+        ];
+
+        // Function to generate HTML for cards
+        function renderReflections(filter) {
+            const container = document.getElementById('reflections-container');
+            container.innerHTML = '';
+
+            reflectionsData.forEach(item => {
+                if (filter === 'all' || item.category === filter) {
+                    const cardHTML = `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card card-custom h-100">
+                                <div class="card-header bg-white border-0 pt-4 px-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="badge badge-hour text-white rounded-pill">Hodina ${item.hours}</span>
+                                        <span class="text-muted small text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">${getCategoryName(item.category)}</span>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-0">${item.topic}</h5>
+                                </div>
+                                <div class="card-body px-4 pb-4">
+                                    <div class="mb-4">
+                                        <h6 class="text-primary small fw-bold text-uppercase mb-2"><i class="bi bi-bullseye me-1"></i> Hlavní cíle</h6>
+                                        <ul class="small ps-3 text-muted mb-0" style="line-height: 1.6;">
+                                            ${item.goals.map(g => `<li>${g}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="accordion" id="accordionExample${item.id}">
+                                        <div class="accordion-item border-0 bg-light rounded-3 overflow-hidden">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed bg-transparent shadow-none fw-medium py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${item.id}">
+                                                    <i class="bi bi-journal-text me-2"></i> Zobrazit detailní reflexi
+                                                </button>
+                                            </h2>
+                                            <div id="collapse${item.id}" class="accordion-collapse collapse" data-bs-parent="#accordionExample${item.id}">
+                                                <div class="accordion-body bg-white border-top">
+                                                    <div class="mb-3">
+                                                        <strong class="d-block text-dark mb-1 small text-uppercase">Metody:</strong>
+                                                        <span class="text-muted small">${item.methods}</span>
+                                                    </div>
+                                                    
+                                                    <div class="reflection-block reflection-positive">
+                                                        <strong class="d-block text-success mb-1"><i class="bi bi-check-circle-fill me-1"></i> Co se podařilo:</strong>
+                                                        ${item.success}
+                                                    </div>
+                                                    
+                                                    <div class="reflection-block reflection-improve">
+                                                        <strong class="d-block text-warning mb-1" style="color: #d39e00 !important;"><i class="bi bi-exclamation-triangle-fill me-1"></i> Ke zlepšení:</strong>
+                                                        ${item.improve}
+                                                    </div>
+                                                    
+                                                    <p class="mt-3 mb-0 text-muted fst-italic small border-top pt-2">
+                                                        <i class="bi bi-info-circle me-1"></i> ${item.details}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += cardHTML;
+                }
+            });
+        }
+
+        // Helper to get nice category name
+        function getCategoryName(cat) {
+            switch(cat) {
+                case 'os': return 'Operační systémy';
+                case 'siete': return 'Sítě';
+                case 'users': return 'Správa uživatelů';
+                default: return 'Ostatní';
+            }
+        }
+
+        // Handle filtering UI
+        function filterReflections(category, btnElement) {
+            // Update active button state
+            document.querySelectorAll('.btn-custom-outline').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            btnElement.classList.add('active');
+            
+            // Render content
+            renderReflections(category);
+        }
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderReflections('all');
+        });
+    </script>
+</body>
+</html>
