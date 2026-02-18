@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodická karta: Pravidla pro AI ve třídě</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome pro ikony -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+            --surface-color: #ffffff;
+            --bg-color: #f3f4f6;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            
+            --traffic-red: #ff4757;
+            --traffic-yellow: #ffa502;
+            --traffic-green: #2ed573;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            /* Jemný pattern na pozadí */
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Modern Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: #6366f1 !important;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 6rem 0 4rem;
+            margin-bottom: 4rem;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3);
+            text-align: center;
+        }
+
+        .badge-glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-weight: 500;
+            padding: 0.5em 1em;
+        }
+
+        /* Cards - Modern Glassy Look */
+        .method-card {
+            background: var(--surface-color);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 24px;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .method-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #8b5cf6;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .icon-blue { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+        .icon-yellow { background: rgba(255, 165, 2, 0.1); color: #ffa502; }
+        .icon-teal { background: rgba(45, 212, 191, 0.1); color: #2dd4bf; }
+
+        /* Timeline Redesign */
+        .timeline-container {
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            padding-bottom: 30px;
+            border-left: 2px dashed #d1d5db;
+        }
+
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -11px;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 4px solid #8b5cf6;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Neon Traffic Light */
+        .traffic-light-modern {
+            background: #1f2937;
+            padding: 1.5rem;
+            border-radius: 50px; /* Pill shape */
+            display: inline-flex;
+            gap: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #374151;
+        }
+
+        .neon-light {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #374151;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .neon-light::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .neon-light.red.active {
+            background: var(--traffic-red);
+            box-shadow: 0 0 30px var(--traffic-red), inset 0 0 10px white;
+        }
+        .neon-light.yellow.active {
+            background: var(--traffic-yellow);
+            box-shadow: 0 0 30px var(--traffic-yellow), inset 0 0 10px white;
+        }
+        .neon-light.green.active {
+            background: var(--traffic-green);
+            box-shadow: 0 0 30px var(--traffic-green), inset 0 0 10px white;
+        }
+
+        /* Content Cards for Semaphore */
+        .rule-card-modern {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .rule-card-modern.active {
+            display: block;
+        }
+
+        .rule-header {
+            padding: 1.5rem;
+            color: white;
+        }
+        
+        .header-red { background: linear-gradient(135deg, #ff4757, #ff6b81); }
+        .header-yellow { background: linear-gradient(135deg, #ffa502, #ffc048); color: #1f2937; }
+        .header-green { background: linear-gradient(135deg, #2ed573, #7bed9f); }
+
+        .citation-block {
+            background: #1e1e2e;
+            color: #a6accd;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-header .line {
+            width: 80px;
+            height: 4px;
+            background: var(--secondary-gradient);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-main" data-bs-offset="100">
+
+    <!-- Navigace -->
+    <nav id="navbar-main" class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-brain me-2"></i>AI.EDU</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="fas fa-bars"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav gap-2">
+                    <li class="nav-item"><a class="nav-link active" href="#metodika">Metodika</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#scenar">Scénář</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#kodex">Kodex</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#reflexe">Reflexe</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modern Hero -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-3 fw-bold mb-4">AI ve třídě: <br>Pravidla hry</h1>
+                    <p class="lead mb-4 opacity-75">Průvodce pro moderní pedagogy, jak nastavit hranice a možnosti umělé inteligence ve výuce.</p>
+                    
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+                        <span class="badge badge-glass rounded-pill"><i class="far fa-clock me-2"></i>45 minut</span>
+                        <span class="badge badge-glass rounded-pill"><i class="fas fa-user-graduate me-2"></i>2. stupeň ZŠ / SŠ</span>
+                        <span class="badge badge-glass rounded-pill"><i class="fas fa-laptop-code me-2"></i>Digi. kompetence</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STRANA 1: METODIKA -->
+    <div class="container mb-5" id="metodika">
+        <div class="section-header">
+            <h2>Metodické ukotvení</h2>
+            <div class="line"></div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Cíle -->
+            <div class="col-md-4">
+                <div class="method-card">
+                    <div class="icon-box icon-blue">
+                        <i class="fas fa-crosshairs"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Cíle hodiny</h4>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-3 d-flex align-items-start"><i class="fas fa-check-circle text-primary mt-1 me-2"></i><span>Pochopení pojmu "halucinace AI" a limitů technologie.</span></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fas fa-check-circle text-primary mt-1 me-2"></i><span>Rozlišení mezi etickou pomocí a plagiátorstvím.</span></li>
+                        <li class="d-flex align-items-start"><i class="fas fa-check-circle text-primary mt-1 me-2"></i><span>Konsenzus na třídních pravidlech.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Úskalí -->
+            <div class="col-md-4">
+                <div class="method-card">
+                    <div class="icon-box icon-yellow">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Na co si dát pozor</h4>
+                    <p class="text-muted">
+                        Žáci mohou mít tendenci hledat "kličky" v pravidlech. Cílem není vytvořit seznam zákazů, ale <strong>kulturu odpovědnosti</strong>.
+                    </p>
+                    <div class="alert alert-warning border-0 bg-opacity-10 bg-warning text-dark mt-3">
+                        <small><i class="fas fa-lightbulb me-1"></i> <strong>Tip:</strong> Nechte žáky vygenerovat pomocí AI "dokonalou lež", kterou pak společně odhalíte.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pomůcky -->
+            <div class="col-md-4">
+                <div class="method-card">
+                    <div class="icon-box icon-teal">
+                        <i class="fas fa-toolbox"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Toolkit</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent border-0 px-0 py-2"><i class="fas fa-tablet-alt text-muted me-2"></i> Tablety / Notebooky</li>
+                        <li class="list-group-item bg-transparent border-0 px-0 py-2"><i class="fas fa-network-wired text-muted me-2"></i> Přístup k LLM (ChatGPT/Gemini)</li>
+                        <li class="list-group-item bg-transparent border-0 px-0 py-2"><i class="fas fa-sticky-note text-muted me-2"></i> Post-it papírky (3 barvy)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scénář -->
+    <div class="container mb-5" id="scenar">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="section-header">
+                    <h2>Scénář hodiny</h2>
+                    <div class="line"></div>
+                </div>
+
+                <div class="method-card p-5">
+                    <div class="timeline-container">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">00:00 - 05:00</span>
+                            <h5 class="fw-bold mt-1">Icebreaker & Přiznání</h5>
+                            <p class="text-muted small">Anonymní hlasování: "Kdo už použil AI na úkol?" Diskuze bez trestů. Vytvoření bezpečné atmosféry.</p>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">05:00 - 15:00</span>
+                            <h5 class="fw-bold mt-1">Hra: Turingův test</h5>
+                            <p class="text-muted small">Analýza 3 textů (Člověk vs AI vs Hybrid). Žáci hledají stopy AI (příliš dokonalá gramatika, opakování slov, obecné fráze).</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">15:00 - 30:00</span>
+                            <h5 class="fw-bold mt-1">Aktivita: Třídní Semafor</h5>
+                            <p class="text-muted small">Třídění konkrétních situací na tabuli. <em>"Nechat si opravit čárky?"</em> vs <em>"Nechat si napsat úvahu?"</em>. Diskuse nad spornými body.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">30:00 - 45:00</span>
+                            <h5 class="fw-bold mt-1">Kodifikace & Závazek</h5>
+                            <p class="text-muted small">Sepsání finálního dokumentu. Ukázka správné citace. Závěrečná "podpisová akce" třídy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interaktivní KODEX -->
+    <div class="container py-5" id="kodex">
+        <div class="section-header">
+            <h2>Třídní AI Kodex</h2>
+            <p class="text-muted">Interaktivní vizualizace pravidel</p>
+        </div>
+
+        <div class="row justify-content-center align-items-center flex-column-reverse flex-lg-row">
+            <!-- Levá strana - Texty -->
+            <div class="col-lg-6 mt-4 mt-lg-0">
+                
+                <!-- RED CARD -->
+                <div id="rule-red" class="rule-card-modern">
+                    <div class="rule-header header-red">
+                        <h3 class="mb-0"><i class="fas fa-hand-paper me-2"></i>ZAKÁZÁNO</h3>
+                        <small class="opacity-75">Porušení akademické integrity a etiky</small>
+                    </div>
+                    <div class="p-4">
+                        <h6 class="fw-bold text-danger mb-3">Konkrétní situace:</h6>
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item border-0"><i class="fas fa-times-circle text-danger me-2"></i>Generování celých prací (slohy, referáty) bez přidané hodnoty.</li>
+                            <li class="list-group-item border-0"><i class="fas fa-times-circle text-danger me-2"></i>Použití při testech vědomostí (pokud není výslovně povoleno).</li>
+                            <li class="list-group-item border-0"><i class="fas fa-times-circle text-danger me-2"></i>Zadávání citlivých údajů (GDPR) nebo fotek spolužáků.</li>
+                            <li class="list-group-item border-0"><i class="fas fa-times-circle text-danger me-2"></i>Generování urážlivého obsahu nebo Deepfakes.</li>
+                        </ul>
+                        <div class="bg-danger bg-opacity-10 p-3 rounded-3 border border-danger border-opacity-25 mb-4">
+                            <small class="fw-bold text-danger"><i class="fas fa-question-circle me-1"></i> PROČ?</small>
+                            <p class="mb-0 small text-danger">Obcházením práce se nic nenaučíš. Mozek potřebuje "trénink" stejně jako svaly. Zneužití dat je navíc protiprávní.</p>
+                        </div>
+                        
+                        <!-- Příklad Promptu -->
+                        <div class="border-top border-danger border-opacity-25 pt-3">
+                            <h6 class="fw-bold text-danger small text-uppercase mb-2"><i class="fas fa-ban me-2"></i>Příklad zakázaného promptu:</h6>
+                            <div class="bg-light p-3 rounded-3 border border-danger border-opacity-25 fst-italic text-muted">
+                                "Napiš za mě celou úvahu na téma 'Svoboda slova' v rozsahu 300 slov, ať to vypadá, že to psal žák 9. třídy, a přidej tam i gramatické chyby."
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YELLOW CARD -->
+                <div id="rule-yellow" class="rule-card-modern">
+                    <div class="rule-header header-yellow">
+                        <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>S OPATRNOSTÍ</h3>
+                        <small class="opacity-75">Vyžaduje kritické myšlení a kontrolu</small>
+                    </div>
+                    <div class="p-4">
+                        <h6 class="fw-bold text-warning mb-3">Konkrétní situace:</h6>
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item border-0"><i class="fas fa-exclamation text-warning me-3"></i><strong>Ověřování faktů:</strong> AI často "halucinuje" (vymýšlí si data).</li>
+                            <li class="list-group-item border-0"><i class="fas fa-exclamation text-warning me-3"></i><strong>Stylistika:</strong> Inspiruj se formulacemi, ale neměň svůj autorský hlas.</li>
+                            <li class="list-group-item border-0"><i class="fas fa-exclamation text-warning me-3"></i><strong>Brainstorming:</strong> Použij jako odrazový můstek, ne jako finální řešení.</li>
+                            <li class="list-group-item border-0"><i class="fas fa-exclamation text-warning me-3"></i><strong>Shrnutí textu:</strong> Ověř, zda AI nezkreslila význam původního textu.</li>
+                        </ul>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-3 border border-warning border-opacity-25 mb-4">
+                            <small class="fw-bold text-warning text-dark"><i class="fas fa-question-circle me-1"></i> PROČ?</small>
+                            <p class="mb-0 small text-dark">AI nerozumí významu, jen skládá slova. Odpovědnost za správnost neseš vždy TY, ne chatbot.</p>
+                        </div>
+
+                        <!-- Příklad Promptu -->
+                        <div class="border-top border-warning border-opacity-25 pt-3">
+                            <h6 class="fw-bold text-warning text-dark small text-uppercase mb-2"><i class="fas fa-search me-2"></i>Příklad k ověření (Rizikový):</h6>
+                            <div class="bg-light p-3 rounded-3 border border-warning border-opacity-25 fst-italic text-muted mb-2">
+                                "Kdo přesně vyhrál volby v zemi X v roce 2024 a jaká byla procenta?"
+                            </div>
+                            <small class="text-muted"><i class="fas fa-info-circle me-1"></i> <strong>Rada:</strong> AI může mít zastaralá data. Vždy ověř informaci ve zpravodajství nebo knize.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GREEN CARD -->
+                <div id="rule-green" class="rule-card-modern active">
+                    <div class="rule-header header-green">
+                        <h3 class="mb-0 text-white"><i class="fas fa-check-double me-2"></i>POVOLENO</h3>
+                        <small class="text-white opacity-75">Doporučené využití pro efektivitu</small>
+                    </div>
+                    <div class="p-4">
+                        <h6 class="fw-bold text-success mb-3">Konkrétní situace:</h6>
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i>Tvorba struktury/osnovy projektu a plánování času.</li>
+                            <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i>Vysvětlení složitého pojmu "jako pro pětileté dítě" (osobní tutor).</li>
+                            <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i>Generování obrázků do prezentací (s uvedením zdroje).</li>
+                            <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i>Simulace historické postavy pro rozhovor (Role-play).</li>
+                            <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i>Jazyková korektura a hledání chyb v kódu.</li>
+                        </ul>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-3 border border-success border-opacity-25 mb-4">
+                            <small class="fw-bold text-success"><i class="fas fa-question-circle me-1"></i> PROČ?</small>
+                            <p class="mb-0 small text-success">Zde AI funguje jako "kalkulačka pro slova" – pomáhá ti pracovat efektivněji a rychleji se učit.</p>
+                        </div>
+
+                        <!-- Příklad Promptu -->
+                        <div class="border-top border-success border-opacity-25 pt-3">
+                            <h6 class="fw-bold text-success small text-uppercase mb-2"><i class="fas fa-rocket me-2"></i>Příklad skvělého promptu:</h6>
+                            <div class="bg-light p-3 rounded-3 border border-success border-opacity-25 fst-italic text-muted">
+                                "Mám napsanou osnovu o fotosyntéze. Tady je: [vložit text]. Můžeš mi dát kritickou zpětnou vazbu? Co mi tam chybí, abych to pochopil lépe?"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citace -->
+                <div class="mt-4">
+                    <h6 class="fw-bold text-uppercase text-muted ls-1 mb-3">Jak správně citovat AI?</h6>
+                    <div class="citation-block shadow-sm">
+                        <span style="color: #c678dd">Zdroj:</span> OpenAI. (2024). <span style="color: #98c379">ChatGPT</span> (verze GPT-4) [Large Language Model].<br>
+                        <span style="color: #c678dd">Prompt:</span> "Navrhni strukturu..."<br>
+                        <span style="color: #c678dd">Dostupné z:</span> https://chat.openai.com
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Pravá strana - Ovladač -->
+            <div class="col-lg-5 text-center mb-4 mb-lg-0">
+                <div class="traffic-light-modern">
+                    <div class="neon-light red" onclick="showRule('red')" title="Zakázáno"></div>
+                    <div class="neon-light yellow" onclick="showRule('yellow')" title="Pozor"></div>
+                    <div class="neon-light green active" onclick="showRule('green')" title="Povoleno"></div>
+                </div>
+                <p class="mt-3 text-muted small fst-italic">Klikni pro zobrazení pravidel</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reflexe -->
+    <div class="container my-5" id="reflexe">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="method-card bg-white border-0 shadow-lg">
+                    <h3 class="fw-bold mb-4">Reflexe spolupráce s AI</h3>
+                    <div class="d-flex gap-4">
+                        <div class="d-none d-md-block text-primary display-4">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <div>
+                            <p class="lead fst-italic mb-3">
+                                "Při přípravě této metodické karty jsem využil AI pro návrh struktury hodiny. Původní návrh byl příliš 'technokratický', musel jsem přidat lidský prvek (diskuze o emocích a podvádění). Vizuální koncept semaforu byl nápadem AI, který jsem rozpracoval do interaktivní podoby."
+                            </p>
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">SF</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Samuel Fuksa</h6>
+                                    <small class="text-muted">Autor metodiky</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-white border-top mt-5">
+        <div class="container text-center">
+            <h5 class="fw-bold mb-3">AI.EDU</h5>
+            <p class="text-muted mb-4">
+                Vypracoval: <strong>Samuel Fuksa</strong><br>
+                Inspirujeme učitele pro výuku v 21. století.
+            </p>
+            <button onclick="window.print()" class="btn btn-dark rounded-pill px-4"><i class="fas fa-print me-2"></i>Uložit do PDF</button>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script pro Semafor -->
+    <script>
+        function showRule(color) {
+            // Vypnout všechna světla
+            document.querySelectorAll('.neon-light').forEach(l => l.classList.remove('active'));
+            // Zapnout vybrané
+            document.querySelector('.neon-light.' + color).classList.add('active');
+
+            // Skrýt karty
+            document.querySelectorAll('.rule-card-modern').forEach(c => c.classList.remove('active'));
+            
+            // Zobrazit vybranou
+            const target = document.getElementById('rule-' + color);
+            // Reset animace
+            target.style.animation = 'none';
+            target.offsetHeight; /* trigger reflow */
+            target.style.animation = null; 
+            
+            target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
