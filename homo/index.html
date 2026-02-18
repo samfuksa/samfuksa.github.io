@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homo Digitalis - Design Manual</title>
+    <!-- Script pro generování obrázků -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+        :root {
+            --brand-yellow: #FFE600;
+            --brand-black: #000000;
+            --brand-white: #FFFFFF;
+            --brand-gray: #F4F4F4;
+            --text-color: #111111;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            background-color: var(--brand-white);
+            line-height: 1.5;
+        }
+
+        /* --- LAYOUT --- */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Print Button */
+        .print-actions {
+            position: absolute;
+            top: 40px;
+            right: 20px;
+        }
+
+        @media print {
+            .print-actions, .btn-download, .code-block {
+                display: none !important;
+            }
+            body { background: white; }
+            .container { width: 100%; max-width: none; }
+        }
+
+        header {
+            border-bottom: 4px solid var(--brand-black);
+            padding-bottom: 40px;
+            margin-bottom: 60px;
+            padding-right: 100px; /* Space for print button */
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-top: 2px solid var(--brand-black);
+            padding-top: 20px;
+            margin-top: 60px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: '→';
+            margin-right: 10px;
+            color: var(--brand-yellow);
+            background: var(--brand-black);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        p {
+            max-width: 600px;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        /* --- THE LOGO (Original CSS) --- */
+        .logo-wrapper {
+            padding: 60px;
+            background-color: var(--brand-gray);
+            display: flex;
+            flex-direction: column; /* Changed for button placement */
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 30px;
+        }
+
+        .logo-brutal {
+            display: inline-flex;
+            flex-direction: column;
+            line-height: 0.8;
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 5rem; /* Scalable base */
+            color: var(--brand-black);
+            background: var(--brand-yellow);
+            padding: 0.2em 0.3em;
+            transform: skewX(-2deg);
+        }
+
+        .logo-brutal span {
+            display: block;
+            letter-spacing: -0.04em;
+        }
+
+        .logo-brutal span:last-child {
+            color: var(--brand-white);
+            background: var(--brand-black);
+            padding: 0 0.1em;
+            margin-left: -0.1em; /* Visual overlap */
+        }
+
+        /* --- BUTTONS --- */
+        .btn-download, .btn-print {
+            padding: 12px 24px;
+            background-color: var(--brand-black);
+            color: var(--brand-white);
+            border: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-download:hover, .btn-print:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+        }
+
+        .btn-print {
+            background-color: transparent;
+            color: var(--brand-black);
+            border: 1px solid var(--brand-black);
+        }
+
+        /* --- COLORS SECTION --- */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .color-swatch {
+            border: 1px solid #eee;
+        }
+
+        .swatch-preview {
+            height: 150px;
+            width: 100%;
+        }
+
+        .swatch-info {
+            padding: 15px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .swatch-info strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* --- TYPOGRAPHY SECTION --- */
+        .typo-specimen {
+            border-left: 10px solid var(--brand-yellow);
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+
+        .font-name {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .font-usage {
+            font-family: 'Space Mono', monospace;
+            color: #888;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .alphabet {
+            font-size: 1.5rem;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        /* --- CLEAR SPACE / OCHRANNÁ ZÓNA --- */
+        .clear-space-diagram {
+            position: relative;
+            display: inline-block;
+            background: #fff;
+            padding: 40px; /* Represents X */
+            border: 1px dashed #ccc;
+        }
+        
+        .clear-space-diagram::after {
+            content: 'Min. spacing (x)';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        /* --- CODE SNIPPET --- */
+        .code-block {
+            background: #222;
+            color: #fff;
+            padding: 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            border-left: 10px solid var(--brand-yellow);
+        }
+
+        footer {
+            margin-top: 100px;
+            border-top: 1px solid #eee;
+            padding: 40px 0;
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="print-actions">
+            <button class="btn-print" onclick="window.print()">🖨️ Tisk PDF</button>
+        </div>
+
+        <header>
+            <div style="font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-bottom: 10px; color: #888;">IDENTITY SYSTEM v1.1</div>
+            <h1>Homo Digitalis</h1>
+            <p>Vizuální identita pro e-learningovou platformu. Design vychází z estetiky brutality, vysokého kontrastu a výrazné typografie.</p>
+        </header>
+
+        <!-- 1. LOGO -->
+        <section id="logo">
+            <h2>01 Logotyp</h2>
+            <p>Základním kamenem identity je typografické logo složené do bloku. Využívá kontrastu mezi žlutým pozadím a černým blokem.</p>
+            
+            <div class="logo-wrapper">
+                <div class="logo-brutal" id="brand-logo">
+                    <span>HOMO</span>
+                    <span>DIGITALIS</span>
+                </div>
+                <button class="btn-download" onclick="downloadLogo('brand-logo', 'homo-digitalis-logo')">⬇ Stáhnout Logo (PNG)</button>
+            </div>
+        </section>
+
+        <!-- 2. BAREVNOST -->
+        <section id="colors">
+            <h2>02 Barevnost</h2>
+            <p>Paleta je striktně omezena na tři základní barvy. Žlutá slouží jako signální barva.</p>
+            
+            <div class="color-grid">
+                <!-- Yellow -->
+                <div class="color-swatch">
+                    <div class="swatch-preview" style="background-color: var(--brand-yellow);"></div>
+                    <div class="swatch-info">
+                        <strong style="color:var(--brand-black)">Signal Yellow</strong>
+                        HEX: #FFE600<br>
+                        RGB: 255, 230, 0
+                    </div>
+                </div>
+                <!-- Black -->
+                <div class="color-swatch">
+                    <div class="swatch-preview" style="background-color: var(--brand-black);"></div>
+                    <div class="swatch-info">
+                        <strong>Carbon Black</strong>
+                        HEX: #000000<br>
+                        RGB: 0, 0, 0
+                    </div>
+                </div>
+                <!-- White -->
+                <div class="color-swatch">
+                    <div class="swatch-preview" style="background-color: var(--brand-white); border-bottom:1px solid #eee;"></div>
+                    <div class="swatch-info">
+                        <strong>Pure White</strong>
+                        HEX: #FFFFFF<br>
+                        RGB: 255, 255, 255
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. TYPOGRAFIE -->
+        <section id="typography">
+            <h2>03 Typografie</h2>
+            <p>Identita využívá kombinaci grotesku pro nadpisy a neproporcionálního písma pro doplňkové texty.</p>
+
+            <div class="typo-specimen">
+                <span class="font-usage">Primární písmo</span>
+                <div class="font-name" style="font-family: 'Inter', sans-serif;">Inter (Black)</div>
+                <div class="alphabet" style="font-family: 'Inter', sans-serif; font-weight: 900;">
+                    ABCČDĎEFGHIJKLMNOPQRŘSŠTŤUVWXYZŽ
+                </div>
+            </div>
+
+            <div class="typo-specimen">
+                <span class="font-usage">Doplňkové písmo</span>
+                <div class="font-name" style="font-family: 'Space Mono', monospace;">Space Mono</div>
+                <div class="alphabet" style="font-family: 'Space Mono', monospace;">
+                    abcčdďefghijklmnopqrřsštťuvwxyzž
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. OCHRANNÁ ZÓNA -->
+        <section id="spacing">
+            <h2>04 Ochranná zóna</h2>
+            <div style="background: #f4f4f4; padding: 50px; text-align: center;">
+                <div class="clear-space-diagram">
+                    <div class="logo-brutal" style="font-size: 2.5rem;">
+                        <span>HOMO</span>
+                        <span>DIGITALIS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. IMPLEMENTACE -->
+        <section id="moodle">
+            <h2>05 Implementace</h2>
+            <p>CSS kód pro Moodle:</p>
+<pre class="code-block">
+.custom-brand-logo {
+    display: inline-flex;
+    flex-direction: column;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 2rem; 
+    color: #000;
+    background: #FFE600;
+    transform: skewX(-2deg);
+}
+</pre>
+        </section>
+
+        <footer>
+            Design System Generated for Homo Digitalis Project<br>
+            2026
+        </footer>
+
+    </div>
+
+    <script>
+        function downloadLogo(elementId, fileName) {
+            const element = document.getElementById(elementId);
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Zpracovávám...";
+
+            html2canvas(element, {
+                backgroundColor: null,
+                scale: 4, // Vysoká kvalita pro tisk
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = fileName + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.innerText = originalText;
+            }).catch(err => {
+                console.error("Error:", err);
+                btn.innerText = originalText;
+                alert("Chyba při stahování.");
+            });
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Baterie - EV Buyer Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        
+        /* Tisková oblast */
+        .print-area { 
+            background: white; 
+            width: 210mm; 
+            min-height: 297mm; 
+            margin: 20px auto; 
+            padding: 15mm; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+            position: relative;
+        }
+
+        /* Interaktivní detaily (Accordion) */
+        details > summary { 
+            list-style: none; 
+            cursor: pointer; 
+            outline: none; 
+            transition: color 0.2s;
+        }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        details[open] summary ~ * { 
+            animation: slideDown 0.3s ease-out forwards; 
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); max-height: 0; }
+            to { opacity: 1; transform: translateY(0); max-height: 200px; }
+        }
+
+        /* Formuláře */
+        .input-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem; font-weight: 600; uppercase; letter-spacing: 0.05em; }
+        .input-group input { 
+            width: 100%; 
+            background: #0f172a; 
+            border: 1px solid #334155; 
+            padding: 0.6rem 0.8rem; 
+            color: white; 
+            border-radius: 0.5rem; 
+            font-size: 0.875rem; 
+            transition: all 0.2s;
+        }
+        .input-group input:focus { outline: none; border-color: #10b981; ring: 2px solid rgba(16, 185, 129, 0.2); }
+
+        /* Custom Gauge Circle */
+        .score-circle-container { position: relative; width: 140px; height: 140px; margin: 0 auto; }
+        .score-circle {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            border: 8px solid #e2e8f0;
+            z-index: 10;
+            background: white;
+            position: relative;
+        }
+        .score-circle-bg-blur {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            filter: blur(20px);
+            opacity: 0.25;
+            z-index: 0;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm 15mm; 
+            }
+            body { 
+                background-color: white; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+                font-size: 11pt;
+            }
+            .no-print { display: none !important; }
+            .print-area { 
+                box-shadow: none; margin: 0; width: 100%; padding: 0; border: none; min-height: auto;
+            }
+            .break-inside-avoid, .grid > div, .bg-white, .bg-slate-50, table, figure, .mb-8 { 
+                break-inside: avoid; page-break-inside: avoid;
+            }
+            canvas { max-width: 100% !important; }
+            details:not([open]) { display: none; }
+            .shadow-sm, .shadow-xl { box-shadow: none !important; }
+            .border-slate-800 { border-color: #000; }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- OVLÁDACÍ PANEL -->
+    <div class="no-print bg-slate-900 text-white p-6 mb-8 border-b-4 border-emerald-500 shadow-xl">
+        <div class="max-w-5xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-emerald-400 flex items-center gap-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        EV Battery Report
+                    </h1>
+                    <p class="text-slate-400 text-sm mt-1">Nástroj pro analýzu ojetých elektromobilů</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-6 rounded-lg cursor-pointer text-center transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/50 hover:shadow-emerald-500/30 border border-emerald-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Nahrát CSV
+                        <input type="file" id="csvInput" accept=".csv" class="hidden">
+                    </label>
+                    <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-6 rounded-lg transition flex items-center justify-center gap-2 border border-slate-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Tisk / PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-800/50 p-6 rounded-xl border border-slate-700 backdrop-blur-sm">
+                <div class="input-group">
+                    <label>Model Vozu</label>
+                    <input type="text" id="inputModel" placeholder="např. VW ID.4, Tesla M3..." oninput="updateCarInfo()">
+                </div>
+                <div class="input-group">
+                    <label>VIN Kód</label>
+                    <input type="text" id="inputVin" placeholder="WVWZZZ..." oninput="updateCarInfo()">
+                </div>
+                <div class="input-group">
+                    <label>Registrační značka (SPZ)</label>
+                    <input type="text" id="inputSpz" placeholder="1AA 0000" oninput="updateCarInfo()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REPORT BODY -->
+    <div id="reportContainer" class="print-area hidden">
+        
+        <!-- 1. HEADER -->
+        <div class="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-8 break-inside-avoid">
+            <div class="w-2/3">
+                <h1 class="text-4xl font-black text-slate-900 uppercase tracking-tighter">Certifikát Baterie</h1>
+                <div class="mt-3 space-y-1">
+                    <div class="text-2xl font-bold text-emerald-700" id="displayModel">Neznámý Model</div>
+                    <div class="flex gap-4 text-sm text-slate-500 mt-2">
+                        <span class="bg-slate-100 px-3 py-1 rounded font-mono border border-slate-200">VIN: <strong id="displayVin" class="text-slate-900">-</strong></span>
+                        <span class="bg-slate-100 px-3 py-1 rounded font-mono border border-slate-200">SPZ: <strong id="displaySpz" class="text-slate-900">-</strong></span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right w-1/3 flex flex-col items-end">
+                <div class="inline-block bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded mb-2 uppercase tracking-widest">Flash Test</div>
+                <div class="text-right">
+                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Datum měření</div>
+                    <div class="font-bold text-slate-900 text-lg leading-none" id="reportDate">-</div>
+                </div>
+                <div class="text-right mt-3">
+                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Doba testu</div>
+                    <div class="font-bold text-slate-900 text-lg leading-none" id="testDuration">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. HLAVNÍ METRIKY (Karty) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 break-inside-avoid">
+            
+            <!-- KARTA 1: Battery Score -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-500/20 shadow-sm relative overflow-hidden flex flex-col items-center justify-start text-center break-inside-avoid">
+                <div class="score-circle-container mb-2 mt-2">
+                    <div class="score-circle-bg-blur bg-emerald-400" id="scoreBlur"></div>
+                    <div class="score-circle" id="scoreCircleBorder">
+                        <span class="text-5xl font-black text-slate-800 tracking-tighter" id="calcScoreValue">--</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400 mt-[-5px]">Bodů</span>
+                    </div>
+                </div>
+                <div class="text-base font-bold text-slate-800 uppercase tracking-wide">Battery Health Score</div>
+                
+                <details class="w-full mt-4 text-left group">
+                    <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-center gap-1 hover:text-emerald-600 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Co to znamená?
+                    </summary>
+                    <div class="mt-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
+                        Toto je nezávislý index kondice baterie (0-100) vypočítaný naším algoritmem. Bere v úvahu především <strong>rozdíl napětí mezi články (imbalance)</strong> a jejich stabilitu. Skóre nad 90 značí excelentní stav.
+                    </div>
+                </details>
+            </div>
+
+            <!-- KARTA 2: BMS SOH -->
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between relative break-inside-avoid">
+                 <div>
+                     <div class="flex justify-between items-center mb-1">
+                        <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">BMS State of Health</div>
+                        <div class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-mono" id="sohSourceBadge">ECU</div>
+                     </div>
+                     <div class="flex items-baseline gap-1 mb-3">
+                        <span class="text-5xl font-bold text-slate-700" id="sohValue">--%</span>
+                     </div>
+                     <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="sohBar" class="bg-slate-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                     </div>
+                     <div class="text-[10px] text-slate-400 mt-2 truncate font-mono" id="sohSource">Zdroj: -</div>
+                 </div>
+                 
+                 <details class="w-full mt-4 text-left group">
+                    <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-emerald-600 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Metrika výrobce
+                    </summary>
+                    <div class="mt-2 text-xs text-slate-500 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed">
+                        SOH (State of Health) je odhad zbývající kapacity baterie vůči nové, reportovaný řídící jednotkou (BMS). Pozor: Někteří výrobci používají "buffer", takže hodnota může zůstat dlouho na 100 %.
+                    </div>
+                </details>
+            </div>
+
+            <!-- KARTA 3: Imbalance (Delta) -->
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between break-inside-avoid">
+                <div>
+                    <div class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Max Delta (Imbalance)</div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl font-bold text-slate-900" id="maxDelta">--</span>
+                        <span class="text-xl text-slate-500 font-medium">mV</span>
+                    </div>
+                    <div id="deltaVerdict" class="inline-flex items-center gap-1.5 mt-3 text-xs font-bold px-3 py-1.5 rounded bg-slate-200 text-slate-600">
+                        <span class="w-2 h-2 rounded-full bg-current"></span>
+                        <span id="deltaVerdictText">-</span>
+                    </div>
+                </div>
+
+                <details class="w-full mt-4 text-left group">
+                    <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-emerald-600 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Proč je to důležité?
+                    </summary>
+                    <div class="mt-2 text-xs text-slate-500 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed">
+                        Rozdíl napětí mezi nejsilnějším a nejslabším článkem. Ideální je <strong>do 10 mV</strong>. Vysoká hodnota (>30 mV) značí, že jeden článek degraduje rychleji a omezuje dojezd celého auta.
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- 3. CHARGING HISTORY -->
+        <div class="mb-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden break-inside-avoid">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Historie Nabíjení (AC vs DC)</h3>
+                <span class="text-[10px] text-slate-400 font-mono bg-white px-2 py-1 rounded border border-slate-200" id="chargeSourceTag">Zdroj: -</span>
+            </div>
+            
+            <div class="p-6 relative">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                    <!-- Pie Chart -->
+                    <div class="h-40 relative flex justify-center md:justify-start">
+                        <canvas id="chargePieChart"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="text-center">
+                                <div class="text-[10px] text-slate-400 uppercase">DC Ratio</div>
+                                <div class="text-xl font-bold text-slate-800" id="valDcRatioCenter">--%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div class="col-span-2">
+                        <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+                            <div class="relative pl-4 border-l-2 border-emerald-500">
+                                <span class="text-xs text-slate-500 uppercase font-semibold">AC (Pomalé)</span>
+                                <div class="text-2xl font-bold text-slate-800 mt-1" id="valAcCharge">--</div>
+                                <div class="text-xs text-emerald-600 mt-0.5 font-medium">Šetrné k chemii baterie</div>
+                            </div>
+                            <div class="relative pl-4 border-l-2 border-blue-500">
+                                <span class="text-xs text-slate-500 uppercase font-semibold">DC (Rychlé)</span>
+                                <div class="text-2xl font-bold text-slate-800 mt-1" id="valDcCharge">--</div>
+                                <div class="text-xs text-blue-600 mt-0.5 font-medium">Zvyšuje tepelné namáhání</div>
+                            </div>
+                        </div>
+
+                         <details class="w-full mt-6 text-left group border-t border-slate-100 pt-3">
+                            <summary class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 hover:text-blue-600 transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Vliv rychlonabíjení
+                            </summary>
+                            <div class="mt-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
+                                Časté rychlonabíjení (DC) výrazně zahřívá články a urychluje degradaci elektrolytu. U ojetého vozu preferujte nižší podíl DC nabíjení (ideálně pod 30 %). Vysoký podíl DC může znamenat, že vůz sloužil jako taxi nebo na dálkové trasy.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <div id="noChargeData" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-center hidden z-10 backdrop-blur-[2px]">
+                    <div class="bg-slate-100 p-4 rounded-full mb-3 text-slate-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <span class="text-slate-800 font-bold text-sm">Data o nabíjení nejsou dostupná</span>
+                    <span class="text-xs text-slate-500 mt-1 max-w-xs leading-relaxed">V souboru chybí senzory pro energii (Total/DC Charge) nebo počty cyklů.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. CELL VOLTAGES GRAPH -->
+        <div class="mb-8 break-inside-avoid">
+            <div class="flex justify-between items-end mb-4 px-1">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Detail Napětí článků</h3>
+                <div class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-600 border border-slate-200">
+                    Min: <span id="chartMin" class="font-bold text-red-600">--</span> 
+                    <span class="text-slate-300 mx-2">|</span> 
+                    Max: <span id="chartMax" class="font-bold text-emerald-600">--</span>
+                </div>
+            </div>
+            
+            <div class="relative h-72 w-full bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                <canvas id="voltageBarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 5. TECH SPECS & TEMPS -->
+        <div class="grid grid-cols-2 gap-8 break-inside-avoid">
+            
+            <!-- Tech Specs List -->
+            <div>
+                <h3 class="text-sm font-bold text-slate-500 uppercase border-b border-slate-200 pb-2 mb-4">Technické parametry</h3>
+                <table class="w-full text-sm">
+                    <tbody class="divide-y divide-slate-100">
+                        <tr>
+                            <td class="py-2.5 text-slate-500">Stav nabití (SOC)</td>
+                            <td class="py-2.5 text-right font-bold text-slate-800 font-mono" id="valSoc">-- %</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2.5 text-slate-500">Stav Tachometru</td>
+                            <td class="py-2.5 text-right font-bold text-slate-800 font-mono" id="valOdo">-- km</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2.5 text-slate-500">12V Baterie</td>
+                            <td class="py-2.5 text-right font-bold text-slate-800 font-mono" id="val12v">-- V</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2.5 text-slate-500">Průměrné napětí (Pack)</td>
+                            <td class="py-2.5 text-right font-bold text-slate-800 font-mono" id="valAvgPack">-- V</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2.5 text-slate-500">Počet měřených článků</td>
+                            <td class="py-2.5 text-right font-bold text-slate-800 font-mono" id="valCellCount">--</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Temperature Table -->
+            <div>
+                <h3 class="text-sm font-bold text-slate-500 uppercase border-b border-slate-200 pb-2 mb-4">Teplotní Management</h3>
+                <div class="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-100 text-xs text-slate-500 uppercase border-b border-slate-200">
+                            <tr>
+                                <th class="px-4 py-2.5 font-medium">Senzor</th>
+                                <th class="px-4 py-2.5 font-medium text-right">Teplota</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200" id="tempTableBody">
+                            <!-- Dynamicky plněné -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2 text-[10px] text-slate-400">
+                    * Zobrazují se klíčové teplotní senzory nalezené v diagnostice.
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="mt-12 border-t-2 border-slate-100 pt-6 flex justify-between items-end break-inside-avoid">
+            <div class="text-[10px] text-slate-400 leading-relaxed max-w-lg">
+                <p class="mb-2"><strong>Disclaimer:</strong> Tento report je generován automaticky z poskytnutých dat. Hodnoty SOH a kondice baterie jsou orientační. Pro uplatnění záruky vždy kontaktujte autorizovaný servis.</p>
+                <p class="mb-1">
+                    Vytvořil <a href="https://samfuksa.eu" target="_blank" class="underline hover:text-slate-600">Samuel Fuksa</a> (samfuksa.eu) s pomocí Google Gemini.
+                </p>
+                <p>
+                    Projekt a zdrojový kód: <a href="https://github.com/samfuksa/samfuksa.github.io/tree/main/baterka" target="_blank" class="underline hover:text-slate-600">GitHub Repozitář</a>
+                </p>
+            </div>
+            <div class="text-right">
+                 <div class="text-slate-300 font-black text-2xl tracking-widest uppercase">EV Check</div>
+            </div>
+        </div>
+
+        <!-- DEBUG SECTION -->
+        <div class="no-print mt-10 p-4 bg-slate-200 rounded text-xs text-slate-600">
+            <details>
+                <summary class="cursor-pointer font-bold hover:text-slate-800">🛠 Nástroje pro ladění: Zobrazit data CSV</summary>
+                <div class="mt-4 p-4 bg-white rounded shadow h-64 overflow-y-auto font-mono" id="debugPidList">
+                    Nahrajte soubor...
+                </div>
+            </details>
+        </div>
+
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="emptyState" class="max-w-2xl mx-auto mt-20 text-center p-12 bg-white rounded-2xl shadow-xl border border-slate-100">
+        <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-emerald-50 text-emerald-500 mb-6 animate-pulse">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </div>
+        <h2 class="text-3xl font-bold text-slate-800 mb-3">Analýza Baterie</h2>
+        <p class="text-slate-500 mb-8 text-lg">Nahrajte <code>.csv</code> export z aplikace Car Scanner a získejte profesionální report.</p>
+        <div class="text-xs text-slate-400">Podporuje data pro VW ID, Enyaq, Hyundai/Kia, Tesla a další.</div>
+    </div>
+
+    <script>
+        const EXPECTED_DELIMITER = ';';
+        const REGEX_CELL = /cell\s*voltage\s*(\d+)/i;
+        const REGEX_MODULE_TEMP = /(?:battery|bms)\s*module\s*(\d+)\s*temp/i;
+
+        // PID Dictionary
+        const PIDS = {
+            SOH: ['soh', 'state of health', 'health', 'kondice', 'zdraví'],
+            SOC: ['state of charge', 'soc', 'nabití', 'charge level', 'display state of charge', 'state of charge display'],
+            ODO: ['odometer', 'distance', 'najeto', 'vzdálenost', 'celková', 'km'],
+            AUX_12V: ['12v', 'aux', 'module voltage', 'napětí modulu', 'supply', 'modulu obd'],
+            
+            // ENERGY
+            CHARGE_TOTAL: [
+                'total energy charged', 'cec', 'cumulative energy charged', 'celkem nabito', 
+                'total charge', 'nabíjení celkem', 'cumulative charge energy',
+                'celková nabitá energie', 'množství nabité energie', 'nabito celkem', 'energy charged total'
+            ],
+            CHARGE_DC: [
+                'accumulated quick charging energy',
+                'total dc charge', 'fast charge energy', 'dc energy', 'cumulative energy charged dc', 
+                'rychlé nabíjení', 'dc charge total', 'dc charge', 'cumulative energy charged (dc)',
+                'nabitá energie (dc)', 'nabíjení dc', 'dc celkem', 'fast charge total'
+            ],
+            CHARGE_AC: [
+                'accumulated normal charging energy',
+                'total ac charge', 'slow charge energy', 'ac energy', 'cumulative energy charged ac', 
+                'pomalé nabíjení', 'ac charge total', 'ac charge', 'cumulative energy charged (ac)',
+                'nabitá energie (ac)', 'nabíjení ac', 'ac celkem', 'slow charge total'
+            ],
+            
+            // COUNTS
+            COUNT_DC: [
+                'number of quick charging',
+                'number of fast charges', 'dc charge count', 'fast charges', 'počet rychlých', 'dc charges', 'počet nabíjení dc'
+            ],
+            COUNT_AC: [
+                'number of standard charging',
+                'number of slow charges', 'ac charge count', 'slow charges', 'počet pomalých', 'ac charges', 'počet nabíjení ac'
+            ],
+            
+            // RATIO
+            RATIO_DC: ['dc charge ratio', 'poměr dc', 'fast charge ratio', 'dc %'],
+
+            // TEMPS (Specific)
+            TEMP_INLET: ['battery inlet temperature', 'teplota vstupu', 'inlet temp'],
+            TEMP_MAX: ['battery max temperature', 'max cell temp', 'maximální teplota', 'max temperature'],
+            TEMP_MIN: ['battery min temperature', 'min cell temp', 'minimální teplota', 'min temperature']
+        };
+
+        let chartVoltage = null;
+        let chartPie = null;
+
+        document.getElementById('csvInput').addEventListener('change', handleFile);
+
+        function updateCarInfo() {
+            document.getElementById('displayModel').textContent = document.getElementById('inputModel').value || "Neznámý Model";
+            document.getElementById('displayVin').textContent = document.getElementById('inputVin').value || "-";
+            document.getElementById('displaySpz').textContent = document.getElementById('inputSpz').value || "-";
+        }
+
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('reportDate').textContent = new Date().toLocaleDateString('cs-CZ');
+
+            const reader = new FileReader();
+            reader.onload = (event) => processData(event.target.result);
+            reader.readAsText(file);
+        }
+
+        function parseCSVLine(line) {
+            const parts = line.split(EXPECTED_DELIMITER);
+            return parts.map(p => {
+                let clean = p.trim();
+                if (clean.startsWith('"') && clean.endsWith('"')) clean = clean.substring(1, clean.length - 1);
+                return clean;
+            });
+        }
+
+        function findPidValue(map, keywords) {
+            for (let [key, val] of map) {
+                const lowerKey = key.toLowerCase();
+                for (let kw of keywords) {
+                    if (lowerKey.includes(kw)) {
+                        return { key: key, val: val };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function formatDuration(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}m ${s}s`;
+        }
+
+        function processData(csvText) {
+            const lines = csvText.split('\n');
+            if (lines.length < 5) { alert("Soubor je příliš krátký."); return; }
+
+            const dataMap = new Map();
+            const lastValues = new Map();
+            
+            let startTime = null;
+            let endTime = null;
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const cols = parseCSVLine(line);
+                if (cols.length < 3) continue;
+
+                const t = parseFloat(cols[0]);
+                if(!isNaN(t)) {
+                    if (startTime === null) startTime = t;
+                    endTime = t;
+                }
+
+                const pid = cols[1];
+                let valStr = cols[2];
+                if(!valStr) continue;
+                const val = parseFloat(valStr.replace(',', '.'));
+
+                if (isNaN(val)) continue;
+                
+                if (!dataMap.has(pid)) dataMap.set(pid, []);
+                dataMap.get(pid).push(val);
+                lastValues.set(pid, val);
+            }
+
+            if (dataMap.size === 0) { alert("Žádná data."); return; }
+
+            const duration = (endTime && startTime) ? (endTime - startTime) : 0;
+
+            const debugContainer = document.getElementById('debugPidList');
+            debugContainer.innerHTML = Array.from(lastValues.keys()).sort().map(k => `<div>${k}: ${lastValues.get(k)}</div>`).join('');
+
+            analyze(dataMap, lastValues, duration);
+        }
+
+        function analyze(dataMap, lastValues, duration) {
+            // 1. Cells
+            let cellVoltages = [];
+            dataMap.forEach((values, key) => {
+                const cellMatch = key.match(REGEX_CELL);
+                if (cellMatch) {
+                    const avg = values.reduce((a,b)=>a+b,0) / values.length;
+                    cellVoltages.push({ id: parseInt(cellMatch[1]), avg: avg, name: key });
+                }
+            });
+            cellVoltages.sort((a,b) => a.id - b.id);
+            if (cellVoltages.length === 0) { alert("Chybí data napětí článků."); return; }
+
+            // Stats
+            const allAvgs = cellVoltages.map(c => c.avg);
+            const globalMin = Math.min(...allAvgs);
+            const globalMax = Math.max(...allAvgs);
+            const globalAvg = allAvgs.reduce((a,b)=>a+b,0) / allAvgs.length;
+            const deltaMv = (globalMax - globalMin) * 1000;
+
+            // 2. BMS SOH
+            let bmsSohData = findPidValue(lastValues, PIDS.SOH);
+            let bmsSoh = bmsSohData ? bmsSohData.val : 0;
+            let sohSource = bmsSohData ? "Načteno z ECU: " + bmsSohData.key : "Nedostupné";
+
+            // 3. Custom Health Score
+            let calcScore = 100;
+            if (deltaMv > 10) calcScore -= (deltaMv - 10) * 0.5; 
+            if (deltaMv > 30) calcScore -= (deltaMv - 30) * 1.5;
+            calcScore = Math.max(0, Math.min(100, Math.round(calcScore)));
+
+            // 4. Charging Logic
+            let chargeData = null;
+            let chargeSource = "-";
+            
+            const dTotal = findPidValue(lastValues, PIDS.CHARGE_TOTAL);
+            const dDc = findPidValue(lastValues, PIDS.CHARGE_DC);
+            const dAc = findPidValue(lastValues, PIDS.CHARGE_AC);
+            
+            if ( (dTotal && dTotal.val > 0) || (dDc && dDc.val > 0) || (dAc && dAc.val > 0) ) {
+                chargeSource = "Energie (kWh)";
+                let total = dTotal ? dTotal.val : 0;
+                let dc = dDc ? dDc.val : 0;
+                let ac = dAc ? dAc.val : 0;
+
+                if (total === 0 && (dc > 0 || ac > 0)) total = dc + ac;
+                if (total > 0) {
+                    if (dc > 0 && ac === 0) ac = total - dc;
+                    if (ac > 0 && dc === 0) dc = total - ac;
+                }
+                if (ac < 0) ac = 0; if (dc < 0) dc = 0;
+                if (total < (dc + ac)) total = dc + ac;
+
+                chargeData = { total, dc, ac, dcRatio: (total > 0) ? (dc/total)*100 : 0, unit: "kWh" };
+            } else {
+                const cDc = findPidValue(lastValues, PIDS.COUNT_DC);
+                const cAc = findPidValue(lastValues, PIDS.COUNT_AC);
+                if ((cDc && cDc.val > 0) || (cAc && cAc.val > 0)) {
+                    chargeSource = "Počet Cyklů";
+                    let dc = cDc ? cDc.val : 0;
+                    let ac = cAc ? cAc.val : 0;
+                    let total = dc + ac;
+                    chargeData = { total, dc, ac, dcRatio: (total > 0) ? (dc/total)*100 : 0, unit: "x" };
+                }
+            }
+            // 5. ODO & 12V & SOC
+            const odoData = findPidValue(lastValues, PIDS.ODO);
+            const auxData = findPidValue(lastValues, PIDS.AUX_12V);
+            const socData = findPidValue(lastValues, PIDS.SOC);
+
+            // 6. Temps - VYLEPŠENÁ LOGIKA
+            // Najít explicitní senzory
+            const tInlet = findPidValue(lastValues, PIDS.TEMP_INLET);
+            const tMax = findPidValue(lastValues, PIDS.TEMP_MAX);
+            const tMin = findPidValue(lastValues, PIDS.TEMP_MIN);
+            
+            // Najít moduly dynamicky
+            const moduleTemps = [];
+            lastValues.forEach((val, key) => {
+                const match = key.match(REGEX_MODULE_TEMP);
+                if (match) {
+                    moduleTemps.push({ id: parseInt(match[1]), val: val, name: key });
+                }
+            });
+            moduleTemps.sort((a,b) => a.id - b.id);
+
+            // Fallback kalkulace pro min/max/avg, pokud nejsou přímé senzory
+            let calcTMax = tMax ? tMax.val : null;
+            let calcTMin = tMin ? tMin.val : null;
+            let calcTAvg = null;
+
+            if (moduleTemps.length > 0) {
+                const vals = moduleTemps.map(m => m.val);
+                if (calcTMax === null) calcTMax = Math.max(...vals);
+                if (calcTMin === null) calcTMin = Math.min(...vals);
+                calcTAvg = vals.reduce((a,b)=>a+b,0) / vals.length;
+            }
+
+            // Příprava dat pro tabulku
+            const tempsOutput = [];
+            
+            if (tInlet) tempsOutput.push({ label: "Vstupní teplota (Inlet)", val: tInlet.val });
+            
+            if (calcTMax !== null) tempsOutput.push({ label: "Maximální teplota", val: calcTMax, highlight: 'red' });
+            if (calcTMin !== null) tempsOutput.push({ label: "Minimální teplota", val: calcTMin, highlight: 'blue' });
+            
+            if (calcTAvg !== null) tempsOutput.push({ label: "Průměrná teplota modulů", val: calcTAvg });
+            else if (moduleTemps.length === 0) {
+                // Pokud nemáme ani moduly, zkusíme najít obecný "Battery Temperature"
+                const genericTemp = findPidValue(lastValues, ['battery temperature', 'teplota baterie']);
+                if (genericTemp) tempsOutput.push({ label: "Teplota Baterie", val: genericTemp.val });
+            }
+
+            renderUI({
+                bmsSoh, sohSource, calcScore, deltaMv,
+                charge: chargeData, chargeSource,
+                odo: odoData ? odoData.val : null,
+                aux: auxData ? auxData.val : null,
+                soc: socData ? socData.val : null,
+                cells: cellVoltages,
+                stats: { min: globalMin, max: globalMax, avg: globalAvg },
+                temps: tempsOutput,
+                duration: duration
+            });
+        }
+
+        function renderUI(data) {
+            document.getElementById('testDuration').textContent = formatDuration(data.duration);
+            document.getElementById('sohValue').textContent = (data.bmsSoh > 0) ? data.bmsSoh + "%" : "N/A";
+            document.getElementById('sohSource').textContent = data.sohSource;
+            document.getElementById('sohBar').style.width = data.bmsSoh + "%";
+            
+            const elScore = document.getElementById('calcScoreValue');
+            const elCircle = document.getElementById('scoreCircleBorder');
+            const elBlur = document.getElementById('scoreBlur');
+            elScore.textContent = data.calcScore;
+            
+            let colorClass = "text-emerald-600";
+            let borderColor = "#10b981";
+            let blurColorClass = "bg-emerald-400";
+            if(data.calcScore < 90) { colorClass = "text-yellow-500"; borderColor = "#eab308"; blurColorClass = "bg-yellow-400"; }
+            if(data.calcScore < 75) { colorClass = "text-red-600"; borderColor = "#dc2626"; blurColorClass = "bg-red-400"; }
+            
+            elScore.className = `text-5xl font-black ${colorClass} tracking-tighter`;
+            elCircle.style.borderColor = borderColor;
+            elBlur.className = `score-circle-bg-blur ${blurColorClass}`;
+
+            const elVerdText = document.getElementById('deltaVerdictText');
+            document.getElementById('maxDelta').textContent = data.deltaMv.toFixed(1);
+            if(data.deltaMv < 15) elVerdText.textContent = "Vynikající"; 
+            else if(data.deltaMv < 30) elVerdText.textContent = "Dobrý"; 
+            else elVerdText.textContent = "Pozor: Imbalance"; 
+
+            if (data.charge) {
+                document.getElementById('noChargeData').classList.add('hidden');
+                document.getElementById('chargeSourceTag').textContent = "Zdroj: " + data.chargeSource;
+                document.getElementById('valAcCharge').textContent = Math.round(data.charge.ac).toLocaleString() + " " + data.charge.unit;
+                document.getElementById('valDcCharge').textContent = Math.round(data.charge.dc).toLocaleString() + " " + data.charge.unit;
+                const ratio = data.charge.dcRatio.toFixed(1);
+                document.getElementById('valDcRatioCenter').textContent = ratio + "%";
+                renderPieChart(data.charge);
+            } else {
+                document.getElementById('noChargeData').classList.remove('hidden');
+            }
+
+            document.getElementById('valSoc').textContent = data.soc ? Math.round(data.soc) + " %" : "-";
+            document.getElementById('valOdo').textContent = data.odo ? Math.round(data.odo).toLocaleString() + " km" : "-";
+            document.getElementById('val12v').textContent = data.aux ? data.aux.toFixed(1) + " V" : "-";
+            document.getElementById('valAvgPack').textContent = data.stats.avg.toFixed(3) + " V";
+            document.getElementById('valCellCount').textContent = data.cells.length;
+            document.getElementById('chartMin').textContent = data.stats.min.toFixed(3) + " V";
+            document.getElementById('chartMax').textContent = data.stats.max.toFixed(3) + " V";
+
+            // Render Temps Table
+            const tbody = document.getElementById('tempTableBody');
+            tbody.innerHTML = '';
+            if (data.temps && data.temps.length > 0) {
+                data.temps.forEach(t => {
+                    let valClass = "text-slate-800";
+                    if (t.highlight === 'red') valClass = "text-red-600";
+                    if (t.highlight === 'blue') valClass = "text-blue-600";
+                    
+                    const row = `<tr>
+                        <td class="px-4 py-3 text-slate-600">${t.label}</td>
+                        <td class="px-4 py-3 text-right font-bold ${valClass} font-mono">${t.val.toFixed(1)} °C</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="2" class="px-4 py-3 text-center text-slate-400">Teplotní data nenalezena</td></tr>`;
+            }
+
+            renderVoltageBarChart(data.cells, data.stats.avg);
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('reportContainer').classList.remove('hidden');
+        }
+
+        function renderPieChart(data) {
+            const ctx = document.getElementById('chargePieChart').getContext('2d');
+            if (chartPie) chartPie.destroy();
+            chartPie = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['AC', 'DC'],
+                    datasets: [{
+                        data: [data.ac, data.dc],
+                        backgroundColor: ['#10b981', '#3b82f6'],
+                        borderWidth: 0, hoverOffset: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: true } } }
+            });
+        }
+
+        function renderVoltageBarChart(cells, globalAvg) {
+            const ctx = document.getElementById('voltageBarChart').getContext('2d');
+            if (chartVoltage) chartVoltage.destroy();
+            const labels = cells.map(c => c.id);
+            const dataVals = cells.map(c => c.avg);
+            const colors = cells.map(c => {
+                const diff = Math.abs(c.avg - globalAvg);
+                if (diff > 0.030) return '#ef4444'; 
+                if (diff > 0.015) return '#f59e0b';
+                return '#10b981';
+            });
+            const minVal = Math.min(...dataVals) - 0.01; 
+            const maxVal = Math.max(...dataVals) + 0.01;
+
+            chartVoltage = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Napětí (V)',
+                        data: dataVals,
+                        backgroundColor: colors,
+                        barPercentage: 0.9, categoryPercentage: 1.0, borderRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)', padding: 12, titleFont: { size: 13 }, bodyFont: { size: 13 }, displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.raw;
+                                    const diff = (val - globalAvg) * 1000;
+                                    const sign = diff > 0 ? "+" : "";
+                                    return [`Napětí: ${val.toFixed(3)} V`, `Delta: ${sign}${diff.toFixed(1)} mV`];
+                                }
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line', yMin: globalAvg, yMax: globalAvg, borderColor: 'rgba(0,0,0,0.5)', borderWidth: 1, borderDash: [5, 5],
+                                    label: { content: 'Průměr', enabled: true, position: 'start', backgroundColor: 'rgba(0,0,0,0.7)', color: 'white', font: {size: 10} }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { maxTicksLimit: 20, font: {size: 10} } },
+                        y: { min: minVal, max: maxVal, title: { display: true, text: 'Volty' }, ticks: { font: {size: 10} } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
