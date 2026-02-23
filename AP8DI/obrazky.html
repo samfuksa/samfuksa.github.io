@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pracovní list: Vlastnosti obrazových souborů (2026)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        .task-card {
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .img-preview {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-weight: bold;
+            text-align: center;
+            padding: 1rem;
+        }
+        /* Simulace obrazových vad pro vizuální ukázku (pokud nejsou dostupné skutečné obrázky) */
+        .img-high-quality { filter: contrast(1.1); }
+        .img-low-quality { filter: blur(1px) contrast(1.5); }
+        .img-pixelated { filter: blur(2px); transform: scale(1.01); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="mb-5 text-center">
+        <h1 class="display-5 fw-bold text-primary">Porovnání vlastností různých typů souborů s obrázkem</h1>
+        <p class="lead">Aktualizováno pro rok 2026 (Zahrnuje moderní formáty WebP a AVIF)</p>
+        <span class="badge bg-info text-dark">Indikátor výkonu: Žák rozeznává různé formáty obrázků a orientuje se ve způsobech jejich využití.</span>
+    </header>
+
+    <div class="card task-card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">A) Vysvětlete, proč se liší velikost souboru</h4>
+        </div>
+        <div class="card-body">
+            <p>Vysvětlete, proč se liší velikost souboru s obrázkem podle formátu obrazového souboru. Níže jsou uvedeny typické velikosti stejné fotografie (papouška) uložené v různých formátech v roce 2026.</p>
+            
+            <form id="formA">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">parrot.BMP (cca 2 610 kB) - Nekomprimovaný originál:</label>
+                    <textarea class="form-control" rows="2" placeholder="Napište své vysvětlení sem..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">parrot.PNG (cca 920 kB) - Bezeztrátová komprese:</label>
+                    <textarea class="form-control" rows="2" placeholder="Napište své vysvětlení sem..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">parrot.JPG (cca 670 kB) - Standardní ztrátová komprese:</label>
+                    <textarea class="form-control" rows="2" placeholder="Napište své vysvětlení sem..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-success">parrot.AVIF / WebP (cca 210 kB) - Moderní formáty nové generace:</label>
+                    <textarea class="form-control border-success" rows="2" placeholder="Vysvětlete výhody moderních formátů..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-danger">parrot_low.JPG (cca 21 kB) - Silná ztrátová komprese:</label>
+                    <textarea class="form-control border-danger" rows="2" placeholder="Co se stane s kvalitou při takto malé velikosti?"></textarea>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card task-card">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">B) Přiřaďte vizuální kvalitu k formátu</h4>
+        </div>
+        <div class="card-body">
+            <p>Vyberte z roletkového menu pod každým obrázkem typ (nebo typy) souboru, který pravděpodobně odpovídá zobrazené kvalitě. Všimněte si artefaktů (kostičkování) u velmi komprimovaných obrázků.</p>
+            
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="img-preview img-high-quality">
+                            [Ostrý obraz bez ztráty detailů, plynulé přechody barev]
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Obrázek 1</h5>
+                            <select class="form-select format-select" data-correct="lossless">
+                                <option value="" selected disabled>Vyberte formát...</option>
+                                <option value="lossless">BMP / PNG / AVIF (Vysoká kvalita)</option>
+                                <option value="lossy">Standardní JPG / WebP</option>
+                                <option value="heavy-lossy">Silně komprimovaný JPG (21 kB)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="img-preview img-low-quality">
+                            [Mírné zhoršení ostrosti, okem téměř neznatelné, malá velikost]
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Obrázek 2</h5>
+                            <select class="form-select format-select" data-correct="lossy">
+                                <option value="" selected disabled>Vyberte formát...</option>
+                                <option value="lossless">BMP / PNG / AVIF (Vysoká kvalita)</option>
+                                <option value="lossy">Standardní JPG / WebP (Zlatá střední cesta)</option>
+                                <option value="heavy-lossy">Silně komprimovaný JPG (21 kB)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="img-preview img-pixelated">
+                            [Viditelné "kostičky" a barevné artefakty kolem hran, rozmazané detaily]
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Obrázek 3</h5>
+                            <select class="form-select format-select" data-correct="heavy-lossy">
+                                <option value="" selected disabled>Vyberte formát...</option>
+                                <option value="lossless">BMP / PNG / AVIF (Vysoká kvalita)</option>
+                                <option value="lossy">Standardní JPG / WebP</option>
+                                <option value="heavy-lossy">Silně komprimovaný JPG (21 kB)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary mt-3" onclick="checkAnswers()">Zkontrolovat přiřazení (Úkol B)</button>
+            <div id="resultMessage" class="mt-3 fw-bold"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function checkAnswers() {
+        const selects = document.querySelectorAll('.format-select');
+        let correctCount = 0;
+        let allAnswered = true;
+
+        selects.forEach(select => {
+            select.classList.remove('is-valid', 'is-invalid');
+            
+            if (select.value === "") {
+                allAnswered = false;
+            } else if (select.value === select.getAttribute('data-correct')) {
+                select.classList.add('is-valid');
+                correctCount++;
+            } else {
+                select.classList.add('is-invalid');
+            }
+        });
+
+        const resultDiv = document.getElementById('resultMessage');
+        
+        if (!allAnswered) {
+            resultDiv.className = "mt-3 fw-bold text-warning";
+            resultDiv.innerText = "Prosím, vyberte odpověď u všech obrázků.";
+        } else if (correctCount === 3) {
+            resultDiv.className = "mt-3 fw-bold text-success";
+            resultDiv.innerText = "Výborně! Všechna přiřazení jsou správně. Kostičkování vzniká při příliš agresivní ztrátové kompresi.";
+        } else {
+            resultDiv.className = "mt-3 fw-bold text-danger";
+            resultDiv.innerText = "Některé odpovědi nejsou správné. Zkuste to znovu. Pamatujte, že nejhorší obraz odpovídá nejmenší velikosti souboru u ztrátové komprese.";
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
