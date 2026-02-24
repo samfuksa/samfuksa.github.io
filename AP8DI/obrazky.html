@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pracovní list: Vlastnosti a formáty obrázků</title>
-    <!-- Modern Typography: Inter -->
+    <!-- Bold Typography: Space Grotesk -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <!-- Bootstrap CSS for layout foundation (but overridden for premium look) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,33 +17,33 @@
 
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --secondary: #10B981;
-            --accent: #F59E0B;
-            --danger: #EF4444;
-            --background: #F8FAFC;
+            --primary: #3B82F6;
+            /* Electric Blue */
+            --primary-hover: #2563EB;
+            --secondary: #34D399;
+            /* Mint */
+            --accent: #FBBF24;
+            /* Mustard */
+            --danger: #F87171;
+            /* Coral Red */
+            --background: #FFFBEB;
+            /* Cream Paper */
             --surface: #FFFFFF;
-            --text-main: #0F172A;
-            --text-muted: #64748B;
-            --border: #E2E8F0;
-            --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.2);
+            --text-main: #111827;
+            --text-muted: #374151;
+            --border: #000000;
+            --radius-md: 0px;
+            /* Strong geometry */
+            --shadow-hard: 4px 4px 0px #000000;
+            --shadow-hard-hover: 2px 2px 0px #000000;
+            --border-thick: 2px solid #000000;
         }
 
         body {
             background-color: var(--background);
-            background-image:
-                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
-            background-attachment: fixed;
-            font-family: 'Inter', sans-serif;
+            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+            background-size: 24px 24px;
+            font-family: 'Space Grotesk', sans-serif;
             color: var(--text-main);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
@@ -56,97 +56,85 @@
             min-height: 297mm;
             margin: 40px auto;
             padding: 25mm 20mm;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
+            border: var(--border-thick);
+            box-shadow: 8px 8px 0px #000000;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
             box-sizing: border-box;
-        }
-
-        /* Decorative top gradient line */
-        #worksheet::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
         }
 
         /* Titles and Typography */
         h2 {
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
             color: var(--text-main);
-            background: linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         p {
             color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 1rem;
+            font-weight: 500;
         }
 
         /* Fill-in Fields */
         .fill-in-box {
-            border: none;
-            border-bottom: 2px solid var(--border);
-            border-radius: 4px 4px 0 0;
-            background-color: rgba(241, 245, 249, 0.5);
+            border: var(--border-thick);
+            background-color: #F8FAFC;
             width: 100%;
             padding: 10px 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
             color: var(--text-main);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease-in-out;
             resize: vertical;
-            /* Allow vertical resize only */
             min-height: 42px;
+            box-shadow: 2px 2px 0px #000000;
+            border-radius: 0;
         }
 
         .fill-in-box:focus {
             outline: none;
-            border-bottom-color: var(--primary);
-            background-color: #EEF2FF;
-            box-shadow: 0 4px 6px -4px rgba(79, 70, 229, 0.2);
+            background-color: #E0E7FF;
+            box-shadow: 0px 0px 0px #000000;
+            transform: translate(2px, 2px);
         }
 
         .fill-in-box::placeholder {
             color: #94A3B8;
-            font-weight: 400;
+            font-weight: 500;
         }
 
         /* Dynamic Task Cards */
         .task-card {
-            border: none;
-            border-radius: var(--radius-md);
+            border: var(--border-thick);
             background: var(--surface);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow-hard);
+            margin-bottom: 2.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             position: relative;
             overflow: hidden;
             page-break-inside: avoid;
+            border-radius: 0;
         }
 
         .task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hard-hover);
         }
 
+        /* Top brutalist accent line instead of side line */
         .task-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            bottom: 0;
-            width: 4px;
+            right: 0;
+            height: 8px;
             background-color: var(--primary);
-            border-radius: var(--radius-md) 0 0 var(--radius-md);
+            border-bottom: var(--border-thick);
+            z-index: 10;
         }
 
         .task-card.border-success::before {
@@ -163,29 +151,27 @@
 
         .task-header {
             background-color: #F8FAFC;
-            padding: 16px 24px;
+            padding: 24px 24px 16px 24px;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            text-transform: uppercase;
             color: var(--text-main);
-            border-bottom: 1px solid var(--border);
+            border-bottom: var(--border-thick);
             display: flex;
             align-items: center;
         }
 
         /* Overriding specific card headers */
         .task-card.border-success .task-header {
-            background-color: rgba(16, 185, 129, 0.05);
-            color: #065F46;
+            background-color: #D1FAE5;
         }
 
         .task-card.border-warning .task-header {
-            background-color: rgba(245, 158, 11, 0.05);
-            color: #92400E;
+            background-color: #FEF3C7;
         }
 
         .task-card.border-danger .task-header {
-            background-color: rgba(239, 68, 68, 0.05);
-            color: #991B1B;
+            background-color: #FEE2E2;
         }
 
         .task-body {
@@ -199,17 +185,17 @@
 
         /* Image Quality Preview Cards */
         .preview-wrapper {
-            transition: all 0.3s ease;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            border: var(--border-thick);
             background: var(--surface);
             height: 100%;
+            box-shadow: var(--shadow-hard);
+            border-radius: 0;
         }
 
         .preview-wrapper:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-md);
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hard-hover);
         }
 
         .img-preview {
@@ -220,70 +206,69 @@
             justify-content: center;
             text-align: center;
             padding: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #FFFFFF;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            position: relative;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #000;
+            border-bottom: var(--border-thick);
+            text-transform: uppercase;
         }
 
         .img-high-quality {
-            background: linear-gradient(135deg, #34D399 0%, #059669 100%);
+            background-color: var(--secondary);
         }
 
         .img-low-quality {
-            background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+            background-color: var(--accent);
         }
 
         .img-pixelated {
-            background: linear-gradient(135deg, #F87171 0%, #DC2626 100%);
-            background-size: 15px 15px;
-            background-image:
-                linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.15) 75%, rgba(255, 255, 255, 0.15)),
-                linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.15) 75%, rgba(255, 255, 255, 0.15));
-            background-position: 0 0, 7.5px 7.5px;
+            background-color: var(--danger);
+            background-image: radial-gradient(#000 2px, transparent 2px);
+            background-size: 10px 10px;
         }
 
         /* Alerts info boxes */
         .alert-info {
-            background-color: rgba(79, 70, 229, 0.05);
-            border: 1px solid rgba(79, 70, 229, 0.2);
-            color: var(--primary);
-            border-radius: var(--radius-sm);
+            background-color: #E0E7FF;
+            border: var(--border-thick);
+            color: var(--text-main);
+            box-shadow: var(--shadow-hard);
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            font-weight: 500;
+            font-weight: 600;
             padding: 16px;
         }
 
         .alert-info::before {
-            content: '💡';
+            content: '�';
             font-size: 1.2rem;
         }
 
-        /* Glassmorphism Control Panel */
+        /* Neo-Brutalist Control Panel */
         #toggle-panel-btn {
             position: fixed;
             top: 24px;
             right: 24px;
             z-index: 1000;
-            border-radius: 50px;
             padding: 12px 24px;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            color: var(--primary);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            background: var(--surface);
+            border: var(--border-thick);
+            color: var(--text-main);
+            box-shadow: var(--shadow-hard);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-radius: 0;
         }
 
         #toggle-panel-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.95);
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hard-hover);
+            background: var(--primary);
+            color: #fff;
         }
 
         #control-panel {
@@ -293,20 +278,17 @@
             z-index: 1001;
             width: 280px;
             display: none;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.02);
-            overflow: hidden;
-            animation: fadeIn 0.3s ease-out;
+            background: var(--surface);
+            border: var(--border-thick);
+            box-shadow: 8px 8px 0px #000000;
+            animation: fadeIn 0.15s ease-out;
+            border-radius: 0;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(-5px);
             }
 
             to {
@@ -316,19 +298,17 @@
         }
 
         #control-panel .card-header {
-            background: transparent;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            color: var(--text-main);
+            background: var(--primary);
+            border-bottom: var(--border-thick);
+            color: #000;
             padding: 16px 20px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         #control-panel .btn-close {
             filter: none;
-            opacity: 0.5;
-        }
-
-        #control-panel .btn-close:hover {
             opacity: 1;
         }
 
@@ -337,79 +317,41 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            font-weight: 600;
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            border: var(--border-thick);
             transition: all 0.2s;
+            box-shadow: var(--shadow-hard);
+            font-family: 'Space Grotesk', sans-serif;
+            border-radius: 0;
         }
 
         .btn-pdf {
             background-color: var(--primary);
-            color: white;
-            border: none;
+            color: black;
         }
 
         .btn-pdf:hover {
             background-color: var(--primary-hover);
             color: white;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-glow);
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hard-hover);
         }
 
         .btn-print {
-            background-color: transparent;
+            background-color: var(--surface);
             color: var(--text-main);
-            border: 1px solid var(--border);
         }
 
         .btn-print:hover {
-            background-color: #F1F5F9;
-            border-color: #CBD5E1;
-            transform: translateY(-1px);
+            background-color: #E2E8F0;
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-hard-hover);
         }
 
         /* Print and PDF overrides - Fixed scaling issue */
-        @media print {
-            body {
-                background-color: white !important;
-                background-image: none !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                margin: 0;
-            }
-
-            #worksheet {
-                margin: 0;
-                padding: 20px;
-                width: 210mm;
-                /* Fixed A4 width */
-                max-width: 210mm;
-                border: none !important;
-                box-shadow: none !important;
-            }
-
-            #worksheet::before {
-                display: none;
-            }
-
-            .task-card {
-                break-inside: avoid;
-                page-break-inside: avoid;
-                margin-bottom: 2rem;
-                box-shadow: none !important;
-                border: 1px solid #E2E8F0 !important;
-            }
-
-            .fill-in-box {
-                background-color: #F8FAFC !important;
-            }
-
-            #control-panel,
-            #toggle-panel-btn {
-                display: none !important;
-            }
-        }
-
+        /* Containers for PDF capturing */
         .pdf-hide {
             display: inherit;
         }
@@ -630,30 +572,22 @@
             panel.style.display = 'none';
             btn.style.display = 'none';
 
-            // Přechod na začátek stránky před generováním (opraví posunutí obsahu dolů)
             window.scrollTo(0, 0);
 
             const element = document.getElementById('worksheet');
 
-            // Dočasné odstranění stínů a vynucení zarovnání vlevo nahoře pro perfektní export
-            const origMargin = element.style.margin;
+            // Dočasně odstraníme stín a hlavně vycentrování obrazovky (margin:auto), 
+            // které mate html2canvas do focení obrovského okraje vlevo a následného "zoomování" uvnitř PDF.
             const origBoxShadow = element.style.boxShadow;
-            const origMaxWidth = element.style.maxWidth;
-            const origWidth = element.style.width;
+            const origMargin = element.style.margin;
 
-            element.style.margin = '0'; // DŮLEŽITÉ: Nenechávat 'auto', to způsobí zmenšení a vycentrování na velké ploše
             element.style.boxShadow = 'none';
-            element.style.maxWidth = '794px';
-            element.style.width = '794px';
+            element.style.margin = '0';
 
             const inputs = element.querySelectorAll('input[type="text"], textarea');
-
             inputs.forEach((input) => {
                 input.setAttribute('value', input.value || '');
-                if (input.tagName.toLowerCase() === 'textarea') {
-                    input.innerHTML = input.value;
-                }
-                // Fix for dark mode bugs in some PDF engines:
+                if (input.tagName.toLowerCase() === 'textarea') input.innerHTML = input.value;
                 input.style.color = '#0F172A';
             });
 
@@ -669,33 +603,29 @@
             });
 
             const opt = {
-                margin: 0, // Nula, protože už máme dostatečné odsazení (padding) v CSS uvnitř #worksheet
+                margin: 0,
                 filename: 'Vlastnosti_Obrazku_Pracovni_List.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
-                    scale: 2, // 2x rozlišení pro ostrost textů
+                    scale: 2,
                     useCORS: true,
                     logging: false,
-                    scrollY: 0,
-                    windowWidth: 794 // Pevná šířka (210mm), zabrání nekontrolovatelnému zmenšování v prohlížeči
+                    scrollX: 0,
+                    scrollY: 0
                 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'] }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                btn.style.display = 'block';
-                btn.style.opacity = '1';
-
-                // Vrátit původní CSS
-                element.style.margin = origMargin;
+                // Vrácení UI do původního stavu
                 element.style.boxShadow = origBoxShadow;
-                element.style.maxWidth = origMaxWidth;
-                element.style.width = origWidth;
+                element.style.margin = origMargin;
 
-                // Reset custom inline styles for text inputs/selects on resume
                 inputs.forEach(input => input.style.color = '');
                 selects.forEach(select => select.style.color = '');
+
+                btn.style.display = 'block';
+                btn.style.opacity = '1';
             });
         }
     </script>
