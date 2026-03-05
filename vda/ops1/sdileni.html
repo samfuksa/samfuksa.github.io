@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodická karta: Souboj oprávnění (Sdílení vs. NTFS)</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome pro ikony -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+            --surface-color: #ffffff;
+            --bg-color: #f3f4f6;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            
+            --traffic-red: #ff4757;
+            --traffic-yellow: #ffa502;
+            --traffic-green: #2ed573;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            /* Jemný pattern na pozadí */
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Modern Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: #6366f1 !important;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 6rem 0 4rem;
+            margin-bottom: 4rem;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3);
+            text-align: center;
+        }
+
+        .badge-glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-weight: 500;
+            padding: 0.5em 1em;
+        }
+
+        /* Cards - Modern Glassy Look */
+        .method-card {
+            background: var(--surface-color);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 24px;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .method-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #8b5cf6;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .icon-blue { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+        .icon-yellow { background: rgba(255, 165, 2, 0.1); color: #ffa502; }
+        .icon-teal { background: rgba(45, 212, 191, 0.1); color: #2dd4bf; }
+
+        /* Timeline Redesign */
+        .timeline-container {
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            padding-bottom: 30px;
+            border-left: 2px dashed #d1d5db;
+        }
+
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -11px;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 4px solid #8b5cf6;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Neon Traffic Light */
+        .traffic-light-modern {
+            background: #1f2937;
+            padding: 1.5rem;
+            border-radius: 50px;
+            display: inline-flex;
+            gap: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #374151;
+        }
+
+        .neon-light {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #374151;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .neon-light::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .neon-light.red.active {
+            background: var(--traffic-red);
+            box-shadow: 0 0 30px var(--traffic-red), inset 0 0 10px white;
+        }
+        .neon-light.yellow.active {
+            background: var(--traffic-yellow);
+            box-shadow: 0 0 30px var(--traffic-yellow), inset 0 0 10px white;
+        }
+        .neon-light.green.active {
+            background: var(--traffic-green);
+            box-shadow: 0 0 30px var(--traffic-green), inset 0 0 10px white;
+        }
+
+        /* Content Cards for Semaphore */
+        .rule-card-modern {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .rule-card-modern.active {
+            display: block;
+        }
+
+        .rule-header {
+            padding: 1.5rem;
+            color: white;
+        }
+        
+        .header-red { background: linear-gradient(135deg, #ff4757, #ff6b81); }
+        .header-yellow { background: linear-gradient(135deg, #ffa502, #ffc048); color: #1f2937; }
+        .header-green { background: linear-gradient(135deg, #2ed573, #7bed9f); }
+
+        .citation-block {
+            background: #1e1e2e;
+            color: #a6accd;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-header .line {
+            width: 80px;
+            height: 4px;
+            background: var(--secondary-gradient);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-main" data-bs-offset="100">
+
+    <!-- Navigace -->
+    <nav id="navbar-main" class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-network-wired me-2"></i>NET.EDU</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="fas fa-bars"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav gap-2">
+                    <li class="nav-item"><a class="nav-link active" href="#metodika">Metodika</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#scenar">Praktická část</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#kodex">Principy</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#reflexe">Reflexe</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modern Hero -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-3 fw-bold mb-4">Souboj oprávnění: <br>Sdílení vs. Zabezpečení</h1>
+                    <p class="lead mb-4 opacity-75">Praktické cvičení pro pochopení, jak funguje síťový přístup k souborům a proč restriktivnější pravidlo vždy vyhrává.</p>
+                    
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+                        <span class="badge badge-glass rounded-pill"><i class="far fa-clock me-2"></i>30 minut</span>
+                        <span class="badge badge-glass rounded-pill"><i class="fas fa-user-graduate me-2"></i>SŠ / IT obory</span>
+                        <span class="badge badge-glass rounded-pill"><i class="fas fa-server me-2"></i>Správa OS a sítí</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STRANA 1: METODIKA -->
+    <div class="container mb-5" id="metodika">
+        <div class="section-header">
+            <h2>Metodické ukotvení</h2>
+            <div class="line"></div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Cíle -->
+            <div class="col-md-4">
+                <div class="method-card">
+                    <div class="icon-box icon-blue">
+                        <i class="fas fa-crosshairs"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Cíle cvičení</h4>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-3 d-flex align-items-start"><i class="fas fa-check-circle text-primary mt-1 me-2"></i><span>Prakticky si ověřit fungování síťového přístupu (SMB).</span></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fas fa-check-circle text-primary mt-1 me-2"></i><span>Pochopit rozdíl mezi právy <em>Sdílení</em> a <em>NTFS Zabezpečením</em>.</span></li>
+                        <li class="d-flex align-items-start"><i class="fas fa-check-circle text-primary mt-1 me-2"></i><span>Naučit se princip "nejpřísnější pravidlo vyhrává".</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Úskalí -->
+            <div class="col-md-4">
+                <div class="method-card">
+                    <div class="icon-box icon-yellow">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Na co si dát pozor</h4>
+                    <p class="text-muted">
+                        Nejčastější chybou při testování je blokace ze strany <strong>Windows Defender Firewallu</strong>. Dále se studenti často pletou v IP adresách (WiFi vs LAN adaptér).
+                    </p>
+                    <div class="alert alert-warning border-0 bg-opacity-10 bg-warning text-dark mt-3">
+                        <small><i class="fas fa-lightbulb me-1"></i> <strong>Tip:</strong> Ujistěte se, že oba počítače jsou ve stejné podsíti a mají povolené "Sdílení souborů a tiskáren".</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pomůcky -->
+            <div class="col-md-4">
+                <div class="method-card">
+                    <div class="icon-box icon-teal">
+                        <i class="fas fa-toolbox"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Toolkit</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent border-0 px-0 py-2"><i class="fas fa-laptop text-muted me-2"></i> 2x PC s OS Windows (práce ve dvojicích)</li>
+                        <li class="list-group-item bg-transparent border-0 px-0 py-2"><i class="fas fa-network-wired text-muted me-2"></i> Propojení v lokální síti</li>
+                        <li class="list-group-item bg-transparent border-0 px-0 py-2"><i class="fas fa-terminal text-muted me-2"></i> Znalost příkazu <code>ipconfig</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scénář -->
+    <div class="container mb-5" id="scenar">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="section-header">
+                    <h2>Praktická část (Pro dvojice)</h2>
+                    <div class="line"></div>
+                </div>
+
+                <div class="method-card p-5">
+                    <div class="timeline-container">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">Krok 1</span>
+                            <h5 class="fw-bold mt-1">Příprava složky a sdílení (Student A)</h5>
+                            <p class="text-muted small mb-2">Na datovém disku <strong>D:</strong> (případně jiné datové složce, např. <code>E:\Data</code>, vyhněte se systémovému disku C: a Ploše) vytvořte složku s názvem <strong>PokusSdileni</strong>. Uvnitř vytvořte textový dokument <code>test.txt</code> a napište do něj libovolný text.</p>
+                            <p class="text-muted small">Otevřete Vlastnosti složky -> karta Sdílení -> Rozšířené možnosti sdílení. Zaškrtněte „Sdílet tuto složku“, klikněte na Oprávnění, vyberte skupinu <em>Everyone (Všichni)</em> a v sekci Povolit zaškrtněte <strong>Úplné řízení</strong>. Zjistěte svou IP adresu (přes cmd a příkaz <code>ipconfig</code>).</p>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">Krok 2</span>
+                            <h5 class="fw-bold mt-1">Omezení přes NTFS (Student A)</h5>
+                            <p class="text-muted small mb-2">Přejděte do karty <strong>Zabezpečení</strong> (u stejné složky). Klikněte na Upravit -> vyberte uživatele <em>Everyone (Všichni)</em>.</p>
+                            <p class="text-muted small"><strong>Důležité:</strong> Nepoužívejte sloupec Odepřít! V sekci <em>Povolit</em> nechte zaškrtnuté <strong>pouze</strong> „Čtení a spouštění“, „Zobrazit obsah složky“ a „Čtení“. Ujistěte se, že políčka „Zápis“, „Změnit“ a „Úplné řízení“ jsou odškrtnutá.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">Krok 3</span>
+                            <h5 class="fw-bold mt-1">Pokus o průnik (Student B)</h5>
+                            <p class="text-muted small mb-2">Na svém počítači otevřete Průzkumník souborů a do adresního řádku zadejte síťovou cestu k počítači Studenta A (např. <code>\\192.168.1.50\PokusSdileni</code>).</p>
+                            <p class="text-muted small">Otevřete soubor <code>test.txt</code>. Přečíst by měl jít bez problému. Zkuste do něj dopsat text a soubor uložit (nebo zkuste ve složce vytvořit nový soubor). <strong>Výsledek: Systém by měl ohlásit chybu přístupu.</strong> Přísnější NTFS pravidlo (jen čtení) přebilo „Úplné řízení“ nastavené ve sdílení.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <span class="text-primary fw-bold text-uppercase small ls-1">Krok 4</span>
+                            <h5 class="fw-bold mt-1">Náprava a otestování (Student A + B)</h5>
+                            <p class="text-muted small">Student A se vrátí do karty Zabezpečení, u uživatele Everyone nově <strong>zaškrtne (Povolí)</strong> možnost pro Zápis (či Změnit). Student B zkusí soubor upravit a uložit znovu ze svého PC. Nyní by uložení mělo projít bez chyby.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interaktivní Principy -->
+    <div class="container py-5" id="kodex">
+        <div class="section-header">
+            <h2>Klíčové principy oprávnění</h2>
+            <p class="text-muted">Interaktivní vizualizace výsledného přístupu</p>
+        </div>
+
+        <div class="row justify-content-center align-items-center flex-column-reverse flex-lg-row">
+            <!-- Levá strana - Texty -->
+            <div class="col-lg-6 mt-4 mt-lg-0">
+                
+                <!-- RED CARD -->
+                <div id="rule-red" class="rule-card-modern">
+                    <div class="rule-header header-red">
+                        <h3 class="mb-0"><i class="fas fa-lock me-2"></i>OMEZENÝ PŘÍSTUP</h3>
+                        <small class="opacity-75">Stav v Kroku 3: Pouze pro čtení</small>
+                    </div>
+                    <div class="p-4">
+                        <h6 class="fw-bold text-danger mb-3">Rozbor situace:</h6>
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item border-0"><i class="fas fa-folder-open text-primary me-2"></i><strong>Sdílení (SMB):</strong> Povoleno Úplné řízení.</li>
+                            <li class="list-group-item border-0"><i class="fas fa-shield-alt text-danger me-2"></i><strong>Zabezpečení (NTFS):</strong> Povoleno POUZE Čtení.</li>
+                            <li class="list-group-item border-0 fw-bold"><i class="fas fa-equals text-dark me-2"></i><strong>Výsledek v síti:</strong> Lze pouze číst, zápis selže.</li>
+                        </ul>
+                        <div class="bg-danger bg-opacity-10 p-3 rounded-3 border border-danger border-opacity-25 mb-4">
+                            <small class="fw-bold text-danger"><i class="fas fa-info-circle me-1"></i> PROČ?</small>
+                            <p class="mb-0 small text-danger">Ačkoliv brána Sdílení je otevřena dokořán, samotný pevný disk (souborový systém NTFS) uživatele k zápisu nepustí. Absence zaškrtnutí "Povolit Zápis" funguje jako ochrana.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YELLOW CARD -->
+                <div id="rule-yellow" class="rule-card-modern">
+                    <div class="rule-header header-yellow">
+                        <h3 class="mb-0"><i class="fas fa-balance-scale me-2"></i>ZLATÉ PRAVIDLO</h3>
+                        <small class="opacity-75">Jak systém počítá výsledek</small>
+                    </div>
+                    <div class="p-4">
+                        <h6 class="fw-bold text-warning mb-3">Pravidlo průniku (Nejpřísnější vyhrává):</h6>
+                        <p class="text-muted small">Při přístupu ke složce přes síť systém Windows porovnává dvě různé sady oprávnění a aplikuje to, které je <strong>více omezující</strong>.</p>
+                        
+                        <div class="bg-light p-3 rounded-3 border mb-4 text-center">
+                            <h5 class="mb-0">
+                                <span class="badge bg-primary">Sdílení</span> <i class="fas fa-plus mx-2 text-muted"></i> <span class="badge bg-secondary">NTFS</span> <i class="fas fa-arrow-right mx-2 text-muted"></i> <span class="badge bg-warning text-dark">Průnik</span>
+                            </h5>
+                        </div>
+
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-3 border border-warning border-opacity-25 mb-4">
+                            <small class="fw-bold text-warning text-dark"><i class="fas fa-cog me-1"></i> SPRÁVNÁ PRAXE (Best Practice)</small>
+                            <p class="mb-0 small text-dark">Místo složitého nastavování obou záložek správci sítí obvykle nastaví v záložce <strong>Sdílení -> Everyone -> Úplné řízení</strong> a skutečná práva uživatelů řídí výhradně přes detailnější záložku <strong>Zabezpečení (NTFS)</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GREEN CARD -->
+                <div id="rule-green" class="rule-card-modern active">
+                    <div class="rule-header header-green">
+                        <h3 class="mb-0 text-white"><i class="fas fa-check-circle me-2"></i>PLNÝ PŘÍSTUP</h3>
+                        <small class="text-white opacity-75">Stav v Kroku 4: Úspěšný zápis</small>
+                    </div>
+                    <div class="p-4">
+                        <h6 class="fw-bold text-success mb-3">Rozbor situace:</h6>
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item border-0"><i class="fas fa-folder-open text-primary me-2"></i><strong>Sdílení (SMB):</strong> Povoleno Úplné řízení.</li>
+                            <li class="list-group-item border-0"><i class="fas fa-shield-alt text-success me-2"></i><strong>Zabezpečení (NTFS):</strong> Povoleno Čtení i Zápis.</li>
+                            <li class="list-group-item border-0 fw-bold"><i class="fas fa-equals text-dark me-2"></i><strong>Výsledek v síti:</strong> Uživatel může číst, upravovat i vytvářet soubory.</li>
+                        </ul>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-3 border border-success border-opacity-25 mb-4">
+                            <small class="fw-bold text-success"><i class="fas fa-check me-1"></i> HOTOVO</small>
+                            <p class="mb-0 small text-success">Tím, že Student A explicitně <strong>povolil</strong> Zápis na kartě Zabezpečení, obě úrovně oprávnění se protnuly a dovolily Studentovi B uložit změny ze sítě na disk.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminologie -->
+                <div class="mt-4">
+                    <h6 class="fw-bold text-uppercase text-muted ls-1 mb-3">Rychlý slovníček</h6>
+                    <div class="citation-block shadow-sm">
+                        <span style="color: #c678dd">SMB:</span> Server Message Block (protokol pro sdílení)<br>
+                        <span style="color: #98c379">NTFS:</span> New Technology File System (systém souborů s bezpečnostními prvky)<br>
+                        <span style="color: #e5c07b">Everyone:</span> Vestavěná skupina zahrnující kohokoliv, kdo přistupuje na dané PC.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Pravá strana - Ovladač -->
+            <div class="col-lg-5 text-center mb-4 mb-lg-0">
+                <div class="traffic-light-modern">
+                    <div class="neon-light red" onclick="showRule('red')" title="Omezeno (Krok 3)"></div>
+                    <div class="neon-light yellow" onclick="showRule('yellow')" title="Pravidlo průniku"></div>
+                    <div class="neon-light green active" onclick="showRule('green')" title="Povoleno (Krok 4)"></div>
+                </div>
+                <p class="mt-3 text-muted small fst-italic">Klikni na ikony pro vizualizaci fází oprávnění</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reflexe -->
+    <div class="container my-5" id="reflexe">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="method-card bg-white border-0 shadow-lg">
+                    <h3 class="fw-bold mb-4">Reflexe po cvičení</h3>
+                    <div class="d-flex gap-4">
+                        <div class="d-none d-md-block text-primary display-4">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <div>
+                            <p class="lead fst-italic mb-3">
+                                "Toto cvičení je pro studenty často "aha momentem". Do té doby si myslí, že když složku nasdílí všem, mají automaticky vystaráno. Teprve když zažijí na vlastní kůži hlášku 'Přístup odepřen' kvůli NTFS restrikci i přes aktivní sdílení, pochopí reálnou logiku Windows."
+                            </p>
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;"><i class="fas fa-chalkboard-teacher"></i></div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Poznámka pro vyučující</h6>
+                                    <small class="text-muted">Počítačové sítě a OS</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-white border-top mt-5">
+        <div class="container text-center">
+            <h5 class="fw-bold mb-3">NET.EDU</h5>
+            <p class="text-muted mb-4">
+                Praktická správa systémů v souvislostech.
+            </p>
+            <button onclick="window.print()" class="btn btn-dark rounded-pill px-4"><i class="fas fa-print me-2"></i>Uložit do PDF</button>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script pro Semafor -->
+    <script>
+        function showRule(color) {
+            // Vypnout všechna světla
+            document.querySelectorAll('.neon-light').forEach(l => l.classList.remove('active'));
+            // Zapnout vybrané
+            document.querySelector('.neon-light.' + color).classList.add('active');
+
+            // Skrýt karty
+            document.querySelectorAll('.rule-card-modern').forEach(c => c.classList.remove('active'));
+            
+            // Zobrazit vybranou
+            const target = document.getElementById('rule-' + color);
+            // Reset animace
+            target.style.animation = 'none';
+            target.offsetHeight; /* trigger reflow */
+            target.style.animation = null; 
+            
+            target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
