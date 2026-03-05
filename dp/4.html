@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="cs" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architekt responzivní výuky | DigCompEdu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --canvas-bg: #1e1e1e;
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --node-bg: #2d2d2d;
+            --cable-color: #6c757d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: #1a1a1a;
+            border-right: 1px solid #333;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .block-template {
+            cursor: grab;
+            transition: transform 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .block-template:hover {
+            transform: translateX(5px);
+            background-color: #2a2a2a !important;
+        }
+
+        .block-faze { border-left-color: #0d6efd; }
+        .block-nastroj { border-left-color: #0dcaf0; }
+        .block-data { border-left-color: #198754; }
+
+        /* Canvas Area */
+        #workspace {
+            position: relative;
+            height: 100vh;
+            background-color: var(--canvas-bg);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        /* SVG pro kreslení kabelů */
+        #svg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cable {
+            fill: none;
+            stroke: var(--cable-color);
+            stroke-width: 3;
+            transition: stroke 0.3s, filter 0.3s;
+        }
+
+        /* Animace pulzů */
+        @keyframes pulse-animation {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        .cable.pulse-red {
+            stroke: #dc3545;
+            filter: drop-shadow(0 0 8px #dc3545);
+            stroke-dasharray: 10, 15;
+            animation: pulse-animation 1s linear infinite;
+        }
+
+        .cable.pulse-gold {
+            stroke: #ffc107;
+            filter: drop-shadow(0 0 8px #ffc107);
+            stroke-dasharray: 10, 15;
+            animation: pulse-animation 1s linear infinite;
+        }
+
+        .cable.pulse-green {
+            stroke: #20c997;
+            filter: drop-shadow(0 0 8px #20c997);
+            stroke-dasharray: 10, 15;
+            animation: pulse-animation 1s linear infinite;
+        }
+        
+        .cable.pulse-blue {
+            stroke: #0dcaf0;
+            filter: drop-shadow(0 0 8px #0dcaf0);
+            stroke-dasharray: 10, 15;
+            animation: pulse-animation 1s linear infinite;
+        }
+
+        /* Nodes na plátně */
+        .node {
+            position: absolute;
+            background-color: var(--node-bg);
+            border: 1px solid #444;
+            border-radius: 8px;
+            width: 220px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 2;
+            cursor: move;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .node-header {
+            padding: 8px 12px;
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bg-faze { background-color: #0d6efd; color: white; }
+        .bg-nastroj { background-color: #0dcaf0; color: black; }
+        .bg-data { background-color: #198754; color: white; }
+
+        .node-body {
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            position: relative;
+        }
+
+        /* Porty pro připojení */
+        .port {
+            width: 14px;
+            height: 14px;
+            background-color: #adb5bd;
+            border: 2px solid #2d2d2d;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 3;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .port:hover {
+            background-color: #fff;
+            transform: translateY(-50%) scale(1.3);
+        }
+
+        .port-in { left: -7px; }
+        .port-out { right: -7px; }
+
+        .port.active-connecting {
+            background-color: #ffc107;
+            box-shadow: 0 0 10px #ffc107;
+        }
+
+        /* Top controls */
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        /* Modal styling */
+        .custom-modal .modal-content {
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        
+        .feedback-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .btn-close-custom {
+            filter: invert(1);
+        }
+        
+        /* Návodové kroky */
+        .step-box {
+            background: #2a2a2a;
+            border-left: 4px solid #0dcaf0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-3 col-lg-2 sidebar d-flex flex-column p-3">
+            <h5 class="text-white mb-3"><i class="bi bi-boxes me-2"></i>Architekt výuky</h5>
+            
+            <button class="btn btn-outline-info btn-sm w-100 mb-3" data-bs-toggle="modal" data-bs-target="#tutorialModal">
+                <i class="bi bi-question-circle"></i> Jak to funguje?
+            </button>
+            
+            <h6 class="text-primary mt-2 border-bottom border-secondary pb-1">Fáze výuky</h6>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-faze" draggable="true" data-type="vyklad" data-cat="faze">Výklad nové látky</div>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-faze" draggable="true" data-type="samostatna" data-cat="faze">Samostatná práce</div>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-faze" draggable="true" data-type="uprava" data-cat="faze">Úprava dalšího výkladu</div>
+
+            <h6 class="text-info mt-3 border-bottom border-secondary pb-1">Nástroje a aktivity</h6>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-nastroj" draggable="true" data-type="dotaz" data-cat="nastroj">Rychlý dotaz (Slido)</div>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-nastroj" draggable="true" data-type="ukol" data-cat="nastroj">Odevzdání úkolu (LMS)</div>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-nastroj" draggable="true" data-type="kolaborace" data-cat="nastroj">Sdílený dokument</div>
+
+            <h6 class="text-success mt-3 border-bottom border-secondary pb-1">Hodnocení a Data</h6>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-data" draggable="true" data-type="znamka" data-cat="data">Číselná známka</div>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-data" draggable="true" data-type="slovni" data-cat="data">Slovní hodnocení</div>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-data" draggable="true" data-type="video" data-cat="data">Video komentář</div>
+            <div class="block-template p-2 mb-2 bg-dark rounded block-data" draggable="true" data-type="sebehodnoceni" data-cat="data">Sebehodnocení žáka</div>
+
+            <div class="mt-auto text-center pt-3 border-top border-secondary">
+                 <button class="btn btn-outline-danger btn-sm w-100" id="btn-clear"><i class="bi bi-trash"></i> Vyčistit plátno</button>
+            </div>
+        </div>
+
+        <!-- Plátno -->
+        <div class="col-9 col-lg-10" id="workspace">
+            <svg id="svg-canvas"></svg>
+            
+            <div id="empty-state" class="position-absolute top-50 start-50 translate-middle text-center text-muted" style="pointer-events: none; z-index: 0;">
+                <i class="bi bi-diagram-3" style="font-size: 5rem; opacity: 0.15;"></i>
+                <h3 style="opacity: 0.4; margin-top: 15px;">Prázdné plátno</h3>
+                <p style="opacity: 0.5;">Přetáhněte sem bloky z levého panelu.</p>
+            </div>
+
+            <div class="top-controls">
+                <button class="btn btn-warning btn-lg shadow-lg" id="btn-simulate" style="border-radius: 30px; font-weight: bold; letter-spacing: 1px;">
+                    <i class="bi bi-play-fill me-1"></i> SIMULOVAT PRŮCHOD
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Návodový Modal (Tutorial) -->
+<div class="modal fade custom-modal" id="tutorialModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-white">
+            <div class="modal-header border-bottom-0">
+                <h4 class="modal-title text-info"><i class="bi bi-info-circle me-2"></i>Vítejte v Architektovi výuky</h4>
+                <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+            </div>
+            <div class="modal-body pb-4 px-4">
+                <p class="lead mb-4">Vyzkoušejte si nanečisto navrhnout vlastní pedagogický proces a sledujte, jak by obstál podle moderních principů DigCompEdu.</p>
+                
+                <div class="step-box">
+                    <h5 class="text-white"><i class="bi bi-1-circle text-info me-2"></i>Přetáhněte bloky</h5>
+                    <p class="text-muted mb-0">V levém panelu najdete stavební kameny vaší hodiny (Fáze výuky, Nástroje, Hodnocení). Chytněte je myší a přetáhněte na plátno.</p>
+                </div>
+                
+                <div class="step-box" style="border-left-color: #ffc107;">
+                    <h5 class="text-white"><i class="bi bi-2-circle text-warning me-2"></i>Propojte je</h5>
+                    <p class="text-muted mb-0">Klikněte na <strong>pravý bod</strong> jednoho bloku a následně na <strong>levý bod</strong> druhého. Vytvoříte tak cestu, kudy půjde student nebo data.</p>
+                </div>
+                
+                <div class="step-box" style="border-left-color: #20c997;">
+                    <h5 class="text-white"><i class="bi bi-3-circle text-success me-2"></i>Spusťte simulaci</h5>
+                    <p class="text-muted mb-0">Klikněte na velké žluté tlačítko vpravo nahoře. Systém prozkoumá vaše propojení a dá vám zpětnou vazbu k vaší výukové architektuře.</p>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 d-flex justify-content-center pb-4">
+                <button type="button" class="btn btn-info px-5 rounded-pill fw-bold" data-bs-dismiss="modal">Rozumím, jdeme na to!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pro výsledek simulace -->
+<div class="modal fade custom-modal feedback-modal" id="resultModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-white">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="resultTitle">Vyhodnocení architektury</h5>
+                <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+            </div>
+            <div class="modal-body text-center pb-5">
+                <div id="resultIcon" class="feedback-icon"></div>
+                <h3 id="resultHeading" class="mb-3"></h3>
+                <p id="resultText" class="text-muted" style="font-size: 1.1rem;"></p>
+                <div id="resultCitation" class="mt-4 p-3 rounded bg-dark border border-secondary text-start font-monospace small text-info" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Zobrazit návod při prvním načtení stránky
+        const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
+        tutorialModal.show();
+
+        const workspace = document.getElementById('workspace');
+        const svgCanvas = document.getElementById('svg-canvas');
+        const templates = document.querySelectorAll('.block-template');
+        const btnSimulate = document.getElementById('btn-simulate');
+        const btnClear = document.getElementById('btn-clear');
+        const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        
+        let nodes = {}; 
+        let connections = []; 
+        let nodeIdCounter = 0;
+        
+        let connectingState = {
+            active: false,
+            fromNodeId: null,
+            tempPath: null
+        };
+
+        // --- Názvy pro vykreslování ---
+        const typeLabels = {
+            'vyklad': 'Výklad nové látky', 'samostatna': 'Samostatná práce', 'uprava': 'Úprava dalšího výkladu',
+            'dotaz': 'Rychlý dotaz (Slido)', 'ukol': 'Odevzdání úkolu', 'kolaborace': 'Sdílený dokument',
+            'znamka': 'Číselná známka', 'slovni': 'Slovní hodnocení', 'video': 'Video komentář', 'sebehodnoceni': 'Sebehodnocení žáka'
+        };
+
+        // ==========================================
+        // 1. DRAG & DROP z menu na plátno
+        // ==========================================
+        templates.forEach(t => {
+            t.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('type', t.dataset.type);
+                e.dataTransfer.setData('cat', t.dataset.cat);
+            });
+        });
+
+        workspace.addEventListener('dragover', (e) => {
+            e.preventDefault(); 
+        });
+
+        workspace.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('type');
+            if (!type) return;
+
+            const cat = e.dataTransfer.getData('cat');
+            const rect = workspace.getBoundingClientRect();
+            const x = e.clientX - rect.left - 100; 
+            const y = e.clientY - rect.top - 20;
+
+            createNode(type, cat, x, y);
+        });
+
+        // ==========================================
+        // 2. TVORBA A POHYB UZLŮ NA PLÁTNĚ
+        // ==========================================
+        function createNode(type, cat, x, y) {
+            const id = 'node_' + (nodeIdCounter++);
+            
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'node';
+            nodeEl.id = id;
+            nodeEl.style.left = x + 'px';
+            nodeEl.style.top = y + 'px';
+
+            let headerClass = cat === 'faze' ? 'bg-faze' : (cat === 'nastroj' ? 'bg-nastroj' : 'bg-data');
+
+            nodeEl.innerHTML = `
+                <div class="node-header ${headerClass}">
+                    <span>${cat.toUpperCase()}</span>
+                    <i class="bi bi-x" style="cursor:pointer;" onclick="deleteNode('${id}')"></i>
+                </div>
+                <div class="node-body">
+                    ${typeLabels[type]}
+                    <div class="port port-in" data-node="${id}" data-type="in" title="Vstup"></div>
+                    <div class="port port-out" data-node="${id}" data-type="out" title="Výstup"></div>
+                </div>
+            `;
+
+            workspace.appendChild(nodeEl);
+            nodes[id] = { id, type, cat, el: nodeEl };
+
+            makeNodeDraggable(nodeEl, id);
+            setupPorts(nodeEl);
+            document.getElementById('empty-state').style.display = 'none';
+        }
+
+        window.deleteNode = function(id) {
+            connections = connections.filter(conn => {
+                if(conn.from === id || conn.to === id) {
+                    conn.pathElement.remove();
+                    return false;
+                }
+                return true;
+            });
+            nodes[id].el.remove();
+            delete nodes[id];
+            
+            if(Object.keys(nodes).length === 0) {
+                document.getElementById('empty-state').style.display = 'block';
+            }
+        };
+
+        function makeNodeDraggable(element, id) {
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+
+            const header = element.querySelector('.node-header');
+            
+            header.addEventListener('mousedown', (e) => {
+                if(e.target.tagName === 'I') return;
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = element.offsetLeft;
+                initialY = element.offsetTop;
+                element.style.zIndex = 100;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                element.style.left = (initialX + dx) + 'px';
+                element.style.top = (initialY + dy) + 'px';
+                updateConnections();
+            });
+
+            document.addEventListener('mouseup', () => {
+                if(isDragging) {
+                    isDragging = false;
+                    element.style.zIndex = 2;
+                }
+            });
+        }
+
+        // ==========================================
+        // 3. PROPOJOVÁNÍ UZLŮ (KABELY)
+        // ==========================================
+        function setupPorts(nodeEl) {
+            const ports = nodeEl.querySelectorAll('.port');
+            ports.forEach(port => {
+                port.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const nodeId = port.dataset.node;
+                    const portType = port.dataset.type;
+
+                    if (portType === 'out') {
+                        if (connectingState.active) cleanupTempConnection();
+                        
+                        connectingState.active = true;
+                        connectingState.fromNodeId = nodeId;
+                        port.classList.add('active-connecting');
+                        
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.classList.add('cable');
+                        path.style.strokeDasharray = "5, 5";
+                        svgCanvas.appendChild(path);
+                        connectingState.tempPath = path;
+
+                    } else if (portType === 'in' && connectingState.active) {
+                        const fromId = connectingState.fromNodeId;
+                        const toId = nodeId;
+
+                        if (fromId !== toId) {
+                            const exists = connections.some(c => c.from === fromId && c.to === toId);
+                            if(!exists) {
+                                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                                path.classList.add('cable');
+                                svgCanvas.appendChild(path);
+                                connections.push({ from: fromId, to: toId, pathElement: path });
+                                updateConnections();
+                            }
+                        }
+                        cleanupTempConnection();
+                    }
+                });
+            });
+        }
+
+        workspace.addEventListener('mousemove', (e) => {
+            if (connectingState.active && connectingState.tempPath) {
+                const rect = workspace.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const fromEl = nodes[connectingState.fromNodeId].el;
+                const portOut = fromEl.querySelector('.port-out');
+                const portRect = portOut.getBoundingClientRect();
+                
+                const startX = portRect.left - rect.left + (portRect.width / 2);
+                const startY = portRect.top - rect.top + (portRect.height / 2);
+
+                drawBezier(connectingState.tempPath, startX, startY, mouseX, mouseY);
+            }
+        });
+
+        workspace.addEventListener('contextmenu', (e) => {
+            if(connectingState.active) { e.preventDefault(); cleanupTempConnection(); }
+        });
+        workspace.addEventListener('click', (e) => {
+            if(connectingState.active && !e.target.classList.contains('port')) { cleanupTempConnection(); }
+        });
+
+        function cleanupTempConnection() {
+            if (connectingState.tempPath) connectingState.tempPath.remove();
+            if (connectingState.fromNodeId) {
+                const el = nodes[connectingState.fromNodeId].el;
+                if(el) el.querySelector('.port-out').classList.remove('active-connecting');
+            }
+            connectingState.active = false;
+            connectingState.fromNodeId = null;
+            connectingState.tempPath = null;
+        }
+
+        function updateConnections() {
+            const rect = workspace.getBoundingClientRect();
+            
+            connections.forEach(conn => {
+                const fromNode = nodes[conn.from];
+                const toNode = nodes[conn.to];
+                if(!fromNode || !toNode) return;
+
+                const portOut = fromNode.el.querySelector('.port-out').getBoundingClientRect();
+                const portIn = toNode.el.querySelector('.port-in').getBoundingClientRect();
+
+                const x1 = portOut.left - rect.left + (portOut.width / 2);
+                const y1 = portOut.top - rect.top + (portOut.height / 2);
+                const x2 = portIn.left - rect.left + (portIn.width / 2);
+                const y2 = portIn.top - rect.top + (portIn.height / 2);
+
+                drawBezier(conn.pathElement, x1, y1, x2, y2);
+            });
+        }
+
+        function drawBezier(pathElement, x1, y1, x2, y2) {
+            const curvature = 0.5;
+            const hx1 = x1 + Math.abs(x2 - x1) * curvature;
+            const hx2 = x2 - Math.abs(x2 - x1) * curvature;
+            const d = `M ${x1} ${y1} C ${hx1} ${y1} ${hx2} ${y2} ${x2} ${y2}`;
+            pathElement.setAttribute('d', d);
+        }
+
+        btnClear.addEventListener('click', () => {
+            Object.keys(nodes).forEach(deleteNode);
+            document.getElementById('empty-state').style.display = 'block';
+        });
+
+        // ==========================================
+        // 4. SIMULAČNÍ JÁDRO & HODNOCENÍ
+        // ==========================================
+        btnSimulate.addEventListener('click', () => {
+            if(Object.keys(nodes).length === 0) {
+                showResult("Prázdné plátno", "Nejprve musíte postavit nějakou architekturu. Přetáhněte bloky z levého panelu.", "bi-info-circle text-info", "normal");
+                return;
+            }
+
+            connections.forEach(c => c.pathElement.className.baseVal = 'cable');
+
+            const nodeTypes = Object.values(nodes).map(n => n.type);
+            const paths = connections.map(c => ({
+                from: nodes[c.from].type,
+                to: nodes[c.to].type,
+                conn: c
+            }));
+
+            // 1. ŠPATNĚ: Denaturace pedagogiky (čistě sumativní, bez sebereflexe a hlubší zpětné vazby)
+            if((nodeTypes.includes('vyklad') || nodeTypes.includes('samostatna')) && 
+                nodeTypes.includes('ukol') && 
+                nodeTypes.includes('znamka') && 
+                !nodeTypes.includes('video') && 
+                !nodeTypes.includes('slovni') &&
+                !nodeTypes.includes('sebehodnoceni')) {
+                
+                animateCables('pulse-red');
+                showResult(
+                    "Varování: Denaturace pedagogiky", 
+                    "Sestavili jste tradiční model orientovaný čistě na výkon. Žák byl zredukován na pouhou číselnou známku, což vede k paternalistickému přístupu. Zcela chybí data 'pro žáka' a formativní složka.", 
+                    "bi-exclamation-triangle-fill text-danger",
+                    "danger",
+                    "„...samotného žáka totiž můžeme velmi snadno zredukovat na pouhý soubor čísel... Takto nasbíraná data jsou pak využívána převážně k hodnocení.“ (Kapitola 4.2)"
+                );
+                return;
+            }
+
+            // 2. EXCELENTNĚ: Responzivní výuka (úprava v reálném čase)
+            const hasResponsivePath = paths.some(p => p.from === 'vyklad' && p.to === 'dotaz') || 
+                                      paths.some(p => p.from === 'dotaz' && p.to === 'uprava') ||
+                                      (nodeTypes.includes('dotaz') && nodeTypes.includes('uprava'));
+
+            if(hasResponsivePath) {
+                animateCables('pulse-gold');
+                showResult(
+                    "Excelentní: Responzivní výuka", 
+                    "Skvělé využití formativního přístupu! Okamžitě zjišťujete pochopení látky pomocí rychlého dotazu a obratem upravujete výklad. To je ukázková responzivní pedagogika.", 
+                    "bi-star-fill text-warning",
+                    "warning",
+                    "„Učitel tak okamžitě vidí, jaká část třídy výkladu porozuměla, a může na to v reálném čase reagovat... Tomuto přístupu se říká responzivní výuka.“ (Kapitoly 4.1 a 4.2)"
+                );
+                return;
+            }
+            
+            // 3. SKVĚLE: Autoregulace a vrstevnické hodnocení (Sdílený dokument + Sebehodnocení)
+            if(nodeTypes.includes('kolaborace') && nodeTypes.includes('sebehodnoceni')) {
+                animateCables('pulse-blue');
+                showResult(
+                    "Skvělé: Podpora autoregulace", 
+                    "Nasazením sdíleného dokumentu otevíráte prostor pro vzájemné hodnocení studentů. Následná autoevaluace dává žákům zodpovědnost za jejich vlastní učení.", 
+                    "bi-people-fill text-info",
+                    "info",
+                    "„...otevírají prostor pro to, aby si žáci mohli poskytovat zpětnou vazbu navzájem... V praxi se s ní dá pracovat například formou reflexe...“ (Kapitoly 4.1 a 4.3)"
+                );
+                return;
+            }
+
+            // 4. PERFEKTNĚ: Lidskost ve zpětné vazbě (Úkol -> Video / Slovní komentář -> Sebehodnocení)
+            if(nodeTypes.includes('ukol') && (nodeTypes.includes('video') || nodeTypes.includes('slovni'))) {
+                animateCables('pulse-green');
+                showResult(
+                    "Perfektní: Empatická zpětná vazba", 
+                    "Výborně! Úkol hodnotíte detailně a lidsky (zvlášť pokud jste využili video komentář, který vrací neverbální komunikaci). Tím přecházíte od pouhé kontroly k podpoře studenta.", 
+                    "bi-heart-fill text-success",
+                    "success",
+                    "„...samotná digitální zpětná vazba postrádá neverbální signály... Video poskytuje mnohem osobnější a empatičtější přístup...“ (Kapitola 4.3)"
+                );
+                return;
+            }
+
+            // 5. Neutrální výsledek
+            animateCables('pulse-gold');
+            showResult(
+                "Simulace dokončena", 
+                "Vaše propojování funguje. Zkuste zapojit bloky jako 'Sebehodnocení žáka', 'Video komentář' nebo zkuste navrhnout úpravu výkladu v reálném čase, ať posunete výuku na další úroveň.", 
+                "bi-activity text-warning",
+                "normal"
+            );
+        });
+
+        function animateCables(pulseClass) {
+            connections.forEach(c => {
+                c.pathElement.classList.add(pulseClass);
+            });
+        }
+
+        function showResult(title, text, iconClass, styleType, citation = null) {
+            document.getElementById('resultTitle').innerText = styleType === 'danger' ? 'Kritické varování' : 'Vyhodnocení systému';
+            document.getElementById('resultHeading').innerText = title;
+            document.getElementById('resultText').innerText = text;
+            
+            const iconEl = document.getElementById('resultIcon');
+            iconEl.className = 'feedback-icon ' + iconClass;
+
+            const citEl = document.getElementById('resultCitation');
+            if(citation) {
+                citEl.innerText = citation;
+                citEl.style.display = 'block';
+            } else {
+                citEl.style.display = 'none';
+            }
+
+            const modalEl = document.getElementById('resultModal');
+            modalEl.style.backgroundColor = 'rgba(0,0,0,0.7)';
+            
+            resultModal.show();
+            
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                connections.forEach(c => c.pathElement.className.baseVal = 'cable');
+            }, { once: true });
+        }
+    });
+</script>
+</body>
+</html>
