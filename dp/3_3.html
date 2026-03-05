@@ -88,6 +88,81 @@
             border: 2px solid white;
         }
 
+        /* Realistická historie verzí (Docs/Word) */
+        .version-history-container {
+            display: flex;
+            height: 500px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            overflow: hidden;
+            text-align: left;
+        }
+        .doc-preview-pane {
+            flex: 2;
+            background-color: #f0f2f5;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .doc-page {
+            background-color: white;
+            padding: 2.5rem;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+            min-height: 100%;
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 800px;
+            transition: opacity 0.15s ease-in-out;
+        }
+        .history-sidebar {
+            flex: 1;
+            background-color: #fff;
+            border-left: 1px solid #dee2e6;
+            overflow-y: auto;
+            min-width: 250px;
+        }
+        .history-group-title {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6c757d;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-top: 1px solid #dee2e6;
+            letter-spacing: 0.5px;
+        }
+        .history-group-title:first-child {
+            border-top: none;
+        }
+        .history-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #f1f3f5;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .history-item:hover {
+            background-color: #f8f9fa;
+        }
+        .history-item.active {
+            background-color: #e6f2ff;
+            border-left: 4px solid #0d6efd;
+            padding-left: calc(1.25rem - 4px);
+        }
+        .author-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .text-hl-adam { background-color: rgba(0, 123, 255, 0.25); border-radius: 2px; }
+        .text-hl-betka { background-color: rgba(111, 66, 193, 0.25); border-radius: 2px; }
+        .text-hl-cyril { background-color: rgba(253, 126, 20, 0.25); border-radius: 2px; }
+        .text-hl-david { background-color: rgba(108, 117, 125, 0.25); border-radius: 2px; }
+
         /* Skryté elementy pro gamifikaci */
         #solveButtonContainer {
             display: none;
@@ -180,36 +255,91 @@
 
     <!-- Modal: Historie verzí -->
     <div class="modal fade" id="docsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-file-word me-2"></i> Google Docs - Historie verzí</h5>
+                    <h5 class="modal-title"><i class="fas fa-history me-2"></i> Historie verzí dokumentu</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="alert alert-info">
-                        <strong>Statistika příspěvků:</strong> Adam (45%), Bětka (30%), Cyril (23%), David (2%).
-                    </div>
-                    <div class="timeline mt-4">
-                        <div class="timeline-item">
-                            <strong>Dnes, 08:15 - <span class="badge user-badge-david">David</span></strong><br>
-                            <span class="text-muted">Změna písma na Arial, oprava dvou překlepů.</span>
+                <div class="modal-body p-0">
+                    <div class="version-history-container">
+                        <!-- Levý panel: Náhled dokumentu -->
+                        <div class="doc-preview-pane">
+                            <div class="doc-page" id="docPreviewContent" style="font-family: Arial, sans-serif;">
+                                <h3 class="text-center mb-4">Projekt: Vliv sociálních sítí na pozornost</h3>
+                                
+                                <h5 class="mt-4">1. Úvod a rešerše literatury</h5>
+                                <p>Tato práce se zabývá vlivem sociálních sítí na schopnost soustředění u dospívající mládeže. V první části analyzujeme současnou literaturu, která naznačuje silnou korelaci mezi časem stráveným před obrazovkou a fragmentací pozornosti...</p>
+                                
+                                <h5 class="mt-4">2. Metodologie výzkumu</h5>
+                                <p>Pro účely této práce jsme zvolili kvantitativní přístup formou dotazníkového šetření. Sběr dat probíhal na vzorku 150 respondentů ve věku 15-18 let. Dotazník obsahoval 20 uzavřených otázek zaměřených na denní rutinu...</p>
+
+                                <h5 class="mt-4">3. Analýza a interpretace dat</h5>
+                                <p>Získaná data byla zpracována v softwaru. Výsledky ukazují, že 78 % respondentů kontroluje svůj telefon do 5 minut po probuzení. Analýza potvrdila hypotézu, že notifikace narušují hlubokou práci.</p>
+
+                                <h5 class="mt-4">4. Závěr</h5>
+                                <p>Závěrem lze konstatovat, že digitální hygiena by měla být klíčovou součástí vzdělávání na školách. Náš výzkum potvrdil původní předpoklady a ukázal potřebu dalšího zkoumání problematiky.</p>
+
+                                <div class="mt-5 pt-3 border-top text-muted">
+                                    <span class="text-hl-david"><em>Pozn.: Formátování textu upraveno na Arial, provedena jazyková korektura překlepů.</em></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="timeline-item">
-                            <strong>Včera, 23:45 - <span class="badge user-badge-adam">Adam</span></strong><br>
-                            <span class="text-muted">Přidány 3 odstavce do závěru (850 slov). Vloženy citace.</span>
-                        </div>
-                        <div class="timeline-item">
-                            <strong>Včera, 21:10 - <span class="badge user-badge-cyril">Cyril</span></strong><br>
-                            <span class="text-muted">Vloženy grafy a tabulky z výzkumu, zformátování obsahu.</span>
-                        </div>
-                        <div class="timeline-item">
-                            <strong>Úterý, 16:30 - <span class="badge user-badge-betka">Bětka</span></strong><br>
-                            <span class="text-muted">Napsána metodologie, rozvržení struktury dokumentu.</span>
-                        </div>
-                        <div class="timeline-item">
-                            <strong>Pondělí, 14:00 - <span class="badge user-badge-adam">Adam</span></strong><br>
-                            <span class="text-muted">Založení dokumentu, sepsání úvodu.</span>
+
+                        <!-- Pravý panel: Panel historie -->
+                        <div class="history-sidebar">
+                            <div class="p-3 bg-white d-flex justify-content-between align-items-center border-bottom">
+                                <span class="fw-bold fs-5">Verze</span>
+                            </div>
+
+                            <div class="history-group-title">Dnes</div>
+                            
+                            <div class="history-item active" onclick="changeDocVersion('v5', this)">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong class="text-primary">08:15 <span class="badge bg-primary ms-1">Aktuální</span></strong>
+                                </div>
+                                <div class="mb-1"><span class="author-dot user-badge-david"></span> <span class="fw-medium">David</span></div>
+                                <div class="text-muted small">Změna písma (Arial), oprava překlepů</div>
+                            </div>
+
+                            <div class="history-group-title">Včera</div>
+
+                            <div class="history-item" onclick="changeDocVersion('v4', this)">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong>23:45</strong>
+                                </div>
+                                <div class="mb-1"><span class="author-dot user-badge-adam"></span> <span class="fw-medium">Adam</span></div>
+                                <div class="text-muted small">Dopsán Závěr, vloženy citace</div>
+                            </div>
+
+                            <div class="history-item" onclick="changeDocVersion('v3', this)">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong>21:10</strong>
+                                </div>
+                                <div class="mb-1"><span class="author-dot user-badge-cyril"></span> <span class="fw-medium">Cyril</span></div>
+                                <div class="text-muted small">Vložena část Analýza dat, tabulky</div>
+                            </div>
+
+                            <div class="history-group-title">Úterý</div>
+
+                            <div class="history-item" onclick="changeDocVersion('v2', this)">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong>16:30</strong>
+                                </div>
+                                <div class="mb-1"><span class="author-dot user-badge-betka"></span> <span class="fw-medium">Bětka</span></div>
+                                <div class="text-muted small">Napsána Metodologie, rozvržení dokumentu</div>
+                            </div>
+
+                            <div class="history-group-title">Pondělí</div>
+
+                            <div class="history-item" onclick="changeDocVersion('v1', this)">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong>14:00</strong>
+                                </div>
+                                <div class="mb-1"><span class="author-dot user-badge-adam"></span> <span class="fw-medium">Adam</span></div>
+                                <div class="text-muted small">Založení dokumentu, sepsání Úvodu</div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -351,6 +481,83 @@
             trello: new bootstrap.Modal(document.getElementById('trelloModal')),
             reflection: new bootstrap.Modal(document.getElementById('reflectionModal'))
         };
+
+        // Databáze verzí dokumentu (pro interaktivní proklikávání)
+        const docVersions = {
+            v1: `
+                <h3 class="text-center mb-4">Projekt: Vliv sociálních sítí na pozornost</h3>
+                <h5 class="mt-4">1. Úvod a rešerše literatury</h5>
+                <p><span class="text-hl-adam">Tato práce se zabývá vlivem sociálních sítí na schopnost soustředění u dospívající mládeže. V první části analyzujeme současnou literaturu, která naznačuje silnou korelaci mezi časem stráveným před obrazovkou a fragmentací pozornosti...</span></p>
+            `,
+            v2: `
+                <h3 class="text-center mb-4">Projekt: Vliv sociálních sítí na pozornost</h3>
+                <h5 class="mt-4">1. Úvod a rešerše literatury</h5>
+                <p>Tato práce se zabývá vlivem sociálních sítí na schopnost soustředění u dospívající mládeže. V první části analyzujeme současnou literaturu, která naznačuje silnou korelaci mezi časem stráveným před obrazovkou a fragmentací pozornosti...</p>
+                <h5 class="mt-4">2. Metodologie výzkumu</h5>
+                <p><span class="text-hl-betka">Pro účely této práce jsme zvolili kvantitativní přístup formou dotazníkového šetření. Sběr dat probíhal na vzorku 150 respondentů ve věku 15-18 let. Dotazník obsahoval 20 uzavřených otázek zaměřených na denní rutinu...</span></p>
+            `,
+            v3: `
+                <h3 class="text-center mb-4">Projekt: Vliv sociálních sítí na pozornost</h3>
+                <h5 class="mt-4">1. Úvod a rešerše literatury</h5>
+                <p>Tato práce se zabývá vlivem sociálních sítí na schopnost soustředění u dospívající mládeže. V první části analyzujeme současnou literaturu, která naznačuje silnou korelaci mezi časem stráveným před obrazovkou a fragmentací pozornosti...</p>
+                <h5 class="mt-4">2. Metodologie výzkumu</h5>
+                <p>Pro účely této práce jsme zvolili kvantitativní přístup formou dotazníkového šetření. Sběr dat probíhal na vzorku 150 respondentů ve věku 15-18 let. Dotazník obsahoval 20 uzavřených otázek zaměřených na denní rutinu...</p>
+                <h5 class="mt-4">3. Analýza a interpretace dat</h5>
+                <p><span class="text-hl-cyril">Získaná data byla zpracována v softwaru. Výsledky ukazují, že 78 % respondentů kontroluje svůj telefon do 5 minut po probuzení. Analýza potvrdila hypotézu, že notifikace narušují hlubokou práci.</span></p>
+            `,
+            v4: `
+                <h3 class="text-center mb-4">Projekt: Vliv sociálních sítí na pozornost</h3>
+                <h5 class="mt-4">1. Úvod a rešerše literatury</h5>
+                <p>Tato práce se zabývá vlivem sociálních sítí na schopnost soustředění u dospívající mládeže. V první části analyzujeme současnou literaturu, která naznačuje silnou korelaci mezi časem stráveným před obrazovkou a fragmentací pozornosti...</p>
+                <h5 class="mt-4">2. Metodologie výzkumu</h5>
+                <p>Pro účely této práce jsme zvolili kvantitativní přístup formou dotazníkového šetření. Sběr dat probíhal na vzorku 150 respondentů ve věku 15-18 let. Dotazník obsahoval 20 uzavřených otázek zaměřených na denní rutinu...</p>
+                <h5 class="mt-4">3. Analýza a interpretace dat</h5>
+                <p>Získaná data byla zpracována v softwaru. Výsledky ukazují, že 78 % respondentů kontroluje svůj telefon do 5 minut po probuzení. Analýza potvrdila hypotézu, že notifikace narušují hlubokou práci.</p>
+                <h5 class="mt-4">4. Závěr</h5>
+                <p><span class="text-hl-adam">Závěrem lze konstatovat, že digitální hygiena by měla být klíčovou součástí vzdělávání na školách. Náš výzkum potvrdil původní předpoklady a ukázal potřebu dalšího zkoumání problematiky.</span></p>
+            `,
+            v5: `
+                <h3 class="text-center mb-4">Projekt: Vliv sociálních sítí na pozornost</h3>
+                <h5 class="mt-4">1. Úvod a rešerše literatury</h5>
+                <p>Tato práce se zabývá vlivem sociálních sítí na schopnost soustředění u dospívající mládeže. V první části analyzujeme současnou literaturu, která naznačuje silnou korelaci mezi časem stráveným před obrazovkou a fragmentací pozornosti...</p>
+                <h5 class="mt-4">2. Metodologie výzkumu</h5>
+                <p>Pro účely této práce jsme zvolili kvantitativní přístup formou dotazníkového šetření. Sběr dat probíhal na vzorku 150 respondentů ve věku 15-18 let. Dotazník obsahoval 20 uzavřených otázek zaměřených na denní rutinu...</p>
+                <h5 class="mt-4">3. Analýza a interpretace dat</h5>
+                <p>Získaná data byla zpracována v softwaru. Výsledky ukazují, že 78 % respondentů kontroluje svůj telefon do 5 minut po probuzení. Analýza potvrdila hypotézu, že notifikace narušují hlubokou práci.</p>
+                <h5 class="mt-4">4. Závěr</h5>
+                <p>Závěrem lze konstatovat, že digitální hygiena by měla být klíčovou součástí vzdělávání na školách. Náš výzkum potvrdil původní předpoklady a ukázal potřebu dalšího zkoumání problematiky.</p>
+                <div class="mt-5 pt-3 border-top text-muted">
+                    <span class="text-hl-david"><em>Pozn.: Formátování textu upraveno na Arial, provedena jazyková korektura překlepů.</em></span>
+                </div>
+            `
+        };
+
+        function changeDocVersion(versionId, element) {
+            const docContent = document.getElementById('docPreviewContent');
+            
+            // Animace pro plynulý přechod (fade out)
+            docContent.style.opacity = 0;
+            
+            setTimeout(() => {
+                // Překreslení obsahu
+                docContent.innerHTML = docVersions[versionId];
+                
+                // Změna písma pro poslední verzi (simulace Davidovy "práce")
+                if(versionId === 'v5') {
+                    docContent.style.fontFamily = 'Arial, sans-serif';
+                } else {
+                    docContent.style.fontFamily = 'inherit';
+                }
+                
+                // Animace zobrazení (fade in)
+                docContent.style.opacity = 1;
+            }, 150);
+
+            // Změna vizuálního označení v bočním panelu
+            const items = document.querySelectorAll('.history-item');
+            items.forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+        }
 
         function openEvidence(modalId, evidenceType) {
             // Zobrazit modal
