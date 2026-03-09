@@ -281,17 +281,33 @@
 
             // Generování nového
             try {
+                // Zkusíme střední korekci (M), která pojme více textu než H a měla by bez problémů stačit
                 qrcodeObj = new QRCode(container, {
                     text: wifiString,
                     width: 200,
                     height: 200,
                     colorDark : "#000000",
                     colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H // Vysoká korekce chyb pro lepší čitelnost
+                    correctLevel : QRCode.CorrectLevel.M
                 });
             } catch (e) {
-                console.error(e);
-                alert("Chyba při generování kódu. Zkuste zkrátit název nebo heslo.");
+                // Funkce QRCode.js občas padne na overflow, pokud je text extrémně dlouhý
+                // a kapacita dané verze+korekce neproběhla úplně ideálně.
+                // Fallback na L (pojemne nejsilnější objem dat)
+                try {
+                    container.innerHTML = "";
+                    qrcodeObj = new QRCode(container, {
+                        text: wifiString,
+                        width: 200,
+                        height: 200,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L
+                    });
+                } catch (e2) {
+                    console.error(e2);
+                    alert("Chyba při generování kódu. Řetězec je stále příliš dlouhý, zkuste zkrátit název nebo heslo.");
+                }
             }
         }
 
