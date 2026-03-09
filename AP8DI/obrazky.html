@@ -208,21 +208,47 @@
             color: #000;
             border-bottom: var(--border-thick);
             text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
         }
 
-        .img-high-quality {
-            background-color: var(--secondary);
+        .img-preview span {
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0px 2px 0 #fff, 2px 0px 0 #fff, 0px -2px 0 #fff, -2px 0px 0 #fff;
         }
 
-        .img-low-quality {
-            background-color: var(--accent);
+        .img-preview::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            /* Slight overflow to hide blur edges */
+            background-image: url('house.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
         }
 
-        .img-pixelated {
-            background-color: var(--danger);
-            background-image: radial-gradient(#000 2px, transparent 2px);
-            background-size: 10px 10px;
+        .img-high-quality::before {
+            /* Záměrně bez filtru pro čistý obraz */
+            content: '';
+            /* Adding dummy content line to satisfy linter for empty ruleset */
         }
+
+        .img-low-quality::before {
+            /* Jemně rozmazané (lossy komprese u JPG) */
+            filter: blur(0.0005px) contrast(0.9);
+        }
+
+        .img-pixelated::before {
+            /* Těžce zkreslené barvy a ostrý blur napodobující silné JPG defekty */
+            filter: blur(2px) hue-rotate(-1deg);
+        }
+
+
 
         /* Alerts info boxes */
         .alert-info {
@@ -468,12 +494,14 @@
                 <div class="row g-4 mt-1 pb-2">
                     <div class="col-md-4">
                         <div class="preview-wrapper">
-                            <div class="img-preview img-high-quality">Dokonalé detaily<br>Originální kvalita</div>
+                            <div class="img-preview img-high-quality"><span>Dokonalé detaily<br>Originální
+                                    kvalita</span></div>
                             <div class="p-3 bg-white">
                                 <h6 class="fw-bold text-center mb-3">Obrázek 1</h6>
-                                <select id="select-b1" class="fill-in-box form-select" title="Vyberte formát pro Obrázek 1" style="font-size: 0.85rem; padding: 8px 10px;">
+                                <select id="select-b1" class="fill-in-box form-select"
+                                    title="Vyberte formát pro Obrázek 1" style="font-size: 0.85rem; padding: 8px 10px;">
                                     <option value="" disabled selected>Vyberte formát...</option>
-                                   <option value="jpg_kvalita">JPG (Kvalitní)</option>
+                                    <option value="jpg_kvalita">JPG (Kvalitní)</option>
                                     <option value="png">PNG (Bezeztrátový)</option>
                                     <option value="jpg_komprese">JPG (Zničený)</option>
                                 </select>
@@ -484,10 +512,11 @@
 
                     <div class="col-md-4">
                         <div class="preview-wrapper">
-                            <div class="img-preview img-low-quality">Lehce rozmyté okraje<br>Pro web ideální</div>
+                            <div class="img-preview img-low-quality"><span>Lehce rozmazané</span></div>
                             <div class="p-3 bg-white">
                                 <h6 class="fw-bold text-center mb-3">Obrázek 2</h6>
-                                <select id="select-b2" class="fill-in-box form-select" title="Vyberte formát pro Obrázek 2" style="font-size: 0.85rem; padding: 8px 10px;">
+                                <select id="select-b2" class="fill-in-box form-select"
+                                    title="Vyberte formát pro Obrázek 2" style="font-size: 0.85rem; padding: 8px 10px;">
                                     <option value="" disabled selected>Vyberte formát...</option>
                                     <option value="jpg_kvalita">JPG (Kvalitní)</option>
                                     <option value="png">PNG (Bezeztrátový)</option>
@@ -499,11 +528,13 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="preview-wrapper border-danger">
-                            <div class="img-preview img-pixelated">Barevné čtverečky<br>Viditelné vady!</div>
+                        <div class="preview-wrapper">
+                            <div class="img-preview img-pixelated"><span>Nečitelná fotografie</span>
+                            </div>
                             <div class="p-3 bg-white">
                                 <h6 class="fw-bold text-center text-danger mb-3">Obrázek 3</h6>
-                                <select id="select-b3" class="fill-in-box form-select" title="Vyberte formát pro Obrázek 3" style="font-size: 0.85rem; padding: 8px 10px;">
+                                <select id="select-b3" class="fill-in-box form-select"
+                                    title="Vyberte formát pro Obrázek 3" style="font-size: 0.85rem; padding: 8px 10px;">
                                     <option value="" disabled selected>Vyberte formát...</option>
                                     <option value="jpg_kvalita">JPG (Kvalitní)</option>
                                     <option value="png">PNG (Bezeztrátový)</option>
@@ -514,39 +545,47 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="text-center mt-4 pdf-hide">
-                    <button type="button" class="btn btn-action" style="background-color: var(--primary); color: white;" onclick="checkTaskB()">Zkontrolovat volby</button>
+                    <button type="button" class="btn btn-action" style="background-color: var(--primary); color: white;"
+                        onclick="checkTaskB()">Zkontrolovat volby</button>
                     <div id="check-b-result" class="mt-2 fw-bold d-none"></div>
                 </div>
             </div>
         </div>
 
         <div class="task-card border-warning">
-    <div class="task-header">C) Formáty: HEIC a WebP</div>
-    <div class="task-body">
-        <p class="mb-3">
-            Zatímco JPG a PNG tu s námi jsou desítky let, moderní zařízení a weby přecházejí na novější formáty. Například <strong>HEIC</strong> (výchozí na iPhonech) nebo <strong>WebP</strong> (běžný na internetu). Mají sice skvělou kompresi, ale přinášejí jeden zásadní zádrhel – <strong>kompatibilitu</strong>.
-        </p>
-        
-        <label class="form-label fw-bold mt-2 text-dark">1. Co se pravděpodobně stane, když pošleš fotku z nového iPhonu (.HEIC) na starší počítač s Windows, a jak tento problém můžeš vyřešit?</label>
-        <textarea class="fill-in-box mb-4" rows="2" placeholder="Např. problém se zobrazením... řešení: online převodník, změna nastavení v mobilu..."></textarea>
+            <div class="task-header">C) Formáty: HEIC a WebP</div>
+            <div class="task-body">
+                <p class="mb-3">
+                    Zatímco JPG a PNG tu s námi jsou desítky let, moderní zařízení a weby přecházejí na novější formáty.
+                    Například <strong>HEIC</strong> (výchozí na iPhonech) nebo <strong>WebP</strong> (běžný na
+                    internetu). Mají sice skvělou kompresi, ale přinášejí jeden zásadní zádrhel –
+                    <strong>kompatibilitu</strong>.
+                </p>
 
-        <label class="form-label fw-bold text-dark">2. Najdi si na internetu obrázek, který se uloží jako .WebP (často např. na e-shopech). Proč dnes tvůrci webů tento formát tolik upřednostňují před klasickým JPG?</label>
-        <textarea class="fill-in-box" rows="2"></textarea>
-    </div>
-</div>
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+                <label class="form-label fw-bold mt-2 text-dark">1. Co se pravděpodobně stane, když pošleš fotku z
+                    nového iPhonu (.HEIC) na starší počítač s Windows, a jak tento problém můžeš vyřešit?</label>
+                <textarea class="fill-in-box mb-4" rows="2"
+                    placeholder="Např. problém se zobrazením... řešení: online převodník, změna nastavení v mobilu..."></textarea>
+
+                <label class="form-label fw-bold text-dark">2. Najdi si na internetu obrázek, který se uloží jako .WebP
+                    (často např. na e-shopech). Proč dnes tvůrci webů tento formát tolik upřednostňují před klasickým
+                    JPG?</label>
+                <textarea class="fill-in-box" rows="2"></textarea>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
         <!-- Task C -->
         <div class="task-card border-warning">
             <div class="task-header">D) Výzva: Optimalizace pro školní web</div>
