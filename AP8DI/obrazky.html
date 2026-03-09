@@ -179,9 +179,6 @@
         }
 
         /* Beautiful Selects - Removed, but keeping base styles for consistency if ever needed */
-        select.form-select {
-            display: none;
-        }
 
         /* Image Quality Preview Cards */
         .preview-wrapper {
@@ -474,11 +471,11 @@
                             <div class="img-preview img-high-quality">Dokonalé detaily<br>Originální kvalita</div>
                             <div class="p-3 bg-white">
                                 <h6 class="fw-bold text-center mb-3">Obrázek 1</h6>
-                                <select class="fill-in-box form-select" title="Vyberte formát pro Obrázek 1">
+                                <select id="select-b1" class="fill-in-box form-select" title="Vyberte formát pro Obrázek 1" style="font-size: 0.85rem; padding: 8px 10px;">
                                     <option value="" disabled selected>Vyberte formát...</option>
+                                   <option value="jpg_kvalita">JPG (Kvalitní)</option>
                                     <option value="png">PNG (Bezeztrátový)</option>
-                                    <option value="jpg_kvalita">JPG (Vysoká kvalita)</option>
-                                    <option value="jpg_komprese">JPG (Silná komprese)</option>
+                                    <option value="jpg_komprese">JPG (Zničený)</option>
                                 </select>
                             </div>
 
@@ -490,11 +487,11 @@
                             <div class="img-preview img-low-quality">Lehce rozmyté okraje<br>Pro web ideální</div>
                             <div class="p-3 bg-white">
                                 <h6 class="fw-bold text-center mb-3">Obrázek 2</h6>
-                                <select class="fill-in-box form-select" title="Vyberte formát pro Obrázek 2">
+                                <select id="select-b2" class="fill-in-box form-select" title="Vyberte formát pro Obrázek 2" style="font-size: 0.85rem; padding: 8px 10px;">
                                     <option value="" disabled selected>Vyberte formát...</option>
+                                    <option value="jpg_kvalita">JPG (Kvalitní)</option>
                                     <option value="png">PNG (Bezeztrátový)</option>
-                                    <option value="jpg_kvalita">JPG (Vysoká kvalita)</option>
-                                    <option value="jpg_komprese">JPG (Silná komprese)</option>
+                                    <option value="jpg_komprese">JPG (Zničený)</option>
                                 </select>
                             </div>
 
@@ -506,23 +503,53 @@
                             <div class="img-preview img-pixelated">Barevné čtverečky<br>Viditelné vady!</div>
                             <div class="p-3 bg-white">
                                 <h6 class="fw-bold text-center text-danger mb-3">Obrázek 3</h6>
-                                <select class="fill-in-box form-select" title="Vyberte formát pro Obrázek 3">
+                                <select id="select-b3" class="fill-in-box form-select" title="Vyberte formát pro Obrázek 3" style="font-size: 0.85rem; padding: 8px 10px;">
                                     <option value="" disabled selected>Vyberte formát...</option>
+                                    <option value="jpg_kvalita">JPG (Kvalitní)</option>
                                     <option value="png">PNG (Bezeztrátový)</option>
-                                    <option value="jpg_kvalita">JPG (Vysoká kvalita)</option>
-                                    <option value="jpg_komprese">JPG (Silná komprese)</option>
+                                    <option value="jpg_komprese">JPG (Zničený)</option>
                                 </select>
                             </div>
 
                         </div>
                     </div>
                 </div>
+                
+                <div class="text-center mt-4 pdf-hide">
+                    <button type="button" class="btn btn-action" style="background-color: var(--primary); color: white;" onclick="checkTaskB()">Zkontrolovat volby</button>
+                    <div id="check-b-result" class="mt-2 fw-bold d-none"></div>
+                </div>
             </div>
         </div>
 
+        <div class="task-card border-warning">
+    <div class="task-header">C) Formáty: HEIC a WebP</div>
+    <div class="task-body">
+        <p class="mb-3">
+            Zatímco JPG a PNG tu s námi jsou desítky let, moderní zařízení a weby přecházejí na novější formáty. Například <strong>HEIC</strong> (výchozí na iPhonech) nebo <strong>WebP</strong> (běžný na internetu). Mají sice skvělou kompresi, ale přinášejí jeden zásadní zádrhel – <strong>kompatibilitu</strong>.
+        </p>
+        
+        <label class="form-label fw-bold mt-2 text-dark">1. Co se pravděpodobně stane, když pošleš fotku z nového iPhonu (.HEIC) na starší počítač s Windows, a jak tento problém můžeš vyřešit?</label>
+        <textarea class="fill-in-box mb-4" rows="2" placeholder="Např. problém se zobrazením... řešení: online převodník, změna nastavení v mobilu..."></textarea>
+
+        <label class="form-label fw-bold text-dark">2. Najdi si na internetu obrázek, který se uloží jako .WebP (často např. na e-shopech). Proč dnes tvůrci webů tento formát tolik upřednostňují před klasickým JPG?</label>
+        <textarea class="fill-in-box" rows="2"></textarea>
+    </div>
+</div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <!-- Task C -->
         <div class="task-card border-warning">
-            <div class="task-header">C) Výzva: Optimalizace pro školní web</div>
+            <div class="task-header">D) Výzva: Optimalizace pro školní web</div>
             <div class="task-body">
                 <p class="mb-3">
                     Máte fotku z akce o velikosti <strong>12 MB</strong> (rozlišení 6000x4000 px). Systém povoluje
@@ -537,7 +564,7 @@
 
         <!-- Task D -->
         <div class="task-card border-success">
-            <div class="task-header">D) Kouzlo průhlednosti</div>
+            <div class="task-header">E) Kouzlo průhlednosti</div>
             <div class="task-body">
                 <p class="mb-3">Stáhněte logo z internetu, které má průhledné pozadí. Uložte ho jednou jako
                     <strong>.PNG</strong> a jednou jako <strong>.JPG</strong>. Vložte oba na barevné pozadí např. v
@@ -551,7 +578,7 @@
 
         <!-- Task E -->
         <div class="task-card border-danger mb-0">
-            <div class="task-header">E) Soukromí napospas: EXIF Data</div>
+            <div class="task-header">F) Soukromí napospas: EXIF Data</div>
             <div class="task-body">
                 <p class="mb-3">Vyfoťte svým mobilem cokoliv a otevřete Vlastnosti souboru v PC. Metadata obrázku (EXIF)
                     často skrývají víc informací než samotný obrázek.</p>
@@ -584,6 +611,34 @@
                     setTimeout(() => btn.style.opacity = '1', 10);
                 }, 200);
             }
+        }
+
+        function checkTaskB() {
+            const resultDiv = document.getElementById('check-b-result');
+            const b1 = document.getElementById('select-b1');
+            const b2 = document.getElementById('select-b2');
+            const b3 = document.getElementById('select-b3');
+
+            const isB1Correct = b1.value === 'png';
+            const isB2Correct = b2.value === 'jpg_kvalita';
+            const isB3Correct = b3.value === 'jpg_komprese';
+
+            // Visual feedback on borders
+            b1.style.border = isB1Correct ? '2px solid var(--secondary)' : (b1.value ? '2px solid var(--danger)' : '2px solid var(--border)');
+            b2.style.border = isB2Correct ? '2px solid var(--secondary)' : (b2.value ? '2px solid var(--danger)' : '2px solid var(--border)');
+            b3.style.border = isB3Correct ? '2px solid var(--secondary)' : (b3.value ? '2px solid var(--danger)' : '2px solid var(--border)');
+
+            if (isB1Correct && isB2Correct && isB3Correct) {
+                resultDiv.textContent = "✅ Výborně! Všechny formáty jsou správně přiřazeny.";
+                resultDiv.className = "mt-2 fw-bold text-success";
+            } else if (!b1.value || !b2.value || !b3.value) {
+                resultDiv.textContent = "⚠️ Nejdříve vyberte formát pro všechny 3 obrázky.";
+                resultDiv.className = "mt-2 fw-bold text-warning";
+            } else {
+                resultDiv.textContent = "❌ Některé odhady nejsou správně. Zkuste to znovu.";
+                resultDiv.className = "mt-2 fw-bold text-danger";
+            }
+            resultDiv.classList.remove('d-none');
         }
 
         function generatePDF() {
