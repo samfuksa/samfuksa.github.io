@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Space+Mono:wght@400;700&display=swap');
+
+    .certificate-container {
+        width: 1122px; /* A4 Landscape width at 96dpi */
+        height: 793px; /* A4 Landscape height at 96dpi */
+        background-color: #FFFFFF; /* Pure White */
+        position: relative;
+        font-family: 'Space Mono', monospace;
+        color: #000000; /* Carbon Black */
+        box-sizing: border-box;
+        border: 2px solid #000;
+        overflow: hidden;
+    }
+
+    /* Žlutý brutální blok na straně */
+    .yellow-block {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 80px;
+        height: 100%;
+        background-color: #FFE600; /* Signal Yellow */
+        border-right: 4px solid #000;
+    }
+
+    .content {
+        padding: 80px 80px 80px 160px; /* Odsazení kvůli žlutému bloku */
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Logo v pravém horním rohu */
+    .logo-brutal {
+        position: absolute;
+        top: 60px;
+        right: 80px;
+        display: inline-flex;
+        flex-direction: column;
+        line-height: 0.8;
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 2.5rem;
+        color: #000000;
+        background: #FFE600;
+        padding: 0.2em 0.3em;
+        transform: skewX(-2deg);
+    }
+    .logo-brutal span { display: block; letter-spacing: -0.04em; }
+    .logo-brutal span:last-child {
+        color: #FFFFFF;
+        background: #000000;
+        padding: 0 0.1em;
+        margin-left: -0.1em;
+    }
+
+    .header-section {
+        margin-bottom: 40px;
+    }
+
+    .cert-title {
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        font-size: 4rem;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        margin: 0;
+        line-height: 1;
+    }
+
+    .cert-subtitle {
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        color: #000;
+        margin-top: 10px;
+        background: #FFE600;
+        display: inline-block;
+        padding: 5px 10px;
+    }
+
+    .presented-to {
+        font-size: 1rem;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        color: #888;
+    }
+
+    .student-name {
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        font-size: 4.5rem;
+        text-transform: uppercase;
+        margin: 0 0 20px 0;
+        line-height: 1;
+        border-bottom: 8px solid #000;
+        padding-bottom: 10px;
+        display: inline-block;
+    }
+
+    .cert-description {
+        font-size: 1.1rem;
+        max-width: 700px;
+        line-height: 1.6;
+        margin-bottom: 60px;
+    }
+
+    .footer-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: auto;
+    }
+
+    .footer-block {
+        width: 300px;
+    }
+
+    .footer-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #888;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .footer-value {
+        font-size: 1.2rem;
+        border-top: 4px solid #000;
+        padding-top: 10px;
+        font-weight: 700;
+    }
+
+    /* Moodle Placeholders Styling */
+    .signature-img {
+        max-height: 80px;
+        margin-bottom: -10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="certificate-container">
+    <div class="yellow-block"></div>
+    
+    <div class="logo-brutal">
+        <span>HOMO</span>
+        <span>DIGITALIS</span>
+    </div>
+
+    <div class="content">
+        <div class="header-section">
+            <h1 class="cert-title">{#S}CERTTITLE{/S}</h1>
+            <div class="cert-subtitle">{#S}SUBTITLE{/S}</div>
+        </div>
+
+        <div>
+            <div class="presented-to">{#S}CERTPRESENTED{/S}</div>
+            <div class="student-name">{$USER->fullname}</div>
+            <div class="cert-description">
+                {$certificate->description}
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <div class="footer-block">
+                <span class="footer-label">{#s}certdate{/s}</span>
+                <div class="footer-value">{{userdate(time(),strftimedate)}}</div>
+            </div>
+            
+            <div class="footer-block" style="text-align: right;">
+                <span class="footer-label">{#s}certsignature{/s}</span>
+                <div class="footer-value">Garant Kurzu</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
