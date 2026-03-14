@@ -110,21 +110,22 @@
         }
 
         /* =========================================
-           LEKTORSKÝ REŽIM (Zvýraznění Dark Patterns)
+           HERNÍ REŽIM (Nalezené Dark Patterns)
            ========================================= */
-        body.educator-mode .dp-element {
-            outline: 4px dashed #dc3545 !important;
+        .dp-found {
+            outline: 4px dashed #28a745 !important;
             outline-offset: 4px;
             position: relative;
-            background-color: rgba(220, 53, 69, 0.05) !important;
+            background-color: rgba(40, 167, 69, 0.05) !important;
+            transition: all 0.3s ease;
         }
 
-        body.educator-mode .dp-element::before {
-            content: attr(data-dp-label);
+        .dp-found::before {
+            content: "✅ Odhaleno: " attr(data-dp-label);
             position: absolute;
             top: -30px;
             left: -4px;
-            background: #dc3545;
+            background: #28a745;
             color: white;
             font-size: 12px;
             font-weight: bold;
@@ -133,33 +134,41 @@
             z-index: 9999;
             white-space: nowrap;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: bounceIn 0.5s;
         }
 
-        /* Zviditelnění zrušení předplatného v lektorském režimu */
-        body.educator-mode .cancel-subscription-link {
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Zviditelnění zrušení předplatného po odhalení */
+        .dp-found .cancel-subscription-link {
             color: #dc3545 !important;
             font-size: 16px;
             cursor: pointer;
         }
 
-        /* Zviditelnění skrytého checkboxu v lektorském režimu */
-        body.educator-mode .sneaky-label {
+        /* Zviditelnění skrytého checkboxu po odhalení */
+        .dp-found .sneaky-label {
             color: #212529 !important;
+        }
+
+        /* Napovězení uživateli, že má klikat a hledat */
+        .dp-element {
+            cursor: crosshair;
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigace a lektorský přepínač -->
+    <!-- Navigace a Scoreboard -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand fw-bold text-warning" href="#">🎮 LootBox Premium</a>
             <div class="d-flex align-items-center">
-                <div class="form-check form-switch text-light">
-                    <input class="form-check-input" type="checkbox" id="educatorToggle">
-                    <label class="form-check-label text-warning fw-bold" for="educatorToggle">
-                        Lektorský režim (Odhalit Dark Patterns)
-                    </label>
+                <div class="bg-dark border border-warning rounded px-3 py-1 text-warning fw-bold fs-5 shadow-sm" style="transition: all 0.3s;">
+                    🔎 Nalezeno chytáků: <span id="scoreDisplay" class="text-white fs-4 ms-2" style="transition: all 0.3s;">0</span> <span class="text-muted">/ 4</span>
                 </div>
             </div>
         </div>
@@ -191,7 +200,7 @@
                         </ul>
 
                         <!-- DARK PATTERN: Sneak into Basket -->
-                        <div class="sneaky-checkbox-container dp-element" data-dp-label="Sneak into Basket (Předem zaškrtnutý skrytý poplatek)">
+                        <div class="sneaky-checkbox-container dp-element" data-dp-id="1" data-dp-label="Sneak into Basket (Předem zaškrtnutý skrytý poplatek)">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="sneakyInsurance" value="199" checked>
                                 <label class="form-check-label sneaky-label" for="sneakyInsurance">
@@ -224,9 +233,9 @@
                     <button class="btn btn-outline-secondary btn-sm">Stáhnout faktury</button>
                 </div>
                 
-                <div class="mt-5 dp-element" data-dp-label="Roach Motel (Zrušení splývá s pozadím)">
+                <div class="mt-5 dp-element" data-dp-id="2" data-dp-label="Roach Motel (Zrušení splývá s pozadím)">
                     <!-- Toto tlačítko je záměrně téměř neviditelné díky CSS .cancel-subscription-link -->
-                    <a href="#" class="cancel-subscription-link" onclick="alert('Tento proces vyžaduje telefonát na naši placenou linku v pracovní dny 8:00 - 8:15.')">
+                    <a href="#" class="cancel-subscription-link" id="cancelLink">
                         Zrušit VIP předplatné (nevratný krok)
                     </a>
                 </div>
@@ -235,7 +244,7 @@
     </main>
 
     <!-- DARK PATTERN: Misdirection (Manipulativní Cookie/Consent okno) -->
-    <div id="cookieBanner" class="position-fixed bottom-0 start-0 w-100 p-4 dp-element" data-dp-label="Misdirection (Obrovské přijmout, skryté odmítnout)">
+    <div id="cookieBanner" class="position-fixed bottom-0 start-0 w-100 p-4 dp-element" data-dp-id="3" data-dp-label="Misdirection (Obrovské přijmout, skryté odmítnout)">
         <div class="container position-relative">
             <div class="row align-items-center">
                 <div class="col-md-7 mb-3 mb-md-0">
@@ -243,20 +252,20 @@
                     <p class="mb-0 text-muted">Naše stránka používá cookies a sledovací technologie třetích stran, abychom vám mohli nabízet "personalizované loot boxy" a sdílet vaše data s našimi partnery pro cílenou reklamu.</p>
                 </div>
                 <div class="col-md-5 text-center text-md-end">
-                    <button class="btn btn-success w-100 btn-huge-accept fw-bold" onclick="hideCookieBanner()">
+                    <button class="btn btn-success w-100 btn-huge-accept fw-bold" onclick="alert('Naletěl jsi! Odvedli jsme tvoji pozornost obřím tlačítkem.')">
                         PŘIJMOUT VŠE A ZÍSKAT VÝHODY
                     </button>
                 </div>
             </div>
             <!-- Záměrně schovaný a odsunutý odkaz mimo zorné pole uživatele -->
-            <a href="#" class="sneaky-decline" onclick="hideCookieBanner()">
+            <a href="#" class="sneaky-decline" onclick="event.preventDefault(); alert('Správně! Našel jsi pečlivě ukryté tlačítko pro odmítnutí.')">
                 Odmítnout všechny cookies a zpomalit načítání hry
             </a>
         </div>
     </div>
 
     <!-- DARK PATTERN: Fake Scarcity (Falešný nátlak / Toast notifikace) -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3 dp-element" style="z-index: 1060" data-dp-label="Fake Scarcity (Generováno přes JS Math.random)">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 dp-element" style="z-index: 1060" data-dp-id="4" data-dp-label="Fake Scarcity (Generováno přes JS Math.random)">
         <div id="scarcityToast" class="toast bg-danger text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header bg-dark text-white border-0">
                 <strong class="me-auto">🔥 Žhavá nabídka!</strong>
@@ -264,6 +273,33 @@
             </div>
             <div class="toast-body fw-bold fs-6" id="toastMessage">
                 <!-- Text generovaný v JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vítězný Modal (zobrazí se po nalezení všech 4) -->
+    <div class="modal fade" id="victoryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center border-success">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title w-100 fw-bold">🎉 Mise splněna!</h5>
+                </div>
+                <div class="modal-body p-4">
+                    <h4 class="mb-3">Odhalil jsi všechny 4 Dark Patterns!</h4>
+                    <p class="text-muted">Jako budoucí vývojář máš zodpovědnost tvořit fér aplikace. Těmito triky se sice dají krátkodobě oklamat lidé, ale ničí se tím důvěra uživatelů.</p>
+                    <div class="text-start bg-light p-3 rounded mt-3">
+                        <p class="mb-1"><strong>🔍 Nalezené techniky:</strong></p>
+                        <ul class="list-unstyled mb-0 ms-2">
+                            <li>✔️ <strong>Sneak into Basket</strong> (Předvyplněný poplatek)</li>
+                            <li>✔️ <strong>Roach Motel</strong> (Neviditelné zrušení)</li>
+                            <li>✔️ <strong>Misdirection</strong> (Zelené "přijmout" a skryté "odmítnout")</li>
+                            <li>✔️ <strong>Fake Scarcity</strong> (Lživá notifikace o vyprodanosti)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success fw-bold px-4" data-bs-dismiss="modal">Skvělé, rozumím!</button>
+                </div>
             </div>
         </div>
     </div>
@@ -276,20 +312,12 @@
         const sneakyCheckbox = document.getElementById('sneakyInsurance');
         const priceDisplay = document.getElementById('totalPrice');
 
-        // Pokud by si náhodou uživatel všiml a odškrtl, cena se upraví
         sneakyCheckbox.addEventListener('change', () => {
             const insurancePrice = sneakyCheckbox.checked ? parseInt(sneakyCheckbox.value) : 0;
             priceDisplay.innerText = basePrice + insurancePrice;
         });
 
-
-        // --- 2. MISDIRECTION (Skrytí banneru) ---
-        function hideCookieBanner() {
-            document.getElementById('cookieBanner').style.display = 'none';
-        }
-
-
-        // --- 3. FAKE SCARCITY (Generování falešného nátlaku) ---
+        // --- 2. FAKE SCARCITY (Generování falešného nátlaku) ---
         const messages = [
             "Právě teď si tento VIP balíček prohlíží {num} dalších lidí!",
             "Zbývají poslední {num} místa na prémiovém serveru!",
@@ -299,37 +327,61 @@
 
         function triggerFakeScarcity() {
             const toastEl = document.getElementById('scarcityToast');
-            const toast = new bootstrap.Toast(toastEl, { delay: 4000 }); // Zmizí po 4 vteřinách
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 }); 
 
-            // Spouštíme v pravidelném intervalu (každých 8 vteřin pro ukázku)
             setInterval(() => {
-                // Náhodný výběr zprávy
                 const randomMsgIndex = Math.floor(Math.random() * messages.length);
-                // Náhodné číslo (např. od 2 do 47)
                 const randomNum = Math.floor(Math.random() * 45) + 2; 
-                
-                // Nahrazení zástupného znaku {num} náhodným číslem
                 const msg = messages[randomMsgIndex].replace('{num}', randomNum);
                 
-                // Vložení do DOMu a zobrazení
                 document.getElementById('toastMessage').innerText = msg;
                 toast.show();
             }, 8000);
         }
 
-        // Spustit falešný nátlak po načtení stránky (s malým zpožděním)
         setTimeout(triggerFakeScarcity, 2000);
 
+        // --- HERNÍ LOGIKA (Lov Dark Patternů) ---
+        let score = 0;
+        const totalPatterns = 4;
+        const foundPatterns = new Set();
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const victoryModal = new bootstrap.Modal(document.getElementById('victoryModal'));
 
-        // --- LEKTORSKÝ REŽIM ---
-        const educatorToggle = document.getElementById('educatorToggle');
-        educatorToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                document.body.classList.add('educator-mode');
-            } else {
-                document.body.classList.remove('educator-mode');
-            }
+        // Procházíme všechny elementy, které jsou dark patterny
+        document.querySelectorAll('.dp-element').forEach(element => {
+            element.addEventListener('click', function(e) {
+                const dpId = this.getAttribute('data-dp-id');
+                
+                // Pokud ještě nebyl nalezen
+                if (!foundPatterns.has(dpId)) {
+                    foundPatterns.add(dpId);
+                    score++;
+                    
+                    // Animace skóre
+                    scoreDisplay.innerText = score;
+                    scoreDisplay.classList.add('text-success', 'fs-3');
+                    setTimeout(() => scoreDisplay.classList.remove('text-success', 'fs-3'), 500);
+                    
+                    // Zvýraznění elementu zeleným ohraničením a štítkem
+                    this.classList.add('dp-found');
+                    
+                    // Zvláštní ošetření u Roach Motel - aby to uživatele nevyhodilo na vršek stránky při kliknutí
+                    if(dpId === "2") {
+                        const cancelLink = document.getElementById('cancelLink');
+                        if(cancelLink) cancelLink.addEventListener('click', ev => ev.preventDefault());
+                    }
+
+                    // Kontrola konce hry
+                    if (score === totalPatterns) {
+                        setTimeout(() => {
+                            victoryModal.show();
+                        }, 800);
+                    }
+                }
+            });
         });
+
     </script>
 </body>
 </html>
