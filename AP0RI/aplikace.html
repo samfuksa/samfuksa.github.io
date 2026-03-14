@@ -19,252 +19,234 @@
 <body class="min-h-screen p-8 flex flex-col items-center">
 
     <header class="text-center mb-10">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Nejpoužívanější Sociální Sítě</h1>
-        <p class="text-gray-500">40 nejpopulárnějších platforem a komunit seřazených podle velikosti</p>
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">Moje Aplikace</h1>
+        <p class="text-gray-500">Pexeso schéma sestavené přesně z tvého výběru</p>
     </header>
 
     <!-- Kontejner pro mřížku karet (pexeso rozložení) -->
     <!-- Používáme grid, který se automaticky přizpůsobí šířce obrazovky -->
     <main class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full max-w-6xl">
 
-        <!-- Karta 1: Facebook -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-facebook text-6xl text-[#1877F2] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Facebook</span>
-        </div>
-
-        <!-- Karta 2: YouTube -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-youtube text-6xl text-[#FF0000] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">YouTube</span>
-        </div>
-
-        <!-- Karta 3: WhatsApp -->
+        <!-- 1: WhatsApp -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
             <i class="fa-brands fa-whatsapp text-6xl text-[#25D366] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">WhatsApp</span>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">WhatsApp</span>
         </div>
 
-        <!-- Karta 4: Instagram -->
+        <!-- 2: Facebook -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-facebook text-6xl text-[#1877F2] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Facebook</span>
+        </div>
+
+        <!-- 3: Instagram -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
             <i class="fa-brands fa-instagram text-6xl text-[#E4405F] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Instagram</span>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Instagram</span>
         </div>
 
-        <!-- Karta 5: WeChat -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-weixin text-6xl text-[#7BB32E] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">WeChat</span>
-        </div>
-
-        <!-- Karta 6: TikTok -->
+        <!-- 4: TikTok -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
             <i class="fa-brands fa-tiktok text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">TikTok</span>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">TikTok</span>
         </div>
 
-        <!-- Karta 7: Messenger -->
+        <!-- 5: YouTube -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-facebook-messenger text-6xl text-[#0084FF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Messenger</span>
+            <i class="fa-brands fa-youtube text-6xl text-[#FF0000] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">YouTube</span>
         </div>
 
-        <!-- Karta 8: Telegram -->
+        <!-- 6: Gmail -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-telegram text-6xl text-[#26A5E4] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Telegram</span>
+            <i class="fa-solid fa-envelope text-6xl text-[#EA4335] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Gmail</span>
         </div>
 
-        <!-- Karta 9: Snapchat -->
+        <!-- 7: Google Maps -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-snapchat text-6xl text-[#FFFC00] drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style="color: #e5e200;"></i>
-            <span class="mt-4 font-semibold text-gray-700">Snapchat</span>
+            <i class="fa-solid fa-map-location-dot text-6xl text-[#34A853] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Maps</span>
         </div>
 
-        <!-- Karta 10: X (Twitter) -->
+        <!-- 8: Google Chrome -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-x-twitter text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">X (Twitter)</span>
+            <i class="fa-brands fa-chrome text-6xl text-[#4285F4] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Chrome</span>
         </div>
 
-        <!-- Karta 11: Pinterest -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-pinterest text-6xl text-[#E60023] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Pinterest</span>
-        </div>
-
-        <!-- Karta 12: Reddit -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-reddit text-6xl text-[#FF4500] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Reddit</span>
-        </div>
-
-        <!-- Karta 13: LinkedIn -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-linkedin text-6xl text-[#0A66C2] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">LinkedIn</span>
-        </div>
-
-        <!-- Karta 14: Quora -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-quora text-6xl text-[#B92B27] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Quora</span>
-        </div>
-
-        <!-- Karta 15: Discord -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-discord text-6xl text-[#5865F2] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Discord</span>
-        </div>
-
-        <!-- Karta 16: Twitch -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-twitch text-6xl text-[#9146FF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Twitch</span>
-        </div>
-
-        <!-- Karta 17: Line -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-line text-6xl text-[#00C300] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Line</span>
-        </div>
-
-        <!-- Karta 18: Viber -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-viber text-6xl text-[#665CAC] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Viber</span>
-        </div>
-
-        <!-- Karta 19: Threads -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-threads text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Threads</span>
-        </div>
-
-        <!-- Karta 20: Skype -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-skype text-6xl text-[#00AFF0] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Skype</span>
-        </div>
-
-        <!-- Karta 21: VKontakte -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-vk text-6xl text-[#4680C2] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">VKontakte</span>
-        </div>
-
-        <!-- Karta 22: Weibo -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-weibo text-6xl text-[#DF2029] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Weibo</span>
-        </div>
-
-        <!-- Karta 23: QQ -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-qq text-6xl text-[#12B7F5] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">QQ</span>
-        </div>
-
-        <!-- Karta 24: Bilibili -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-bilibili text-6xl text-[#00A1D6] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Bilibili</span>
-        </div>
-
-        <!-- Karta 25: Slack -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-slack text-6xl text-[#4A154B] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Slack</span>
-        </div>
-
-        <!-- Karta 26: Mastodon -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-mastodon text-6xl text-[#6364FF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Mastodon</span>
-        </div>
-
-        <!-- Karta 27: Tumblr -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-tumblr text-6xl text-[#36465D] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Tumblr</span>
-        </div>
-
-        <!-- Karta 28: Spotify -->
+        <!-- 9: Spotify -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
             <i class="fa-brands fa-spotify text-6xl text-[#1DB954] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Spotify</span>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Spotify</span>
         </div>
 
-        <!-- Karta 29: GitHub -->
+        <!-- 10: Messenger -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-github text-6xl text-[#181717] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">GitHub</span>
+            <i class="fa-brands fa-facebook-messenger text-6xl text-[#0084FF] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Messenger</span>
         </div>
 
-        <!-- Karta 30: Medium -->
+        <!-- 11: Telegram -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-medium text-6xl text-[#000000] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Medium</span>
+            <i class="fa-brands fa-telegram text-6xl text-[#26A5E4] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Telegram</span>
         </div>
 
-        <!-- Karta 31: Vimeo -->
+        <!-- 12: Snapchat -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-vimeo text-6xl text-[#1AB7EA] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Vimeo</span>
+            <i class="fa-brands fa-snapchat text-6xl text-[#FFFC00] drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style="color: #e5e200;"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Snapchat</span>
         </div>
 
-        <!-- Karta 32: Patreon -->
+        <!-- 13: Twitter -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-patreon text-6xl text-[#FF424D] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Patreon</span>
+            <i class="fa-brands fa-x-twitter text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Twitter</span>
         </div>
 
-        <!-- Karta 33: Dribbble -->
+        <!-- 14: Pinterest -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-dribbble text-6xl text-[#EA4C89] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Dribbble</span>
+            <i class="fa-brands fa-pinterest text-6xl text-[#E60023] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Pinterest</span>
         </div>
 
-        <!-- Karta 34: Behance -->
+        <!-- 15: Netflix -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-behance text-6xl text-[#1769FF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Behance</span>
+            <span class="text-6xl font-extrabold text-[#E50914] group-hover:scale-110 transition-transform duration-300">N</span>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Netflix</span>
         </div>
 
-        <!-- Karta 35: Stack Overflow -->
+        <!-- 16: Google Drive -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-stack-overflow text-6xl text-[#F48024] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Stack Overflow</span>
+            <i class="fa-brands fa-google-drive text-6xl text-[#1FA463] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Drive</span>
         </div>
 
-        <!-- Karta 36: Strava -->
+        <!-- 17: Google Photos -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-strava text-6xl text-[#FC4C02] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Strava</span>
+            <i class="fa-solid fa-images text-6xl text-[#4285F4] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Photos</span>
         </div>
 
-        <!-- Karta 37: Xing -->
+        <!-- 18: Dropbox -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-xing text-6xl text-[#026466] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Xing</span>
+            <i class="fa-brands fa-dropbox text-6xl text-[#0061FE] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Dropbox</span>
         </div>
 
-        <!-- Karta 38: Yelp -->
+        <!-- 19: Zoom -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-yelp text-6xl text-[#D32323] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Yelp</span>
+            <i class="fa-solid fa-video text-6xl text-[#2D8CFF] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Zoom</span>
         </div>
 
-        <!-- Karta 39: Foursquare -->
+        <!-- 20: Skype -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-foursquare text-6xl text-[#F94877] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Foursquare</span>
+            <i class="fa-brands fa-skype text-6xl text-[#00AFF0] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Skype</span>
         </div>
 
-        <!-- Karta 40: Blogger -->
+        <!-- 21: Microsoft Teams -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-blogger text-6xl text-[#F57D00] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700">Blogger</span>
+            <i class="fa-solid fa-people-group text-6xl text-[#6264A7] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Microsoft Teams</span>
+        </div>
+
+        <!-- 22: Outlook -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-solid fa-envelope-open-text text-6xl text-[#0078D4] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Outlook</span>
+        </div>
+
+        <!-- 23: Slack -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-slack text-6xl text-[#4A154B] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Slack</span>
+        </div>
+
+        <!-- 24: LinkedIn -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-linkedin text-6xl text-[#0A66C2] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">LinkedIn</span>
+        </div>
+
+        <!-- 25: Google Calendar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-regular fa-calendar-days text-6xl text-[#4285F4] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Calendar</span>
+        </div>
+
+        <!-- 26: Google Play -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-google-play text-6xl text-[#34A853] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Play</span>
+        </div>
+
+        <!-- 27: App Store -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-app-store-ios text-6xl text-[#007AFF] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">App Store</span>
+        </div>
+
+        <!-- 28: Safari -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-safari text-6xl text-[#007AFF] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Safari</span>
+        </div>
+
+        <!-- 29: Chrome (Mobile) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-chrome text-6xl text-[#F4B400] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Chrome (Mobile)</span>
+        </div>
+
+        <!-- 30: Viber -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-viber text-6xl text-[#665CAC] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Viber</span>
+        </div>
+
+        <!-- 31: Signal -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-solid fa-comment-dots text-6xl text-[#3A76F0] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Signal</span>
+        </div>
+
+        <!-- 32: Discord -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-discord text-6xl text-[#5865F2] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Discord</span>
+        </div>
+
+        <!-- 33: Reddit -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-reddit text-6xl text-[#FF4500] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Reddit</span>
+        </div>
+
+        <!-- 34: Amazon -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-amazon text-6xl text-[#FF9900] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Amazon</span>
+        </div>
+
+        <!-- 35: Duolingo -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <span class="text-6xl font-extrabold text-[#58CC02] group-hover:scale-110 transition-transform duration-300">D</span>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Duolingo</span>
+        </div>
+
+        <!-- 36: Uber -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-brands fa-uber text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Uber</span>
+        </div>
+
+        <!-- 37: Bolt -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+            <i class="fa-solid fa-bolt text-6xl text-[#34D186] group-hover:scale-110 transition-transform duration-300"></i>
+            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Bolt</span>
         </div>
 
     </main>
