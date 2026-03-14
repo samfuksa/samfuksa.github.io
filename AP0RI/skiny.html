@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LootBox Premium | VIP Předplatné</title>
+    
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           ZÁKLADNÍ STYLY APLIKACE
+           ========================================= */
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 100px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #1e0b36 0%, #4a148c 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .pricing-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* =========================================
+           1. MISDIRECTION (Odvedení pozornosti)
+           ========================================= */
+        #cookieBanner {
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.2);
+            z-index: 1050;
+            background-color: #ffffff;
+        }
+        
+        .btn-huge-accept {
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        /* Nenápadný odkaz odsunutý mimo logickou zónu zorného pole */
+        .sneaky-decline {
+            font-size: 0.65rem;
+            color: #adb5bd;
+            text-decoration: none;
+            position: absolute;
+            bottom: 5px;
+            right: 15px;
+            opacity: 0.6;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* =========================================
+           2. SNEAK INTO BASKET (Skrytá položka)
+           ========================================= */
+        .sneaky-checkbox-container {
+            background-color: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        /* Záměrně špatný kontrast a malý font pro zmatení uživatele */
+        .sneaky-label {
+            font-size: 0.7rem;
+            color: #ced4da; /* Velmi světle šedá na světle šedé */
+            line-height: 1.1;
+        }
+
+        /* =========================================
+           3. ROACH MOTEL (Snadno dovnitř, těžko ven)
+           ========================================= */
+        .account-settings {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Tlačítko/odkaz, který splývá s pozadím */
+        .cancel-subscription-link {
+            color: #f4f6f9; /* Stejná barva jako body background! */
+            text-decoration: none;
+            font-size: 10px;
+            cursor: default; /* Odstranění pointeru (ručičky) */
+            user-select: none;
+        }
+
+        .cancel-subscription-link:hover {
+            color: #e9ecef; /* Téměř neviditelná změna při najetí */
+        }
+
+        /* =========================================
+           LEKTORSKÝ REŽIM (Zvýraznění Dark Patterns)
+           ========================================= */
+        body.educator-mode .dp-element {
+            outline: 4px dashed #dc3545 !important;
+            outline-offset: 4px;
+            position: relative;
+            background-color: rgba(220, 53, 69, 0.05) !important;
+        }
+
+        body.educator-mode .dp-element::before {
+            content: attr(data-dp-label);
+            position: absolute;
+            top: -30px;
+            left: -4px;
+            background: #dc3545;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 9999;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Zviditelnění zrušení předplatného v lektorském režimu */
+        body.educator-mode .cancel-subscription-link {
+            color: #dc3545 !important;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Zviditelnění skrytého checkboxu v lektorském režimu */
+        body.educator-mode .sneaky-label {
+            color: #212529 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigace a lektorský přepínač -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-warning" href="#">🎮 LootBox Premium</a>
+            <div class="d-flex align-items-center">
+                <div class="form-check form-switch text-light">
+                    <input class="form-check-input" type="checkbox" id="educatorToggle">
+                    <label class="form-check-label text-warning fw-bold" for="educatorToggle">
+                        Lektorský režim (Odhalit Dark Patterns)
+                    </label>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Sekce -->
+    <header class="hero-section">
+        <div class="container">
+            <h1 class="display-5 fw-bold">Získej naprostou převahu!</h1>
+            <p class="lead">Připoj se k elitě. VIP účet ti odemkne legendární skiny a zaručí 0% reklam.</p>
+        </div>
+    </header>
+
+    <!-- Hlavní obsah - Eshop -->
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card pricing-card">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">VIP Členství</h2>
+                            <h3 class="display-4 fw-bold text-primary">299 <span class="fs-4 text-muted">Kč/měsíc</span></h3>
+                        </div>
+                        
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-2">✅ Prioritní matchmaking serverů</li>
+                            <li class="mb-2">✅ +500% herní měny (XP Boost)</li>
+                            <li class="mb-2">✅ Exkluzivní zlatý odznak na profilu</li>
+                        </ul>
+
+                        <!-- DARK PATTERN: Sneak into Basket -->
+                        <div class="sneaky-checkbox-container dp-element" data-dp-label="Sneak into Basket (Předem zaškrtnutý skrytý poplatek)">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sneakyInsurance" value="199" checked>
+                                <label class="form-check-label sneaky-label" for="sneakyInsurance">
+                                    Souhlasím s přidáním prémiového "Pojištění herního inventáře proti hacknutí" za dodatečných 199 Kč měsíčně. V případě zrušení přicházíte o záruku.
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center mb-4 fw-bold fs-5">
+                            <span>Celkem k úhradě:</span>
+                            <span class="text-primary"><span id="totalPrice">498</span> Kč</span>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="alert('Děkujeme za nákup! Peníze byly strženy.')">
+                            DOKONČIT NÁKUP
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DARK PATTERN: Roach Motel (Skryté zrušení předplatného) -->
+        <div class="row justify-content-center account-settings">
+            <div class="col-md-8 text-center">
+                <h5 class="text-muted mb-3">Správa stávajícího účtu</h5>
+                <div class="d-flex justify-content-center gap-3">
+                    <button class="btn btn-outline-secondary btn-sm">Změnit platební kartu</button>
+                    <button class="btn btn-outline-secondary btn-sm">Stáhnout faktury</button>
+                </div>
+                
+                <div class="mt-5 dp-element" data-dp-label="Roach Motel (Zrušení splývá s pozadím)">
+                    <!-- Toto tlačítko je záměrně téměř neviditelné díky CSS .cancel-subscription-link -->
+                    <a href="#" class="cancel-subscription-link" onclick="alert('Tento proces vyžaduje telefonát na naši placenou linku v pracovní dny 8:00 - 8:15.')">
+                        Zrušit VIP předplatné (nevratný krok)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- DARK PATTERN: Misdirection (Manipulativní Cookie/Consent okno) -->
+    <div id="cookieBanner" class="position-fixed bottom-0 start-0 w-100 p-4 dp-element" data-dp-label="Misdirection (Obrovské přijmout, skryté odmítnout)">
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-md-7 mb-3 mb-md-0">
+                    <h4 class="fw-bold text-success">🎁 Nepropásněte denní odměny!</h4>
+                    <p class="mb-0 text-muted">Naše stránka používá cookies a sledovací technologie třetích stran, abychom vám mohli nabízet "personalizované loot boxy" a sdílet vaše data s našimi partnery pro cílenou reklamu.</p>
+                </div>
+                <div class="col-md-5 text-center text-md-end">
+                    <button class="btn btn-success w-100 btn-huge-accept fw-bold" onclick="hideCookieBanner()">
+                        PŘIJMOUT VŠE A ZÍSKAT VÝHODY
+                    </button>
+                </div>
+            </div>
+            <!-- Záměrně schovaný a odsunutý odkaz mimo zorné pole uživatele -->
+            <a href="#" class="sneaky-decline" onclick="hideCookieBanner()">
+                Odmítnout všechny cookies a zpomalit načítání hry
+            </a>
+        </div>
+    </div>
+
+    <!-- DARK PATTERN: Fake Scarcity (Falešný nátlak / Toast notifikace) -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 dp-element" style="z-index: 1060" data-dp-label="Fake Scarcity (Generováno přes JS Math.random)">
+        <div id="scarcityToast" class="toast bg-danger text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-dark text-white border-0">
+                <strong class="me-auto">🔥 Žhavá nabídka!</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body fw-bold fs-6" id="toastMessage">
+                <!-- Text generovaný v JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Skripty -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- 1. SNEAK INTO BASKET (Dynamický přepočet ceny) ---
+        const basePrice = 299;
+        const sneakyCheckbox = document.getElementById('sneakyInsurance');
+        const priceDisplay = document.getElementById('totalPrice');
+
+        // Pokud by si náhodou uživatel všiml a odškrtl, cena se upraví
+        sneakyCheckbox.addEventListener('change', () => {
+            const insurancePrice = sneakyCheckbox.checked ? parseInt(sneakyCheckbox.value) : 0;
+            priceDisplay.innerText = basePrice + insurancePrice;
+        });
+
+
+        // --- 2. MISDIRECTION (Skrytí banneru) ---
+        function hideCookieBanner() {
+            document.getElementById('cookieBanner').style.display = 'none';
+        }
+
+
+        // --- 3. FAKE SCARCITY (Generování falešného nátlaku) ---
+        const messages = [
+            "Právě teď si tento VIP balíček prohlíží {num} dalších lidí!",
+            "Zbývají poslední {num} místa na prémiovém serveru!",
+            "Před {num} minutami si tento balíček koupil jiný hráč z tvého okolí!",
+            "Pozor! Za {num} hodin tato výhodná cena končí!"
+        ];
+
+        function triggerFakeScarcity() {
+            const toastEl = document.getElementById('scarcityToast');
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 }); // Zmizí po 4 vteřinách
+
+            // Spouštíme v pravidelném intervalu (každých 8 vteřin pro ukázku)
+            setInterval(() => {
+                // Náhodný výběr zprávy
+                const randomMsgIndex = Math.floor(Math.random() * messages.length);
+                // Náhodné číslo (např. od 2 do 47)
+                const randomNum = Math.floor(Math.random() * 45) + 2; 
+                
+                // Nahrazení zástupného znaku {num} náhodným číslem
+                const msg = messages[randomMsgIndex].replace('{num}', randomNum);
+                
+                // Vložení do DOMu a zobrazení
+                document.getElementById('toastMessage').innerText = msg;
+                toast.show();
+            }, 8000);
+        }
+
+        // Spustit falešný nátlak po načtení stránky (s malým zpožděním)
+        setTimeout(triggerFakeScarcity, 2000);
+
+
+        // --- LEKTORSKÝ REŽIM ---
+        const educatorToggle = document.getElementById('educatorToggle');
+        educatorToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.classList.add('educator-mode');
+            } else {
+                document.body.classList.remove('educator-mode');
+            }
+        });
+    </script>
+</body>
+</html>
