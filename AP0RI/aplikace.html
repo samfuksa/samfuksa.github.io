@@ -3,253 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schéma Aplikací - Pexeso</title>
-    <!-- Tailwind CSS pro rychlé stylování -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome pro ikony reálných aplikací -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>Pexeso - Schéma Aplikací</title>
     <style>
-        /* Vlastní styly pro jemné doladění, zbytek řeší Tailwind */
+        /* Základní nastavení pro obrazovku */
         body {
-            background-color: #f3f4f6; /* Světle šedé pozadí pro kontrast s bílými kartami */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ovladani {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0078D4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #005a9e;
+        }
+
+        /* ULTIMÁTNÍ OPRAVA PRO TISK: Používáme oddělené okraje a Thead */
+        .pexeso-plocha {
+            border-collapse: separate; /* Ochrana proti mizejícím čarám na dalších stranách */
+            border-spacing: 0;
+            border-left: 1px dashed #000;
+            width: 180mm; 
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
+
+        /* Řádek tabulky se nikdy nesmí roztrhnout */
+        .pexeso-radek {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        /* Buňka tabulky = kartička */
+        .karta {
+            width: 45mm; 
+            height: 45mm;
+            border: none;
+            border-bottom: 1px dashed #000; /* Karta má jen spodek a pravou stranu, nevyváří duplicity */
+            border-right: 1px dashed #000;
+            padding: 0;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+
+        /* Vnitřek pro zarovnání textu a ikony na střed */
+        .karta-obsah {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .ikona {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 8px;
+            object-fit: contain;
+        }
+
+        .nazev {
+            font-size: 12px;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+        }
+
+        /* =========================================
+           PRAVIDLA POUZE PRO TISK
+           ========================================= */
+        @media print {
+            @page {
+                size: A4;
+                margin: 15mm; 
+            }
+
+            body {
+                background-color: white;
+                padding: 0;
+                display: block; 
+            }
+
+            .ovladani {
+                display: none; 
+            }
+
+            .pexeso-plocha {
+                box-shadow: none; 
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen p-8 flex flex-col items-center">
+<body>
 
-    <header class="text-center mb-10">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Moje Aplikace</h1>
-        <p class="text-gray-500">Pexeso schéma sestavené přesně z tvého výběru</p>
-    </header>
+    <div class="ovladani">
+        <h2>Pexeso - Schéma Aplikací</h2>
+        <p>Kliknutím na tlačítko níže otevřeš náhled tisku. Karet se teď na stránku vejde kolik chceš, aniž by se roztrhly.</p>
+        <button onclick="window.print()">🖨️ Vytisknout Pexeso</button>
+    </div>
 
-    <!-- Kontejner pro mřížku karet (pexeso rozložení) -->
-    <!-- Používáme grid, který se automaticky přizpůsobí šířce obrazovky -->
-    <main class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full max-w-6xl">
+    <!-- Nahradili jsme DIV neprůstřelnou tabulkou -->
+    <table class="pexeso-plocha" id="plocha">
+        <!-- Generováno přes JavaScript do řádků -->
+    </table>
 
-        <!-- 1: WhatsApp -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-whatsapp text-6xl text-[#25D366] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">WhatsApp</span>
-        </div>
+    <script>
+        // Tvoje aplikace
+        const aplikace = [
+            { name: "WhatsApp", domain: "whatsapp.com", color: "#25D366" },
+            { name: "Facebook", domain: "facebook.com", color: "#1877F2" },
+            { name: "Instagram", domain: "instagram.com", color: "#E4405F" },
+            { name: "TikTok", domain: "tiktok.com", color: "#000000" },
+            { name: "YouTube", domain: "youtube.com", color: "#FF0000" },
+            { name: "Gmail", domain: "mail.google.com", color: "#EA4335" },
+            { name: "Google Maps", domain: "maps.google.com", color: "#34A853" },
+            { name: "Google Chrome", domain: "chrome.com", color: "#4285F4" },
+            { name: "Spotify", domain: "spotify.com", color: "#1DB954" },
+            { name: "Messenger", domain: "messenger.com", color: "#00B2FF" },
+            { name: "Telegram", domain: "telegram.org", color: "#26A5E4" },
+            { name: "Snapchat", domain: "snapchat.com", color: "#FFFC00" },
+            { name: "Twitter", domain: "x.com", color: "#000000" },
+            { name: "Pinterest", domain: "pinterest.com", color: "#E60023" },
+            { name: "Netflix", domain: "netflix.com", color: "#E50914" },
+            { name: "Google Drive", domain: "drive.google.com", color: "#0F9D58" },
+            { name: "Google Photos", domain: "photos.google.com", color: "#4285F4" },
+            { name: "Dropbox", domain: "dropbox.com", color: "#0061FF" },
+            { name: "Zoom", domain: "zoom.us", color: "#2D8CFF" },
+            { name: "Skype", domain: "skype.com", color: "#00AFF0" },
+            { name: "Microsoft Teams", domain: "teams.microsoft.com", color: "#6264A7" },
+            { name: "Outlook", domain: "outlook.com", color: "#0078D4" },
+            { name: "Slack", domain: "slack.com", color: "#4A154B" },
+            { name: "LinkedIn", domain: "linkedin.com", color: "#0A66C2" },
+            { name: "Google Calendar", domain: "calendar.google.com", color: "#4285F4" },
+            { name: "Google Play", domain: "play.google.com", color: "#414141" },
+            { name: "App Store", domain: "apps.apple.com", color: "#0D96F6" },
+            { name: "Safari", domain: "apple.com", color: "#000000" },
+            { name: "Chrome (Mobile)", domain: "chrome.com", color: "#4285F4" },
+            { name: "Viber", domain: "viber.com", color: "#7360F2" },
+            { name: "Signal", domain: "signal.org", color: "#3A76F0" },
+            { name: "Discord", domain: "discord.com", color: "#5865F2" },
+            { name: "Reddit", domain: "reddit.com", color: "#FF4500" },
+            { name: "Amazon", domain: "amazon.com", color: "#FF9900" },
+            { name: "Spotify", domain: "spotify.com", color: "#1DB954" },
+            { name: "Duolingo", domain: "duolingo.com", color: "#58CC02" },
+            { name: "Uber", domain: "uber.com", color: "#000000" },
+            { name: "Bolt", domain: "bolt.eu", color: "#32C872" },
+            { name: "Spotify", domain: "spotify.com", color: "#1DB954" }
+        ];
 
-        <!-- 2: Facebook -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-facebook text-6xl text-[#1877F2] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Facebook</span>
-        </div>
+        const plocha = document.getElementById('plocha');
+        let htmlObsah = `
+            <thead style="display: table-header-group;">
+                <tr><th colspan="4" style="height: 0; line-height: 0; padding: 0; border-top: 1px dashed #000;"></th></tr>
+            </thead>
+            <tbody>
+        `;
 
-        <!-- 3: Instagram -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-instagram text-6xl text-[#E4405F] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Instagram</span>
-        </div>
+        // Procházíme aplikace po čtveřicích, abychom z nich udělali řádky (<tr>) v tabulce
+        for (let i = 0; i < aplikace.length; i += 4) {
+            htmlObsah += '<tr class="pexeso-radek">';
+            
+            // Vezme max 4 aplikace do jednoho řádku
+            const aplikaceDoRadku = aplikace.slice(i, i + 4);
+            
+            aplikaceDoRadku.forEach(app => {
+                const iconUrl = `https://www.google.com/s2/favicons?domain=${app.domain}&sz=128`;
+                const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=random&color=fff&size=128`;
+                
+                htmlObsah += `
+                    <td class="karta">
+                        <div class="karta-obsah">
+                            <img src="${iconUrl}" alt="${app.name}" class="ikona" onerror="this.onerror=null;this.src='${fallbackUrl}';">
+                            <div class="nazev" style="color: ${app.color};">${app.name}</div>
+                        </div>
+                    </td>
+                `;
+            });
 
-        <!-- 4: TikTok -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-tiktok text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">TikTok</span>
-        </div>
+            // Pokud nám v posledním řádku nevyjdou aplikace na 4, doplníme prázdné karty
+            for (let j = aplikaceDoRadku.length; j < 4; j++) {
+                htmlObsah += `<td class="karta"></td>`;
+            }
 
-        <!-- 5: YouTube -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-youtube text-6xl text-[#FF0000] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">YouTube</span>
-        </div>
+            htmlObsah += '</tr>';
+        }
 
-        <!-- 6: Gmail -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-envelope text-6xl text-[#EA4335] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Gmail</span>
-        </div>
-
-        <!-- 7: Google Maps -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-map-location-dot text-6xl text-[#34A853] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Maps</span>
-        </div>
-
-        <!-- 8: Google Chrome -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-chrome text-6xl text-[#4285F4] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Chrome</span>
-        </div>
-
-        <!-- 9: Spotify -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-spotify text-6xl text-[#1DB954] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Spotify</span>
-        </div>
-
-        <!-- 10: Messenger -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-facebook-messenger text-6xl text-[#0084FF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Messenger</span>
-        </div>
-
-        <!-- 11: Telegram -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-telegram text-6xl text-[#26A5E4] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Telegram</span>
-        </div>
-
-        <!-- 12: Snapchat -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-snapchat text-6xl text-[#FFFC00] drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style="color: #e5e200;"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Snapchat</span>
-        </div>
-
-        <!-- 13: Twitter -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-x-twitter text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Twitter</span>
-        </div>
-
-        <!-- 14: Pinterest -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-pinterest text-6xl text-[#E60023] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Pinterest</span>
-        </div>
-
-        <!-- 15: Netflix -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <span class="text-6xl font-extrabold text-[#E50914] group-hover:scale-110 transition-transform duration-300">N</span>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Netflix</span>
-        </div>
-
-        <!-- 16: Google Drive -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-google-drive text-6xl text-[#1FA463] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Drive</span>
-        </div>
-
-        <!-- 17: Google Photos -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-images text-6xl text-[#4285F4] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Photos</span>
-        </div>
-
-        <!-- 18: Dropbox -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-dropbox text-6xl text-[#0061FE] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Dropbox</span>
-        </div>
-
-        <!-- 19: Zoom -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-video text-6xl text-[#2D8CFF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Zoom</span>
-        </div>
-
-        <!-- 20: Skype -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-skype text-6xl text-[#00AFF0] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Skype</span>
-        </div>
-
-        <!-- 21: Microsoft Teams -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-people-group text-6xl text-[#6264A7] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Microsoft Teams</span>
-        </div>
-
-        <!-- 22: Outlook -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-envelope-open-text text-6xl text-[#0078D4] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Outlook</span>
-        </div>
-
-        <!-- 23: Slack -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-slack text-6xl text-[#4A154B] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Slack</span>
-        </div>
-
-        <!-- 24: LinkedIn -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-linkedin text-6xl text-[#0A66C2] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">LinkedIn</span>
-        </div>
-
-        <!-- 25: Google Calendar -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-regular fa-calendar-days text-6xl text-[#4285F4] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Calendar</span>
-        </div>
-
-        <!-- 26: Google Play -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-google-play text-6xl text-[#34A853] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Google Play</span>
-        </div>
-
-        <!-- 27: App Store -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-app-store-ios text-6xl text-[#007AFF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">App Store</span>
-        </div>
-
-        <!-- 28: Safari -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-safari text-6xl text-[#007AFF] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Safari</span>
-        </div>
-
-        <!-- 29: Chrome (Mobile) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-chrome text-6xl text-[#F4B400] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Chrome (Mobile)</span>
-        </div>
-
-        <!-- 30: Viber -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-viber text-6xl text-[#665CAC] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Viber</span>
-        </div>
-
-        <!-- 31: Signal -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-comment-dots text-6xl text-[#3A76F0] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Signal</span>
-        </div>
-
-        <!-- 32: Discord -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-discord text-6xl text-[#5865F2] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Discord</span>
-        </div>
-
-        <!-- 33: Reddit -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-reddit text-6xl text-[#FF4500] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Reddit</span>
-        </div>
-
-        <!-- 34: Amazon -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-amazon text-6xl text-[#FF9900] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Amazon</span>
-        </div>
-
-        <!-- 35: Duolingo -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <span class="text-6xl font-extrabold text-[#58CC02] group-hover:scale-110 transition-transform duration-300">D</span>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Duolingo</span>
-        </div>
-
-        <!-- 36: Uber -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-brands fa-uber text-6xl text-black group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Uber</span>
-        </div>
-
-        <!-- 37: Bolt -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 aspect-square flex flex-col items-center justify-center p-4 hover:-translate-y-2 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-            <i class="fa-solid fa-bolt text-6xl text-[#34D186] group-hover:scale-110 transition-transform duration-300"></i>
-            <span class="mt-4 font-semibold text-gray-700 text-center leading-tight">Bolt</span>
-        </div>
-
-    </main>
-
+        htmlObsah += '</tbody>';
+        plocha.innerHTML = htmlObsah;
+    </script>
 </body>
 </html>
