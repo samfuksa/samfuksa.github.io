@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pexeso - Schéma Aplikací</title>
+    <style>
+        /* Základní nastavení pro obrazovku */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ovladani {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0078D4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #005a9e;
+        }
+
+        /* ULTIMÁTNÍ OPRAVA PRO TISK: Používáme oddělené okraje a Thead */
+        .pexeso-plocha {
+            border-collapse: separate; /* Ochrana proti mizejícím čarám na dalších stranách */
+            border-spacing: 0;
+            border-left: 1px dashed #000;
+            width: 180mm; 
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
+
+        /* Řádek tabulky se nikdy nesmí roztrhnout */
+        .pexeso-radek {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        /* Buňka tabulky = kartička */
+        .karta {
+            width: 45mm; 
+            height: 45mm;
+            border: none;
+            border-bottom: 1px dashed #000; /* Karta má jen spodek a pravou stranu, nevyváří duplicity */
+            border-right: 1px dashed #000;
+            padding: 0;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+
+        /* Vnitřek pro zarovnání textu a ikony na střed */
+        .karta-obsah {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .ikona {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 8px;
+            object-fit: contain;
+        }
+
+        .nazev {
+            font-size: 12px;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+        }
+
+        /* =========================================
+           PRAVIDLA POUZE PRO TISK
+           ========================================= */
+        @media print {
+            @page {
+                size: A4;
+                margin: 15mm; 
+            }
+
+            body {
+                background-color: white;
+                padding: 0;
+                display: block; 
+            }
+
+            .ovladani {
+                display: none; 
+            }
+
+            .pexeso-plocha {
+                box-shadow: none; 
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ovladani">
+        <h2>Pexeso - Schéma Aplikací</h2>
+        <p>Kliknutím na tlačítko níže otevřeš náhled tisku. Karet se teď na stránku vejde kolik chceš, aniž by se roztrhly.</p>
+        <button onclick="window.print()">🖨️ Vytisknout Pexeso</button>
+    </div>
+
+    <!-- Nahradili jsme DIV neprůstřelnou tabulkou -->
+    <table class="pexeso-plocha" id="plocha">
+        <!-- Generováno přes JavaScript do řádků -->
+    </table>
+
+    <script>
+        // Tvoje aplikace
+        const aplikace = [
+            { name: "WhatsApp", domain: "whatsapp.com", color: "#25D366" },
+            { name: "Facebook", domain: "facebook.com", color: "#1877F2" },
+            { name: "Instagram", domain: "instagram.com", color: "#E4405F" },
+            { name: "TikTok", domain: "tiktok.com", color: "#000000" },
+            { name: "YouTube", domain: "youtube.com", color: "#FF0000" },
+            { name: "Gmail", domain: "mail.google.com", color: "#EA4335" },
+            { name: "Google Maps", domain: "maps.google.com", color: "#34A853" },
+            { name: "Google Chrome", domain: "chrome.com", color: "#4285F4" },
+            { name: "Spotify", domain: "spotify.com", color: "#1DB954" },
+            { name: "Messenger", domain: "messenger.com", color: "#00B2FF" },
+            { name: "Telegram", domain: "telegram.org", color: "#26A5E4" },
+            { name: "Snapchat", domain: "snapchat.com", color: "#FFFC00" },
+            { name: "Twitter", domain: "x.com", color: "#000000" },
+            { name: "Pinterest", domain: "pinterest.com", color: "#E60023" },
+            { name: "Netflix", domain: "netflix.com", color: "#E50914" },
+            { name: "Google Drive", domain: "drive.google.com", color: "#0F9D58" },
+            { name: "Google Photos", domain: "photos.google.com", color: "#4285F4" },
+            { name: "Dropbox", domain: "dropbox.com", color: "#0061FF" },
+            { name: "Zoom", domain: "zoom.us", color: "#2D8CFF" },
+            { name: "Skype", domain: "skype.com", color: "#00AFF0" },
+            { name: "Microsoft Teams", domain: "teams.microsoft.com", color: "#6264A7" },
+            { name: "Outlook", domain: "outlook.com", color: "#0078D4" },
+            { name: "Slack", domain: "slack.com", color: "#4A154B" },
+            { name: "LinkedIn", domain: "linkedin.com", color: "#0A66C2" },
+            { name: "Google Calendar", domain: "calendar.google.com", color: "#4285F4" },
+            { name: "Google Play", domain: "play.google.com", color: "#414141" },
+            { name: "App Store", domain: "apps.apple.com", color: "#0D96F6" },
+            { name: "Safari", domain: "apple.com", color: "#000000" },
+            { name: "Chrome (Mobile)", domain: "chrome.com", color: "#4285F4" },
+            { name: "Viber", domain: "viber.com", color: "#7360F2" },
+            { name: "Signal", domain: "signal.org", color: "#3A76F0" },
+            { name: "Discord", domain: "discord.com", color: "#5865F2" },
+            { name: "Reddit", domain: "reddit.com", color: "#FF4500" },
+            { name: "Amazon", domain: "amazon.com", color: "#FF9900" },
+            { name: "Spotify", domain: "spotify.com", color: "#1DB954" },
+            { name: "Duolingo", domain: "duolingo.com", color: "#58CC02" },
+            { name: "Uber", domain: "uber.com", color: "#000000" },
+            { name: "Bolt", domain: "bolt.eu", color: "#32C872" },
+            { name: "Spotify", domain: "spotify.com", color: "#1DB954" }
+        ];
+
+        const plocha = document.getElementById('plocha');
+        let htmlObsah = `
+            <thead style="display: table-header-group;">
+                <tr><th colspan="4" style="height: 0; line-height: 0; padding: 0; border-top: 1px dashed #000;"></th></tr>
+            </thead>
+            <tbody>
+        `;
+
+        // Procházíme aplikace po čtveřicích, abychom z nich udělali řádky (<tr>) v tabulce
+        for (let i = 0; i < aplikace.length; i += 4) {
+            htmlObsah += '<tr class="pexeso-radek">';
+            
+            // Vezme max 4 aplikace do jednoho řádku
+            const aplikaceDoRadku = aplikace.slice(i, i + 4);
+            
+            aplikaceDoRadku.forEach(app => {
+                const iconUrl = `https://www.google.com/s2/favicons?domain=${app.domain}&sz=128`;
+                const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=random&color=fff&size=128`;
+                
+                htmlObsah += `
+                    <td class="karta">
+                        <div class="karta-obsah">
+                            <img src="${iconUrl}" alt="${app.name}" class="ikona" onerror="this.onerror=null;this.src='${fallbackUrl}';">
+                            <div class="nazev" style="color: ${app.color};">${app.name}</div>
+                        </div>
+                    </td>
+                `;
+            });
+
+            // Pokud nám v posledním řádku nevyjdou aplikace na 4, doplníme prázdné karty
+            for (let j = aplikaceDoRadku.length; j < 4; j++) {
+                htmlObsah += `<td class="karta"></td>`;
+            }
+
+            htmlObsah += '</tr>';
+        }
+
+        htmlObsah += '</tbody>';
+        plocha.innerHTML = htmlObsah;
+    </script>
+</body>
+</html>
