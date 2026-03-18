@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit sociálních sítí: Nastavení soukromí</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome pro ikony -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- html2pdf.js pro export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            --surface-color: #ffffff;
+            --bg-color: #f3f4f6;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            
+            /* Značkové barvy */
+            --tiktok-color: #000000;
+            --instagram-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --snapchat-color: #fffc00;
+            --discord-color: #5865F2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .doc-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--surface-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .doc-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 2rem;
+            position: relative;
+        }
+
+        .doc-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: var(--surface-color);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+        }
+
+        .badge-pill {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .bg-tiktok { background: var(--tiktok-color); }
+        .bg-instagram { background: var(--instagram-gradient); }
+        .bg-snapchat { background: var(--snapchat-color); color: #000 !important; }
+        .bg-discord { background: var(--discord-color); }
+
+        .action-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            padding: 10px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .action-icon {
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .icon-on { color: var(--success-color); }
+        .icon-off { color: var(--danger-color); }
+
+        .action-title {
+            font-weight: 600;
+            color: #1e293b;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .action-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .block-section {
+            background: linear-gradient(to right, #fff1f2, #fef2f2);
+            border: 1px solid #fecdd3;
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .report-section {
+            background: linear-gradient(to right, #eff6ff, #f8fafc);
+            border: 1px solid #bfdbfe;
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        
+        .report-section .step-number {
+            background: #3b82f6;
+        }
+
+        .device-section {
+            background: linear-gradient(to right, #f5f3ff, #faf5ff);
+            border: 1px solid #e9d5ff;
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .device-section .step-number {
+            background: #8b5cf6;
+        }
+
+        .block-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .btn-export {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+
+        /* Třída pro export (skrytí prvků v PDF) */
+        .pdf-export-mode .no-print {
+            display: none !important;
+        }
+        .pdf-export-mode .doc-container {
+            box-shadow: none !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+        }
+    </style>
+</head>
+
+<body class="py-5">
+
+    <div class="container">
+        <!-- Ovládací prvky mimo dokument -->
+        <div class="d-flex justify-content-end mb-4 no-print">
+            <button class="btn btn-export" id="exportBtn" onclick="generatePDF()">
+                <i class="fas fa-file-pdf me-2"></i>Stáhnout jako PDF
+            </button>
+        </div>
+
+        <!-- Hlavní kontejner dokumentu -->
+        <div class="doc-container" id="printable-content">
+            
+            <!-- Hlavička -->
+            <header class="doc-header text-center">
+                <div class="mb-3">
+                    <span class="badge-pill"><i class="fas fa-shield-alt me-2"></i>Pro žáky</span>
+                </div>
+                <h1 class="display-5 fw-bold mb-2">Audit sociálních sítí</h1>
+                <p class="lead mb-4 text-white-50">Praktický průvodce: Jak si nastavit soukromí a chránit se online</p>
+            </header>
+
+            <div class="p-4 p-md-5 pt-2">
+                
+                <div class="row g-4 mb-5">
+                    <!-- TIKTOK SEKCE -->
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="platform-header">
+                                <div class="icon-wrapper bg-tiktok">
+                                    <i class="fab fa-tiktok"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h4 mb-0 fw-bold">TikTok</h3>
+                                    <span class="text-muted small">Nastavení & Soukromí</span>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3 text-success fw-bold"><i class="fas fa-toggle-on me-2"></i>Co určitě ZAPNOUT</h5>
+                            <ul class="action-list mb-4">
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Soukromý účet</span>
+                                        <p class="action-desc">Tvá videa uvidí jen lidé, které schválíš.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Filtrování komentářů</span>
+                                        <p class="action-desc">Skryje spam a urážlivé komentáře pod videi.</p>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <h5 class="mb-3 text-danger fw-bold"><i class="fas fa-toggle-off me-2"></i>Co určitě VYPNOUT</h5>
+                            <ul class="action-list">
+                                <li class="action-item border-start border-danger border-4">
+                                    <i class="fas fa-times-circle action-icon icon-off"></i>
+                                    <div>
+                                        <span class="action-title">Stav aktivity</span>
+                                        <p class="action-desc">Ostatní neuvidí, kdy jsi online.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-danger border-4">
+                                    <i class="fas fa-times-circle action-icon icon-off"></i>
+                                    <div>
+                                        <span class="action-title">Navrhovat účet ostatním</span>
+                                        <p class="action-desc">Zabrání aplikaci nabízet tvůj profil cizím lidem.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-danger border-4">
+                                    <i class="fas fa-times-circle action-icon icon-off"></i>
+                                    <div>
+                                        <span class="action-title">Stahování videí</span>
+                                        <p class="action-desc">Zakáže ostatním stahovat tvá videa do mobilu.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- INSTAGRAM SEKCE -->
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="platform-header">
+                                <div class="icon-wrapper bg-instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h4 mb-0 fw-bold">Instagram</h3>
+                                    <span class="text-muted small">Nastavení a soukromí</span>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3 text-success fw-bold"><i class="fas fa-toggle-on me-2"></i>Co určitě ZAPNOUT</h5>
+                            <ul class="action-list mb-4">
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Soukromý účet</span>
+                                        <p class="action-desc">Tvoje fotky a stories uvidí jen sledující.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Skrytá slova</span>
+                                        <p class="action-desc">Automaticky skrývá žádosti o zprávy s urážkami.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Dvoufázové ověření</span>
+                                        <p class="action-desc">Ochrání tvůj účet před hackery pomocí SMS kódu.</p>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <h5 class="mb-3 text-danger fw-bold"><i class="fas fa-toggle-off me-2"></i>Co určitě VYPNOUT</h5>
+                            <ul class="action-list">
+                                <li class="action-item border-start border-danger border-4">
+                                    <i class="fas fa-times-circle action-icon icon-off"></i>
+                                    <div>
+                                        <span class="action-title">Zobrazit stav aktivity</span>
+                                        <p class="action-desc">Schová zelenou tečku, když jsi v aplikaci.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-danger border-4">
+                                    <i class="fas fa-times-circle action-icon icon-off"></i>
+                                    <div>
+                                        <span class="action-title">Sdílení příběhů</span>
+                                        <p class="action-desc">Nedovolí ostatním posílat tvá stories do zpráv.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SNAPCHAT SEKCE -->
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="platform-header">
+                                <div class="icon-wrapper bg-snapchat">
+                                    <i class="fab fa-snapchat-ghost"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h4 mb-0 fw-bold">Snapchat</h3>
+                                    <span class="text-muted small">Ovládání soukromí</span>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3 text-success fw-bold"><i class="fas fa-toggle-on me-2"></i>Co určitě ZAPNOUT</h5>
+                            <ul class="action-list mb-4">
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Režim duchů (Ghost Mode)</span>
+                                        <p class="action-desc">Tvoji polohu na Snap Mapě neuvidí nikdo.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Kontaktovat mě: Jen přátelé</span>
+                                        <p class="action-desc">Zabrání cizím lidem posílat ti zprávy a Snapy.</p>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <h5 class="mb-3 text-danger fw-bold"><i class="fas fa-toggle-off me-2"></i>Co určitě VYPNOUT</h5>
+                            <ul class="action-list">
+                                <li class="action-item border-start border-danger border-4">
+                                    <i class="fas fa-times-circle action-icon icon-off"></i>
+                                    <div>
+                                        <span class="action-title">Ukázat v "Rychlém přidání"</span>
+                                        <p class="action-desc">Aplikace tě přestane nabízet cizím lidem do přátel.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- DISCORD SEKCE -->
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <div class="platform-header">
+                                <div class="icon-wrapper bg-discord">
+                                    <i class="fab fa-discord"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h4 mb-0 fw-bold">Discord</h3>
+                                    <span class="text-muted small">Ochrana soukromí a bezpečí</span>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3 text-success fw-bold"><i class="fas fa-toggle-on me-2"></i>Co určitě ZAPNOUT</h5>
+                            <ul class="action-list mb-4">
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Filtrování explicitního obsahu</span>
+                                        <p class="action-desc">Automaticky zablokuje nevhodné obrázky ve zprávách.</p>
+                                    </div>
+                                </li>
+                                <li class="action-item border-start border-success border-4">
+                                    <i class="fas fa-check-circle action-icon icon-on"></i>
+                                    <div>
+                                        <span class="action-title">Kdo si mě může přidat</span>
+                                        <p class="action-desc">Omez to jen na "Přátele přátel" nebo "Členy serveru".</p>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <h5 class="mb-3 text-danger fw-bold"><i class="fas fa-toggle-off me-2"></i>Co určitě VYPNOUT</h5>
+                            <ul class="action-list">
+                                <li class="action-item border-start border-danger border-4">
+                                    <i class="fas fa-times-circle action-icon icon-off"></i>
+                                    <div>
+                                        <span class="action-title">Zprávy od členů serveru</span>
+                                        <p class="action-desc">Nedovolí náhodným lidem ze serverů psát ti do soukromí.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- BLOKOVÁNÍ SEKCE -->
+                <div class="block-section mt-2">
+                    <h3 class="h4 mb-4 fw-bold text-danger"><i class="fas fa-user-slash me-2"></i>Jak zablokovat otravného uživatele?</h3>
+                    <p class="mb-4">Pokud ti někdo píše něco nepříjemného, neodepisuj. <strong>Zablokuj ho.</strong> Daný člověk nezjistí, že jsi ho zablokoval(a) – nepřijde mu žádné upozornění.</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">1</div>
+                                <div>Otevři profil člověka, kterého chceš zablokovat.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">2</div>
+                                <div>Klikni na <strong>Tři tečky</strong> <i class="fas fa-ellipsis-h text-muted mx-1"></i> (nebo šipku) vpravo nahoře.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">3</div>
+                                <div>Vyber <strong>Blokovat</strong> <i class="fas fa-ban text-danger mx-1"></i> a potvrď volbu.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NAHLÁŠENÍ SEKCE -->
+                <div class="report-section mt-4">
+                    <h3 class="h4 mb-4 fw-bold text-primary"><i class="fas fa-flag me-2"></i>Jak nahlásit nevhodný obsah?</h3>
+                    <p class="mb-4">Vidíš kyberšikanu, nenávistné komentáře nebo něco, co na sítě nepatří? <strong>Nahlaste to!</strong> Je to anonymní a pomůžeš tím sobě i ostatním.</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">1</div>
+                                <div>Najdi příspěvek, komentář nebo zprávu, která porušuje pravidla.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">2</div>
+                                <div>Klikni na <strong>Tři tečky</strong> <i class="fas fa-ellipsis-h text-muted mx-1"></i> nebo ikonku sdílení u obsahu.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">3</div>
+                                <div>Vyber <strong>Nahlásit</strong> <i class="fas fa-exclamation-triangle text-warning mx-1"></i> a zvol správný důvod (např. šikana, spam).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KONTROLA ZAŘÍZENÍ SEKCE -->
+                <div class="device-section mt-4 mb-2">
+                    <h3 class="h4 mb-4 fw-bold" style="color: #8b5cf6;"><i class="fas fa-mobile-alt me-2"></i>Jak zjistit, jestli ti někdo nechodí na účet?</h3>
+                    <p class="mb-4">Máš podezření, že se ti někdo cizí (nebo bývalý kamarád) přihlašuje na profil? Zkontroluj si <strong>přihlášená zařízení</strong> a cizí ihned vyhoď.</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">1</div>
+                                <div>Jdi do <strong>Nastavení</strong> svého profilu v jakékoliv aplikaci.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">2</div>
+                                <div>Najdi sekci <strong>Zabezpečení</strong> nebo <strong>Centrum účtů</strong>.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="block-step h-100">
+                                <div class="step-number">3</div>
+                                <div>Otevři <strong>Přihlášená zařízení</strong>. Cizí nebo staré telefony ihned odhlas!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Skript pro PDF export -->
+    <script>
+        function generatePDF() {
+            const btn = document.getElementById('exportBtn');
+            const originalText = btn.innerHTML;
+            
+            // Indikace načítání
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generuji PDF...';
+            btn.disabled = true;
+
+            // Přidáme třídu pro úpravu stylů pro tisk
+            document.body.classList.add('pdf-export-mode');
+
+            const element = document.getElementById('printable-content');
+            
+            // Nastavení html2pdf podobné jako v předloze
+            const opt = {
+                margin: [10, 0, 10, 0], // top, left, bottom, right v mm
+                filename: 'Audit_socialnich_siti_Zaci.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    windowWidth: 850,
+                    width: 850,
+                    scrollY: 0,
+                    backgroundColor: '#ffffff'
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                },
+                pagebreak: {
+                    mode: ['css', 'legacy']
+                }
+            };
+
+            // Zpoždění pro překreslení DOMu
+            setTimeout(() => {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    document.body.classList.remove('pdf-export-mode');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }).catch(err => {
+                    console.error('Chyba při exportu PDF:', err);
+                    document.body.classList.remove('pdf-export-mode');
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Chyba generování';
+                    setTimeout(() => { 
+                        btn.innerHTML = originalText; 
+                        btn.disabled = false; 
+                    }, 3000);
+                });
+            }, 500);
+        }
+    </script>
+
+</body>
+</html>
