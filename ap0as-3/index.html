@@ -11,8 +11,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- html2pdf.js pro export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
@@ -212,45 +210,12 @@
             flex-shrink: 0;
         }
 
-        .btn-export {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
-        }
-
-        .btn-export:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
-            color: white;
-        }
-
-        /* Třída pro export (skrytí prvků v PDF) */
-        .pdf-export-mode .no-print {
-            display: none !important;
-        }
-        .pdf-export-mode .doc-container {
-            box-shadow: none !important;
-            margin: 0 !important;
-            max-width: 100% !important;
-            border-radius: 0 !important;
-        }
     </style>
 </head>
 
 <body class="py-5">
 
     <div class="container">
-        <!-- Ovládací prvky mimo dokument -->
-        <div class="d-flex justify-content-end mb-4 no-print">
-            <button class="btn btn-export" id="exportBtn" onclick="generatePDF()">
-                <i class="fas fa-file-pdf me-2"></i>Stáhnout jako PDF
-            </button>
-        </div>
 
         <!-- Hlavní kontejner dokumentu -->
         <div class="doc-container" id="printable-content">
@@ -558,62 +523,6 @@
         </div>
     </div>
 
-    <!-- Skript pro PDF export -->
-    <script>
-        function generatePDF() {
-            const btn = document.getElementById('exportBtn');
-            const originalText = btn.innerHTML;
-            
-            // Indikace načítání
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generuji PDF...';
-            btn.disabled = true;
-
-            // Přidáme třídu pro úpravu stylů pro tisk
-            document.body.classList.add('pdf-export-mode');
-
-            const element = document.getElementById('printable-content');
-            
-            // Nastavení html2pdf podobné jako v předloze
-            const opt = {
-                margin: [10, 0, 10, 0], // top, left, bottom, right v mm
-                filename: 'Audit_socialnich_siti_Zaci.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    windowWidth: 850,
-                    width: 850,
-                    scrollY: 0,
-                    backgroundColor: '#ffffff'
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait'
-                },
-                pagebreak: {
-                    mode: ['css', 'legacy']
-                }
-            };
-
-            // Zpoždění pro překreslení DOMu
-            setTimeout(() => {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    document.body.classList.remove('pdf-export-mode');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }).catch(err => {
-                    console.error('Chyba při exportu PDF:', err);
-                    document.body.classList.remove('pdf-export-mode');
-                    btn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Chyba generování';
-                    setTimeout(() => { 
-                        btn.innerHTML = originalText; 
-                        btn.disabled = false; 
-                    }, 3000);
-                });
-            }, 500);
-        }
-    </script>
 
 </body>
 </html>
