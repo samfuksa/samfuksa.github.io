@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McCafé Objednávkový Kiosek</title>
+    <!-- Tailwind CSS pro rychlé stylování -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons pro ikonky -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        mcd: {
+                            dark: '#004B23', // Tmavě zelená McDonald's pro moderní vzhled
+                            gold: '#FFC72C', // Zlatá/žlutá McDonald's
+                            light: '#E5E7EB', // Světle šedá
+                            red: '#DA291C'   // McDonald's červená
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Skrytí posuvníků pro čistší vzhled kiosku */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d4; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+        
+        /* Zabráníme výběru textu na dotykové obrazovce */
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Animace stisknutí tlačítka */
+        .btn-press:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen w-full overflow-hidden no-select font-sans flex text-gray-800">
+
+    <!-- Levý panel: Kategorie -->
+    <aside class="w-1/5 bg-mcd-dark text-white flex flex-col shadow-2xl z-20">
+        <!-- Logo oblast -->
+        <div class="p-6 flex flex-col items-center justify-center border-b border-gray-700">
+            <div class="w-20 h-20 bg-mcd-gold rounded-full flex items-center justify-center mb-3 shadow-lg">
+                <span class="text-mcd-dark font-black text-4xl tracking-tighter">M</span>
+            </div>
+            <h1 class="text-xl font-bold tracking-wide">McDonald's</h1>
+        </div>
+
+        <!-- Seznam kategorií (generováno dynamicky) -->
+        <div id="category-list" class="flex-1 overflow-y-auto py-4">
+            <!-- Položky se vloží pomocí JS -->
+        </div>
+
+        <!-- Tlačítko zpět/jazyk -->
+        <div class="p-4 border-t border-gray-700">
+            <button class="w-full flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-xl btn-press transition-colors">
+                <i data-lucide="globe" class="w-6 h-6"></i>
+                <span class="font-bold text-lg">Čeština</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Prostřední panel: Produkty -->
+    <main class="flex-1 flex flex-col bg-gray-50 relative">
+        <!-- Hlavička kategorie -->
+        <header class="bg-white p-6 shadow-sm flex items-center justify-between z-10">
+            <h2 id="current-category-title" class="text-3xl font-bold text-mcd-dark">Burgery</h2>
+            <div class="bg-mcd-light text-mcd-dark px-4 py-2 rounded-full font-bold">
+                Jezte u nás
+            </div>
+        </header>
+
+        <!-- Grid produktů -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Produkty se vloží pomocí JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Pravý panel: Košík (Vaše objednávka) -->
+    <aside class="w-1/4 min-w-[320px] bg-white shadow-[-5px_0_15px_rgba(0,0,0,0.05)] flex flex-col z-20">
+        <div class="bg-mcd-gold p-6 text-mcd-dark shadow-md">
+            <h2 class="text-2xl font-black flex items-center gap-2">
+                <i data-lucide="shopping-bag" class="w-8 h-8"></i>
+                Moje objednávka
+            </h2>
+        </div>
+
+        <!-- Položky v košíku -->
+        <div id="cart-items" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-gray-50">
+            <!-- Prázdný stav -->
+            <div class="flex flex-col items-center justify-center h-full text-gray-400 opacity-70">
+                <i data-lucide="coffee" class="w-16 h-16 mb-4"></i>
+                <p class="text-xl font-medium text-center">Přidejte si něco<br>dobrého</p>
+            </div>
+        </div>
+
+        <!-- Součet a platba -->
+        <div class="bg-white p-6 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] border-t border-gray-200">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-xl font-bold text-gray-600">Celkem</span>
+                <span id="cart-total" class="text-3xl font-black text-mcd-dark">0 Kč</span>
+            </div>
+            <button id="checkout-btn" onclick="processCheckout()" class="w-full bg-green-600 disabled:bg-gray-300 disabled:text-gray-500 text-white py-5 rounded-2xl font-black text-2xl shadow-lg btn-press transition-colors flex items-center justify-center gap-3" disabled>
+                <span>Zaplatit</span>
+                <i data-lucide="arrow-right" class="w-7 h-7"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Modální okno po zaplacení -->
+    <div id="success-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl transform scale-100 transition-transform">
+            <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="check" class="w-12 h-12"></i>
+            </div>
+            <h2 class="text-3xl font-black text-mcd-dark mb-4">Děkujeme!</h2>
+            <p class="text-xl text-gray-600 mb-8">Vaše číslo objednávky je:<br><span class="text-5xl font-black text-mcd-dark mt-4 block" id="order-number">000</span></p>
+            <p class="text-gray-500 mb-8">Vezměte si účtenku a sledujte obrazovku.</p>
+            <button onclick="resetKiosk()" class="w-full bg-mcd-gold text-mcd-dark py-4 rounded-xl font-bold text-xl btn-press">
+                Nová objednávka
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Inicializace ikonek
+        lucide.createIcons();
+
+        // Databáze produktů a kategorií
+        const data = {
+            categories: [
+                { id: 'burgers', name: 'Burgery', icon: 'utensils' },
+                { id: 'chicken', name: 'Kuřecí', icon: 'flame' },
+                { id: 'sides', name: 'Přílohy', icon: 'box' },
+                { id: 'drinks', name: 'Nápoje', icon: 'cup-soda' },
+                { id: 'desserts', name: 'Dezerty', icon: 'ice-cream' }
+            ],
+            products: [
+                // Burgery
+                { id: 'b1', category: 'burgers', name: 'Big Mac', price: 105, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop' },
+                { id: 'b2', category: 'burgers', name: 'Cheeseburger', price: 45, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=300&fit=crop' },
+                { id: 'b3', category: 'burgers', name: 'Dvojitý Cheeseburger', price: 79, image: 'https://images.unsplash.com/photo-1594212689539-78d103b41e8f?w=400&h=300&fit=crop' },
+                { id: 'b4', category: 'burgers', name: 'Tasty Cheese', price: 55, image: 'https://images.unsplash.com/photo-1603064752734-4c48eff53d05?w=400&h=300&fit=crop' },
+                
+                // Kuřecí
+                { id: 'c1', category: 'chicken', name: 'McChicken', price: 95, image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&h=300&fit=crop' },
+                { id: 'c2', category: 'chicken', name: 'Chicken McNuggets 6ks', price: 85, image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&h=300&fit=crop' },
+                { id: 'c3', category: 'chicken', name: 'Chicken McNuggets 9ks', price: 115, image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&h=300&fit=crop' },
+                
+                // Přílohy
+                { id: 's1', category: 'sides', name: 'Velké Hranolky', price: 65, image: 'https://images.unsplash.com/photo-1573080496599-cb90f36746f3?w=400&h=300&fit=crop' },
+                { id: 's2', category: 'sides', name: 'Malé Hranolky', price: 45, image: 'https://images.unsplash.com/photo-1576107241775-8eb3442651bc?w=400&h=300&fit=crop' },
+                
+                // Nápoje
+                { id: 'd1', category: 'drinks', name: 'Coca-Cola 0.5l', price: 55, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=300&fit=crop' },
+                { id: 'd2', category: 'drinks', name: 'Fanta 0.5l', price: 55, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=300&fit=crop' },
+                
+                // Dezerty
+                { id: 'ds1', category: 'desserts', name: 'McFlurry Oreo', price: 75, image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&h=300&fit=crop' },
+                { id: 'ds2', category: 'desserts', name: 'Taštička Jablko', price: 45, image: 'https://images.unsplash.com/photo-1579954115563-e72bf1a8147d?w=400&h=300&fit=crop' },
+            ]
+        };
+
+        // Stav aplikace
+        let currentCategory = 'burgers';
+        let cart = [];
+
+        // Funkce pro formátování měny
+        const formatPrice = (price) => `${price} Kč`;
+
+        // Renderování kategorií (Levý panel)
+        function renderCategories() {
+            const container = document.getElementById('category-list');
+            container.innerHTML = '';
+
+            data.categories.forEach(cat => {
+                const isActive = cat.id === currentCategory;
+                const btn = document.createElement('button');
+                btn.className = `w-full p-6 flex flex-col items-center justify-center gap-3 transition-colors border-l-4 ${isActive ? 'bg-white text-mcd-dark border-mcd-gold' : 'hover:bg-gray-800 text-gray-300 border-transparent'}`;
+                btn.onclick = () => {
+                    currentCategory = cat.id;
+                    document.getElementById('current-category-title').innerText = cat.name;
+                    renderCategories();
+                    renderProducts();
+                };
+
+                btn.innerHTML = `
+                    <i data-lucide="${cat.icon}" class="w-10 h-10 ${isActive ? 'text-mcd-gold' : ''}"></i>
+                    <span class="font-bold text-lg">${cat.name}</span>
+                `;
+                container.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        // Renderování produktů (Prostřední panel)
+        function renderProducts() {
+            const container = document.getElementById('product-grid');
+            container.innerHTML = '';
+
+            const filteredProducts = data.products.filter(p => p.category === currentCategory);
+
+            filteredProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col btn-press transition-transform cursor-pointer border border-gray-100';
+                card.onclick = () => addToCart(product.id);
+
+                card.innerHTML = `
+                    <div class="h-48 w-full bg-gray-200 relative">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black bg-opacity-10 hover:bg-opacity-0 transition-opacity"></div>
+                    </div>
+                    <div class="p-5 flex flex-col flex-1 justify-between gap-4">
+                        <h3 class="font-bold text-xl text-gray-800 leading-tight">${product.name}</h3>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="font-black text-2xl text-mcd-dark">${formatPrice(product.price)}</span>
+                            <div class="w-12 h-12 bg-mcd-gold text-mcd-dark rounded-full flex items-center justify-center shadow-md">
+                                <i data-lucide="plus" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Přidání do košíku
+        function addToCart(productId) {
+            const product = data.products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.product.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ product: product, quantity: 1 });
+            }
+            renderCart();
+            
+            // Malý vizuální efekt
+            const cartPanel = document.getElementById('cart-items');
+            cartPanel.classList.add('bg-green-50');
+            setTimeout(() => cartPanel.classList.remove('bg-green-50'), 200);
+        }
+
+        // Změna množství v košíku
+        function updateQuantity(productId, delta) {
+            const index = cart.findIndex(item => item.product.id === productId);
+            if (index !== -1) {
+                cart[index].quantity += delta;
+                if (cart[index].quantity <= 0) {
+                    cart.splice(index, 1);
+                }
+                renderCart();
+            }
+        }
+
+        // Renderování košíku (Pravý panel)
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-gray-400 opacity-70 mt-20">
+                        <i data-lucide="utensils" class="w-16 h-16 mb-4"></i>
+                        <p class="text-xl font-medium text-center">Přidejte si něco<br>dobrého</p>
+                    </div>
+                `;
+                totalEl.innerText = '0 Kč';
+                checkoutBtn.disabled = true;
+                lucide.createIcons();
+                return;
+            }
+
+            checkoutBtn.disabled = false;
+
+            cart.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                total += itemTotal;
+
+                const cartItem = document.createElement('div');
+                cartItem.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3';
+                
+                cartItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="font-bold text-gray-800 text-lg leading-tight w-2/3">${item.product.name}</span>
+                        <span class="font-black text-mcd-dark">${formatPrice(itemTotal)}</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <button onclick="updateQuantity('${item.product.id}', -1)" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 btn-press text-gray-600">
+                            <i data-lucide="${item.quantity === 1 ? 'trash-2' : 'minus'}" class="w-5 h-5 ${item.quantity === 1 ? 'text-red-500' : ''}"></i>
+                        </button>
+                        <span class="font-bold text-xl w-8 text-center">${item.quantity}</span>
+                        <button onclick="updateQuantity('${item.product.id}', 1)" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 btn-press text-gray-600">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(cartItem);
+            });
+
+            totalEl.innerText = formatPrice(total);
+            lucide.createIcons();
+        }
+
+        // Simulace platby a dokončení objednávky
+        function processCheckout() {
+            if (cart.length === 0) return;
+            
+            // Generování náhodného čísla objednávky
+            const orderNum = Math.floor(Math.random() * 100) + 100;
+            document.getElementById('order-number').innerText = orderNum;
+            
+            // Zobrazení modálu
+            const modal = document.getElementById('success-modal');
+            modal.classList.remove('hidden');
+        }
+
+        // Reset kiosku do výchozího stavu
+        function resetKiosk() {
+            cart = [];
+            currentCategory = 'burgers';
+            document.getElementById('current-category-title').innerText = 'Burgery';
+            
+            renderCategories();
+            renderProducts();
+            renderCart();
+            
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+
+        // Inicializace při načtení
+        window.onload = () => {
+            renderCategories();
+            renderProducts();
+            renderCart();
+        };
+
+    </script>
+</body>
+</html>
