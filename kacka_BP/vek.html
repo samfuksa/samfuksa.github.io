@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vláčkový Histogram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4;
+            color: #1f2937;
+        }
+
+        /* Vzor pro moderní vagóny (pohled shora/zepředu) */
+        .wagon-pattern {
+            background-color: var(--train-color);
+            background-image: repeating-linear-gradient(
+                to top,
+                rgba(0,0,0,0.15) 0px,
+                rgba(0,0,0,0.15) 4px,
+                transparent 4px,
+                transparent 40px
+            );
+            border-left: 4px solid rgba(255,255,255,0.4);
+            border-right: 4px solid rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        /* Koleje na spodní straně grafu */
+        .railway-track {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: 
+                repeating-linear-gradient(
+                    to right,
+                    #4b5563 0px,
+                    #4b5563 6px,
+                    transparent 6px,
+                    transparent 16px
+                );
+            border-top: 2px solid #374151;
+            border-bottom: 2px solid #374151;
+            z-index: 20;
+        }
+
+        /* Vlastní posuvník pro tabulku dat a graf */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
+
+        /* Kontejner grafu pro animaci vláčků */
+        #chartContainer {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding-bottom: 35px; /* Místo pro texty pod grafem a koleje */
+            padding-top: 60px;    /* Místo pro texty (procenta) nad grafem */
+            box-sizing: border-box;
+        }
+
+        .train-column {
+            display: flex;
+            flex-direction: column; /* Moderní vlak jede nahoru, lokomotiva je první shora */
+            width: 60px;
+            height: 0; /* Začíná na 0 pro animaci */
+            transition: height 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+
+        /* Moderní lokomotiva (vysokorychlostní vlak) */
+        .locomotive {
+            width: 60px;
+            height: 50px;
+            flex-shrink: 0;
+            background: linear-gradient(to top, var(--train-color) 0%, #cbd5e1 100%);
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            position: relative;
+            z-index: 10;
+            border-left: 4px solid rgba(255,255,255,0.4);
+            border-right: 4px solid rgba(0,0,0,0.3);
+            border-top: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
+        }
+
+        .locomotive::after { /* Moderní čelní sklo kokpitu */
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 20px;
+            background-color: #0f172a;
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.2);
+        }
+
+        .wagons {
+            width: 60px;
+            flex-grow: 1; /* Vyplní zbytek výšky */
+            position: relative;
+        }
+
+        .data-label {
+            position: absolute;
+            bottom: 100%; /* Vždy nad vlakem */
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #1f2937;
+            text-align: center;
+            width: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out 1.5s; /* Ukáže se po animaci */
+        }
+        
+        .category-label {
+            position: absolute;
+            top: 100%; /* Vždy pod vlakem */
+            margin-top: 8px;
+            font-size: 0.875rem;
+            color: #4b5563;
+            text-align: center;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .show-labels .data-label {
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-extrabold text-green-700 flex items-center justify-center gap-3">
+            <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c-4.42 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h12v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-3.58-4-8-4zM7.5 17c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm3.5-7H6V6h5v4zm4 0h-5V6h5v4zm1.5 7c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            Vláčkový Histogram
+        </h1>
+        <p class="text-gray-600 mt-2">Zadejte věkové kategorie a sledujte, jak vláčky vyrazí na trať!</p>
+    </header>
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Levý panel: Vstup dat -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-green-500 flex flex-col h-[500px]">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data kategorií</h2>
+            
+            <form id="addDataForm" class="flex gap-2 mb-4">
+                <input type="text" id="ageRange" placeholder="Věk (např. 0-10)" required class="w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
+                <input type="number" id="peopleCount" placeholder="Počet" min="0" required class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
+                <button type="submit" class="w-1/6 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors flex items-center justify-center">
+                    +
+                </button>
+            </form>
+
+            <!-- Seznam zadaných dat -->
+            <div class="flex-grow overflow-y-auto border border-gray-100 rounded-lg bg-gray-50 p-2 mb-4">
+                <ul id="dataList" class="space-y-2">
+                    <!-- Položky budou vloženy pomocí JS -->
+                </ul>
+                <div id="emptyState" class="text-center text-gray-400 mt-10">
+                    <p>Zatím žádná data.</p>
+                    <p class="text-sm">Přidejte kategorie výše.</p>
+                </div>
+            </div>
+
+            <!-- Tlačítka -->
+            <div class="flex flex-col gap-2">
+                <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Vypustit vlaky
+                </button>
+                <div class="flex gap-2 w-full">
+                    <button id="downloadBtn" class="flex-grow bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Stáhnout PNG
+                    </button>
+                    <button id="clearBtn" class="bg-red-100 hover:bg-red-200 text-red-600 font-bold py-3 px-4 rounded-xl transition-colors">
+                        Smazat
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pravý panel: Graf (Histogram) -->
+        <div id="exportArea" class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 border-t-4 border-blue-500 h-[500px] flex flex-col relative overflow-hidden">
+            <h2 class="text-xl font-bold mb-2 text-gray-800 absolute top-6 left-6 z-30">Výsledný graf</h2>
+            
+            <!-- Kontejner pro Y osu a samotný graf -->
+            <div class="flex flex-grow mt-10 relative">
+                
+                <!-- Osa Y (Hodnoty) -->
+                <div class="w-12 border-r border-gray-300 flex flex-col justify-between items-end pr-2 pb-[35px] pt-[60px] text-xs text-gray-500 absolute h-full left-0 top-0 z-30 bg-white" id="yAxis">
+                    <!-- Hodnoty osy Y vygeneruje JS -->
+                </div>
+
+                <!-- Samotná plocha grafu -->
+                <div class="flex-grow ml-12 relative overflow-x-auto overflow-y-visible" id="chartArea">
+                    <div id="chartContainer" class="min-w-max px-4">
+                        <!-- Zde budou vlaky generovány JS -->
+                        <div class="railway-track"></div>
+                        
+                        <!-- Původní prázdný stav -->
+                        <div id="chartEmptyState" class="absolute inset-0 flex items-center justify-center text-gray-400 z-10">
+                            Zadejte data a stiskněte "Vypustit vlaky"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modální okno pro chyby (v iframe se nemá používat alert) -->
+    <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4">
+            <h3 class="text-lg font-bold text-red-600 mb-2">Chyba</h3>
+            <p id="errorMessage" class="text-gray-700 mb-4"></p>
+            <button onclick="closeModal()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Zavřít</button>
+        </div>
+    </div>
+
+    <script>
+        // Stav aplikace
+        let chartData = [];
+        
+        // Paleta barev pro vláčky
+        const colors = [
+            '#ef4444', // red
+            '#f97316', // orange
+            '#eab308', // yellow
+            '#22c55e', // green
+            '#06b6d4', // cyan
+            '#3b82f6', // blue
+            '#8b5cf6', // violet
+            '#d946ef', // fuchsia
+            '#f43f5e'  // rose
+        ];
+
+        // DOM Elementy
+        const form = document.getElementById('addDataForm');
+        const ageInput = document.getElementById('ageRange');
+        const countInput = document.getElementById('peopleCount');
+        const dataList = document.getElementById('dataList');
+        const emptyState = document.getElementById('emptyState');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const exportArea = document.getElementById('exportArea');
+        const chartContainer = document.getElementById('chartContainer');
+        const chartEmptyState = document.getElementById('chartEmptyState');
+        const yAxis = document.getElementById('yAxis');
+        const errorModal = document.getElementById('errorModal');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Předvyplněná ukázková data
+        const sampleData = [
+            { id: 1, age: '0-10', count: 120, color: colors[0] },
+            { id: 2, age: '11-20', count: 250, color: colors[1] },
+            { id: 3, age: '21-30', count: 310, color: colors[2] },
+            { id: 4, age: '31-40', count: 180, color: colors[3] },
+            { id: 5, age: '41-50', count: 150, color: colors[4] }
+        ];
+
+        // Inicializace s ukázkovými daty
+        function init() {
+            chartData = [...sampleData];
+            renderDataList();
+            checkDataState();
+        }
+
+        // Zobrazení chyby
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorModal.classList.remove('hidden');
+            errorModal.classList.add('flex');
+        }
+
+        function closeModal() {
+            errorModal.classList.add('hidden');
+            errorModal.classList.remove('flex');
+        }
+
+        // Přidání dat
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const age = ageInput.value.trim();
+            const count = parseInt(countInput.value, 10);
+
+            if (!age || isNaN(count)) {
+                showError('Vyplňte prosím obě pole správně.');
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                age: age,
+                count: count,
+                color: colors[chartData.length % colors.length]
+            };
+
+            chartData.push(newItem);
+            
+            ageInput.value = '';
+            countInput.value = '';
+            ageInput.focus();
+
+            renderDataList();
+            checkDataState();
+            
+            // Pokud byl graf už vygenerován, zresetujeme ho, aby uživatel věděl, že musí kliknout znovu
+            chartContainer.innerHTML = '<div class="railway-track"></div><div class="absolute inset-0 flex items-center justify-center text-gray-400 z-10 bg-white bg-opacity-80">Data byla změněna. Klikněte na Vypustit vlaky.</div>';
+        });
+
+        // Odebrání dat
+        function removeData(id) {
+            chartData = chartData.filter(item => item.id !== id);
+            // Přebarvení zbylých
+            chartData.forEach((item, index) => {
+                item.color = colors[index % colors.length];
+            });
+            renderDataList();
+            checkDataState();
+        }
+
+        // Smazat vše
+        clearBtn.addEventListener('click', () => {
+            chartData = [];
+            renderDataList();
+            checkDataState();
+            resetChart();
+        });
+
+        // Kontrola stavu pro tlačítka
+        function checkDataState() {
+            if (chartData.length === 0) {
+                emptyState.style.display = 'block';
+                generateBtn.disabled = true;
+            } else {
+                emptyState.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        }
+
+        // Vykreslení seznamu nalevo
+        function renderDataList() {
+            dataList.innerHTML = '';
+            
+            let total = chartData.reduce((sum, item) => sum + item.count, 0);
+
+            chartData.forEach(item => {
+                const percent = total > 0 ? Math.round((item.count / total) * 100) : 0;
+                
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-3 bg-white rounded-lg shadow-sm border-l-4';
+                li.style.borderLeftColor = item.color;
+                
+                li.innerHTML = `
+                    <div class="flex-grow">
+                        <span class="font-bold text-gray-800 block">${item.age} let</span>
+                        <span class="text-sm text-gray-500">${item.count} osob (${percent}%)</span>
+                    </div>
+                    <button onclick="removeData(${item.id})" class="text-red-400 hover:text-red-600 p-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                dataList.appendChild(li);
+            });
+        }
+
+        // Reset grafu do původního stavu
+        function resetChart() {
+            chartContainer.innerHTML = '<div class="railway-track"></div><div id="chartEmptyState" class="absolute inset-0 flex items-center justify-center text-gray-400 z-10">Zadejte data a stiskněte "Vypustit vlaky"</div>';
+            chartContainer.classList.remove('show-labels');
+            yAxis.innerHTML = '';
+        }
+
+        // Generování grafu
+        generateBtn.addEventListener('click', () => {
+            if (chartData.length === 0) return;
+
+            // Vyčistit předchozí
+            chartContainer.innerHTML = '<div class="railway-track"></div>';
+            chartContainer.classList.remove('show-labels');
+            yAxis.innerHTML = '';
+
+            const maxCount = Math.max(...chartData.map(d => d.count));
+            const totalCount = chartData.reduce((sum, item) => sum + item.count, 0);
+            
+            // Osa Y a rozměry
+            const steps = 4;
+            const stepValue = Math.ceil(maxCount / steps);
+            const chartHeightPx = chartContainer.clientHeight - 95; // 35px bottom + 60px top padding
+            
+            for (let i = steps; i >= 0; i--) {
+                const val = i * stepValue;
+                const div = document.createElement('div');
+                div.textContent = val;
+                // Pozicování textu osy Y
+                div.style.position = 'absolute';
+                div.style.bottom = `calc(35px + ${(i/steps) * chartHeightPx}px)`;
+                div.style.transform = 'translateY(50%)'; // Zarovnání na střed hodnoty
+                yAxis.appendChild(div);
+            }
+            
+            // Vytvoření vlaků
+            chartData.forEach((item, index) => {
+                const percent = Math.round((item.count / totalCount) * 100);
+                
+                // Výška vlaku v pixelech
+                const targetHeightPx = (item.count / (maxCount * 1.1)) * chartHeightPx;
+                
+                const trainWrapper = document.createElement('div');
+                trainWrapper.className = 'train-column mx-2 sm:mx-4';
+                
+                // Přidání CSS proměnné pro barvu vagónů
+                trainWrapper.style.setProperty('--train-color', item.color);
+                
+                // Vnitřek vlaku (html struktura)
+                trainWrapper.innerHTML = `
+                    <div class="data-label">
+                        <div class="text-lg leading-none mb-1">${item.count}</div>
+                        <div class="text-sm font-normal text-gray-600">${percent}%</div>
+                    </div>
+                    
+                    <div class="locomotive"></div>
+                    
+                    <div class="wagons wagon-pattern"></div>
+                    
+                    <div class="category-label">${item.age}</div>
+                `;
+
+                chartContainer.appendChild(trainWrapper);
+
+                // Spuštění animace po malém zpoždění (force reflow)
+                setTimeout(() => {
+                    // Nastavíme cílovou výšku. Minimum je 50px (jen lokomotiva)
+                    trainWrapper.style.height = `${Math.max(50, targetHeightPx)}px`;
+                }, 100 * index); // Postupné vyjíždění
+            });
+
+            // Zobrazení popisků po dojetí všech vlaků (1.5s animace + zpoždění posledního)
+            setTimeout(() => {
+                chartContainer.classList.add('show-labels');
+            }, 1500 + (chartData.length * 100));
+        });
+
+        // Stáhnout jako PNG
+        downloadBtn.addEventListener('click', async () => {
+            if (chartData.length === 0) {
+                showError('Nejprve přidejte data a vypusťte vlaky.');
+                return;
+            }
+            try {
+                const originalText = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = 'Generuji...';
+                downloadBtn.disabled = true;
+
+                // Vyčkáme malou chvíli pro překreslení tlačítka
+                await new Promise(resolve => setTimeout(resolve, 50));
+
+                const canvas = await html2canvas(exportArea, {
+                    scale: 2,
+                    backgroundColor: '#ffffff'
+                });
+                
+                const link = document.createElement('a');
+                link.download = 'vlakovy-histogram.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            } catch (err) {
+                console.error(err);
+                showError('Nepodařilo se vygenerovat obrázek. Zkuste to prosím znovu.');
+                downloadBtn.disabled = false;
+            }
+        });
+
+        // Spustit při načtení
+        init();
+
+    </script>
+</body>
+</html>
