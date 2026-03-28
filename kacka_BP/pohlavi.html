@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generátor piktogramového grafu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Speciální styly pro plynulé zobrazení ikonek */
+        .icon-wrapper {
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: middle;
+            height: 32px;
+            margin-right: 2px;
+            margin-bottom: 4px;
+        }
+        .icon-svg {
+            width: 32px;
+            height: 32px;
+            display: block;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 text-center md:text-left">
+            <h1 class="text-3xl font-bold text-gray-900">Tvorba piktogramového grafu</h1>
+            <p class="text-gray-500 mt-2">Zadejte data a vytvořte si přehlednou vizualizaci. Graf se aktualizuje automaticky.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Levý panel: Ovládací prvky -->
+            <div class="lg:col-span-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-semibold mb-6 border-b pb-2">Nastavení dat</h2>
+                
+                <div class="space-y-4">
+                    <!-- Název grafu -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Název grafu</label>
+                        <input type="text" id="input-title" value="Zastoupení zaměstnanců podle pohlaví" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-100">
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">Zadat hodnoty:</h3>
+                        
+                        <!-- Muži -->
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2A2,2 0 0,1 14,4A2,2 0 0,1 12,6A2,2 0 0,1 10,4A2,2 0 0,1 12,2M10.5,22H13.5V16H16V9A2,2 0 0,0 14,7H10A2,2 0 0,0 8,9V16H10.5V22Z"/></svg>
+                            </div>
+                            <div class="flex-grow">
+                                <label class="block text-xs text-gray-500">Muži</label>
+                                <input type="number" id="input-men" value="45" min="0" 
+                                    class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
+                            </div>
+                        </div>
+
+                        <!-- Ženy -->
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded bg-pink-100 text-pink-600 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2A2,2 0 0,1 14,4A2,2 0 0,1 12,6A2,2 0 0,1 10,4A2,2 0 0,1 12,2M13.93,22H10.07L11.35,15.45L9.25,11H8V9A2,2 0 0,1 10,7H14A2,2 0 0,1 16,9V11H14.75L12.65,15.45L13.93,22Z"/></svg>
+                            </div>
+                            <div class="flex-grow">
+                                <label class="block text-xs text-gray-500">Ženy</label>
+                                <input type="number" id="input-women" value="62" min="0" 
+                                    class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 outline-none transition-colors">
+                            </div>
+                        </div>
+
+                        <!-- Jiné -->
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-8 h-8 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/></svg>
+                            </div>
+                            <div class="flex-grow">
+                                <label class="block text-xs text-gray-500">Jiné</label>
+                                <input type="number" id="input-other" value="8" min="0" 
+                                    class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 outline-none transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="export-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors flex justify-center items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Stáhnout jako PNG
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pravý panel: Náhled grafu -->
+            <div class="lg:col-span-8 overflow-x-auto">
+                <!-- Wrapper pro export (tento element se bude fotit) -->
+                <div id="export-target" class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 min-w-[500px]">
+                    <h2 id="chart-title" class="text-2xl font-bold text-gray-800 text-center mb-8">Zastoupení zaměstnanců podle pohlaví</h2>
+                    
+                    <div id="chart-container" class="space-y-6">
+                        <!-- Zde se dynamicky vygenerují řádky grafu -->
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-gray-200 text-center">
+                        <p id="chart-legend" class="text-sm text-gray-500 font-medium">1 piktogram = 1 %</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // Definice SVG cest pro jednotlivé kategorie (Material Design ikony)
+        const paths = {
+            men: "M12,2A2,2 0 0,1 14,4A2,2 0 0,1 12,6A2,2 0 0,1 10,4A2,2 0 0,1 12,2M10.5,22H13.5V16H16V9A2,2 0 0,0 14,7H10A2,2 0 0,0 8,9V16H10.5V22Z",
+            women: "M12,2A2,2 0 0,1 14,4A2,2 0 0,1 12,6A2,2 0 0,1 10,4A2,2 0 0,1 12,2M13.93,22H10.07L11.35,15.45L9.25,11H8V9A2,2 0 0,1 10,7H14A2,2 0 0,1 16,9V11H14.75L12.65,15.45L13.93,22Z",
+            other: "M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"
+        };
+
+        // Definice barev pro kategorie
+        const colors = {
+            men: "#3b82f6",   // Modrá (Tailwind blue-500)
+            women: "#ec4899", // Růžová (Tailwind pink-500)
+            other: "#10b981"  // Zelená (Tailwind emerald-500)
+        };
+
+        const labels = {
+            men: "Muži",
+            women: "Ženy",
+            other: "Jiné"
+        };
+
+        // Reference na DOM elementy
+        const inputs = {
+            title: document.getElementById('input-title'),
+            men: document.getElementById('input-men'),
+            women: document.getElementById('input-women'),
+            other: document.getElementById('input-other')
+        };
+        const elements = {
+            chartTitle: document.getElementById('chart-title'),
+            chartContainer: document.getElementById('chart-container'),
+            chartLegend: document.getElementById('chart-legend')
+        };
+
+        // Funkce pro vygenerování HTML jednoho řádku grafu
+        function createRow(category, count, percentage) {
+            // Pokud je hodnota 0, nevykreslujeme řádek (nebo jej můžeme nechat prázdný, zde jej ponecháme pro přehlednost)
+            
+            const fullIcons = Math.floor(percentage);
+            const fraction = percentage % 1;
+
+            let iconsHtml = '';
+
+            // Přidání celých ikon
+            for (let i = 0; i < fullIcons; i++) {
+                iconsHtml += `
+                    <div class="icon-wrapper" style="width: 32px;">
+                        <svg class="icon-svg" style="color: ${colors[category]}" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="${paths[category]}"/>
+                        </svg>
+                    </div>`;
+            }
+
+            // Přidání částečné ikony (oříznuté pomocí wrapper šířky)
+            if (fraction > 0) {
+                const partialWidth = fraction * 32; // Šířka v pixelech (z celkových 32)
+                iconsHtml += `
+                    <div class="icon-wrapper" style="width: ${partialWidth}px;">
+                        <svg class="icon-svg" style="color: ${colors[category]}; opacity: 0.8;" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="${paths[category]}"/>
+                        </svg>
+                    </div>`;
+            }
+
+            // Formátování procent (český formát s desetinnou čárkou)
+            const displayPct = percentage % 1 === 0 ? percentage + ' %' : percentage.toFixed(1).replace('.', ',') + ' %';
+
+            return `
+                <div class="flex items-center group hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                    <div class="w-24 shrink-0 font-medium text-gray-700 text-right pr-4 border-r-2 border-gray-200">
+                        ${labels[category]}
+                    </div>
+                    <div class="flex-grow pl-4 flex flex-wrap items-center">
+                        ${iconsHtml || '<span class="text-gray-300 italic text-sm">Žádná data</span>'}
+                    </div>
+                    <div class="w-24 shrink-0 text-right">
+                        <div class="font-bold text-lg text-gray-800">${displayPct}</div>
+                        <div class="text-xs text-gray-500 w-full text-right">(${count})</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Hlavní funkce pro aktualizaci grafu
+        function updateChart() {
+            const valMen = Math.max(0, parseInt(inputs.men.value) || 0);
+            const valWomen = Math.max(0, parseInt(inputs.women.value) || 0);
+            const valOther = Math.max(0, parseInt(inputs.other.value) || 0);
+            
+            const total = valMen + valWomen + valOther;
+            
+            // Výpočet procent
+            const pctMen = total > 0 ? (valMen / total) * 100 : 0;
+            const pctWomen = total > 0 ? (valWomen / total) * 100 : 0;
+            const pctOther = total > 0 ? (valOther / total) * 100 : 0;
+            
+            // Aktualizace textů
+            elements.chartTitle.textContent = inputs.title.value || 'Graf bez názvu';
+            elements.chartLegend.textContent = '1 piktogram = 1 %';
+
+            // Sestavení grafu
+            let html = '';
+            html += createRow('men', valMen, pctMen);
+            html += createRow('women', valWomen, pctWomen);
+            html += createRow('other', valOther, pctOther);
+
+            elements.chartContainer.innerHTML = html;
+        }
+
+        // Přidání posluchačů událostí na všechny inputy pro real-time aktualizaci
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', updateChart);
+        });
+
+        // Inicializace při načtení
+        updateChart();
+
+        // Logika pro export do PNG
+        document.getElementById('export-btn').addEventListener('click', function() {
+            const targetElement = document.getElementById('export-target');
+            const originalBg = targetElement.style.backgroundColor;
+            
+            // Nastavení bílého pozadí před exportem (aby nebyl PNG průhledný)
+            targetElement.style.backgroundColor = '#ffffff';
+            
+            // Změna textu tlačítka během exportu
+            const btn = this;
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Zpracovávám...`;
+            btn.disabled = true;
+
+            html2canvas(targetElement, {
+                scale: 2, // Vyšší rozlišení pro hezčí export
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                // Vytvoření odkazu ke stažení
+                const link = document.createElement('a');
+                link.download = `graf-${inputs.title.value.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'piktogram'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                // Vrácení původních stavů
+                targetElement.style.backgroundColor = originalBg;
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error("Chyba při exportu:", err);
+                alert("Došlo k chybě při vytváření obrázku.");
+                targetElement.style.backgroundColor = originalBg;
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
