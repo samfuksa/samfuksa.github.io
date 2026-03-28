@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generátor Vlakových Grafů</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar pro hezčí vzhled */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+    <div class="max-w-7xl mx-auto p-4 lg:p-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><path d="M4 15h16"/><path d="M4 15v-5a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v5"/><path d="M12 15v4"/><path d="M8 15v4"/><path d="M16 15v4"/><path d="M2 19h20"/></svg>
+                Generátor vlakových grafů
+            </h1>
+            <p class="text-slate-500 mt-2">Nastavte kategorie, definujte hodnocení a vygenerujte si graf ve tvaru vlaku.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Levý panel: Ovládání a vstupy -->
+            <div class="lg:col-span-4 space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                
+                <!-- Název grafu -->
+                <div>
+                    <h2 class="text-lg font-semibold mb-4 text-slate-700 border-b pb-2">1. Název grafu</h2>
+                    <input type="text" id="chart-title-input" value="Hodnocení našich služeb" 
+                           oninput="updateChartTitle(this.value)"
+                           class="w-full text-sm border-slate-300 border rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                           placeholder="Zadejte název grafu">
+                </div>
+
+                <!-- Definice legendy -->
+                <div>
+                    <h2 class="text-lg font-semibold mb-4 text-slate-700 border-b pb-2">2. Názvy hodnocení (Legenda)</h2>
+                    <div class="space-y-3" id="legend-inputs">
+                        <!-- Generováno přes JS -->
+                    </div>
+                </div>
+
+                <!-- Definice kategorií -->
+                <div>
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h2 class="text-lg font-semibold text-slate-700">3. Kategorie a data</h2>
+                        <button onclick="addCategory()" class="text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-md font-medium transition-colors">
+                            + Přidat kategorii
+                        </button>
+                    </div>
+                    <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2" id="categories-container">
+                        <!-- Generováno přes JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Pravý panel: Náhled a export -->
+            <div class="lg:col-span-8 flex flex-col">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex-grow flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold text-slate-700">Náhled grafu</h2>
+                        <button onclick="downloadChart()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow font-medium transition-colors flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            Stáhnout PNG
+                        </button>
+                    </div>
+                    
+                    <!-- Kontejner pro Canvas, aby byl responzivní -->
+                    <div class="w-full overflow-x-auto border border-slate-200 rounded-xl bg-slate-50 flex justify-center items-center" style="min-height: 400px;">
+                        <canvas id="chartCanvas" class="max-w-full h-auto shadow-sm bg-white"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- STAV APLIKACE ---
+        let chartTitle = 'Hodnocení našich služeb';
+        const colors = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e']; // Od červené po zelenou
+        const textColors = ['#fff', '#fff', '#000', '#000', '#fff']; // Barva textu vagonu pro kontrast
+
+        let labels = ['Hrůza', 'Špatné', 'Průměr', 'Dobré', 'Skvělé'];
+        
+        let categories = [
+            { id: 1, name: 'Kvalita jídla', values: [5, 10, 25, 40, 20] },
+            { id: 2, name: 'Čistota', values: [0, 5, 10, 30, 55] },
+            { id: 3, name: 'Rychlost obsluhy', values: [15, 20, 30, 20, 15] }
+        ];
+
+        // --- INICIALIZACE A RENDER UI ---
+        function initUI() {
+            renderLegendInputs();
+            renderCategories();
+            drawChart();
+        }
+
+        function renderLegendInputs() {
+            const container = document.getElementById('legend-inputs');
+            container.innerHTML = '';
+            
+            labels.forEach((label, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3';
+                div.innerHTML = `
+                    <div class="w-4 h-4 rounded-full shadow-sm" style="background-color: ${colors[index]}"></div>
+                    <input type="text" value="${label}" 
+                           oninput="updateLabel(${index}, this.value)"
+                           class="flex-1 text-sm border-slate-300 border rounded-md px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                           placeholder="Název ${index + 1}. hodnocení">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+
+            categories.forEach((cat, catIndex) => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 border border-slate-200 p-4 rounded-xl relative';
+                
+                let inputsHtml = '';
+                for (let i = 0; i < 5; i++) {
+                    inputsHtml += `
+                        <div class="flex flex-col items-center gap-1 w-1/5">
+                            <div class="w-full h-1.5 rounded-full mb-1" style="background-color: ${colors[i]}"></div>
+                            <input type="number" min="0" value="${cat.values[i]}"
+                                   oninput="updateValue(${catIndex}, ${i}, this.value)"
+                                   class="w-full text-center text-sm border border-slate-300 rounded-md py-1 focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    <button onclick="removeCategory(${cat.id})" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors" title="Smazat kategorii">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                    <input type="text" value="${cat.name}"
+                           oninput="updateCategoryName(${catIndex}, this.value)"
+                           class="w-[calc(100%-30px)] font-medium text-slate-800 bg-transparent border-b border-slate-300 pb-1 mb-4 outline-none focus:border-blue-500"
+                           placeholder="Název kategorie">
+                    <div class="flex gap-2 w-full justify-between">
+                        ${inputsHtml}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- LOGIKA AKTUALIZACÍ ---
+        function updateChartTitle(val) {
+            chartTitle = val;
+            drawChart();
+        }
+
+        function updateLabel(index, val) {
+            labels[index] = val;
+            drawChart();
+        }
+
+        function updateCategoryName(index, val) {
+            categories[index].name = val;
+            drawChart();
+        }
+
+        function updateValue(catIndex, valIndex, val) {
+            categories[catIndex].values[valIndex] = parseInt(val) || 0;
+            drawChart();
+        }
+
+        function addCategory() {
+            const newId = categories.length > 0 ? Math.max(...categories.map(c => c.id)) + 1 : 1;
+            categories.push({
+                id: newId,
+                name: `Nová kategorie ${newId}`,
+                values: [0, 0, 0, 0, 0]
+            });
+            renderCategories();
+            drawChart();
+        }
+
+        function removeCategory(id) {
+            categories = categories.filter(c => c.id !== id);
+            renderCategories();
+            drawChart();
+        }
+
+        // --- VYKRESLOVÁNÍ GRAFU NA CANVAS ---
+        function drawChart() {
+            const canvas = document.getElementById('chartCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Nastavení rozměrů
+            const padding = 40;
+            const topMargin = 140; // Větší místo pro legendu a název
+            const rowHeight = 80; // Větší výška pro moderní vlak
+            const canvasWidth = 1000;
+            const canvasHeight = Math.max(topMargin + (categories.length * rowHeight) + padding, 350);
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            // Bílé pozadí (důležité pro export do PNG)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Nastavení fontů pro celý graf
+            ctx.textBaseline = 'middle';
+
+            // Vykreslení názvu grafu
+            if (chartTitle.trim() !== '') {
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 26px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(chartTitle, canvasWidth / 2, 40);
+            }
+
+            // Vykreslení legendy
+            drawLegend(ctx, 90);
+
+            // Vykreslení kategorií a vlaků
+            const textWidth = 220; // Prostor pro text kategorie
+            const maxBarWidth = 600; // Maximální délka celého vlaku (bez lokomotivy)
+            const startX = padding + textWidth;
+            let currentY = topMargin;
+
+            categories.forEach(cat => {
+                // Název kategorie
+                ctx.fillStyle = '#1e293b';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(cat.name, startX - 20, currentY + 20, textWidth - 20);
+
+                // Moderní koleje
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillRect(startX - 20, currentY + 40, maxBarWidth + 100, 4); // Betonové podloží
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillRect(startX - 20, currentY + 38, maxBarWidth + 100, 2); // Kolejnice
+
+                // Výpočet celkového součtu pro proporce
+                const total = cat.values.reduce((a, b) => a + b, 0);
+
+                if (total > 0) {
+                    let currentX = startX;
+                    
+                    // Vykreslení vagonů
+                    for (let i = 0; i < 5; i++) {
+                        const val = cat.values[i];
+                        if (val > 0) {
+                            const width = (val / total) * maxBarWidth;
+                            drawWagon(ctx, currentX, currentY, width, 40, colors[i], textColors[i], val, total);
+                            currentX += width;
+                        }
+                    }
+                    
+                    // Vykreslení lokomotivy na konec vlaku
+                    drawLocomotive(ctx, currentX, currentY, 40);
+                } else {
+                    // Žádná data
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = 'italic 14px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Žádná data', startX + 10, currentY + 20);
+                }
+
+                currentY += rowHeight;
+            });
+        }
+
+        function drawLegend(ctx, y) {
+            let currentX = 40;
+            ctx.textAlign = 'left';
+
+            for (let i = 0; i < 5; i++) {
+                // Barevný čtvereček
+                ctx.fillStyle = colors[i];
+                ctx.fillRect(currentX, y - 10, 20, 20);
+                
+                // Olemování čtverečku pro lepší vzhled
+                ctx.strokeStyle = '#00000020';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(currentX, y - 10, 20, 20);
+
+                // Text legendy
+                ctx.fillStyle = '#334155';
+                ctx.font = '14px sans-serif';
+                ctx.fillText(labels[i], currentX + 30, y);
+
+                // Posun pro další prvek (dynamicky podle délky textu)
+                const textWidth = ctx.measureText(labels[i]).width;
+                currentX += textWidth + 60; 
+            }
+        }
+
+        function drawWagon(ctx, x, y, width, height, color, textColor, value, total) {
+            // Bezpečnostní pojistka proti vykreslení příliš malých nebo negativních částí
+            if (width < 2) return; 
+
+            // Základní tělo (aerodynamické)
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+
+            // Odlesk nahoře pro moderní kovový vzhled
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.fillRect(x, y, width, 6);
+
+            // Ztmavení dole
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(x, y + height - 14, width, 6);
+
+            // Spodní šasi (skirt) chránící podvozek
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(x, y + height - 8, width, 8);
+
+            // Moderní tmavý okenní pás
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(x, y + 12, width, 14);
+
+            // Spojka - harmonika tvořící kontinuální vlak
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(x + width, y, 3, height);
+
+            // Procento uvnitř vagonu
+            if (width > 35) {
+                const percentage = Math.round((value / total) * 100) + '%';
+                // Píšeme přes tmavé okno, proto je text vždy bílý
+                ctx.fillStyle = '#ffffff'; 
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(percentage, x + width / 2, y + 19);
+            }
+        }
+
+        function drawLocomotive(ctx, x, y, height) {
+            const startX = x + 3; // Za spojkou
+            const noseLength = 70; // Aerodynamický nos
+            
+            // Střecha a nos (Bullet train styl)
+            ctx.fillStyle = '#cbd5e1'; // Stříbrná špička
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(startX + 15, y);
+            ctx.bezierCurveTo(startX + 45, y, startX + noseLength - 5, y + height - 8, startX + noseLength, y + height - 8);
+            ctx.lineTo(startX, y + height - 8);
+            ctx.fill();
+
+            // Odlesk
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(startX + 15, y);
+            ctx.bezierCurveTo(startX + 35, y, startX + 50, y + 10, startX + noseLength - 10, y + height - 8);
+            ctx.lineTo(startX + noseLength - 15, y + height - 8);
+            ctx.bezierCurveTo(startX + 45, y + 6, startX + 25, y + 6, startX, y + 6);
+            ctx.fill();
+
+            // Spodní šasi
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.moveTo(startX, y + height - 8);
+            ctx.lineTo(startX + noseLength, y + height - 8);
+            ctx.quadraticCurveTo(startX + noseLength - 2, y + height, startX + noseLength - 10, y + height);
+            ctx.lineTo(startX, y + height);
+            ctx.fill();
+
+            // Okno kabiny (navazuje na okna vagonů)
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.moveTo(startX, y + 12);
+            ctx.lineTo(startX + 15, y + 12);
+            ctx.bezierCurveTo(startX + 30, y + 12, startX + 45, y + 18, startX + 50, y + 26);
+            ctx.lineTo(startX, y + 26);
+            ctx.fill();
+
+            // Reflektor
+            ctx.fillStyle = '#fde047'; 
+            ctx.beginPath();
+            ctx.arc(startX + noseLength - 8, y + height - 12, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Světelný kužel (zář světla dopředu)
+            ctx.fillStyle = 'rgba(253, 224, 71, 0.25)';
+            ctx.beginPath();
+            ctx.moveTo(startX + noseLength - 5, y + height - 12);
+            ctx.lineTo(startX + noseLength + 40, y + height - 25);
+            ctx.lineTo(startX + noseLength + 40, y + height + 5);
+            ctx.fill();
+        }
+
+        // --- EXPORT DO PNG ---
+        function downloadChart() {
+            const canvas = document.getElementById('chartCanvas');
+            const link = document.createElement('a');
+            link.download = 'vlakovy-graf.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Spuštění po načtení
+        window.onload = initUI;
+    </script>
+</body>
+</html>
