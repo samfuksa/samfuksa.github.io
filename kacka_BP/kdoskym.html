@@ -1,210 +1,225 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Download, BarChart2 } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tvůrce piktogramového grafu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
 
-// --- Komponenty piktogramů (SVG) ---
-// Jednotlivec (inspirováno modrou ikonou z předlohy)
-const IndividualIcon = ({ className }) => (
-<svg viewBox="0 0 16 32" fill="currentColor" className={className}>
-    <g transform="translate(2, 0)">
-        <circle cx="6" cy="5" r="3.5" />
-        <path
-            d="M2.5 10.5 C1 10.5 0 11.5 0 13.5 L0 20 L2 20 L2 31 L4.5 31 L4.5 22.5 L7.5 22.5 L7.5 31 L10 31 L10 20 L12 20 L12 13.5 C12 11.5 11 10.5 9.5 10.5 Z" />
-    </g>
-</svg>
-);
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-// Pár (Muž a Žena vedle sebe)
-const CoupleIcon = ({ className }) => (
-<svg viewBox="0 0 32 32" fill="currentColor" className={className}>
-    {/* Muž */}
-    <g transform="translate(1, 0)">
-        <circle cx="6" cy="5" r="3.5" />
-        <path
-            d="M2.5 10.5 C1 10.5 0 11.5 0 13.5 L0 20 L2 20 L2 31 L4.5 31 L4.5 22.5 L7.5 22.5 L7.5 31 L10 31 L10 20 L12 20 L12 13.5 C12 11.5 11 10.5 9.5 10.5 Z" />
-    </g>
-    {/* Žena (inspirováno růžovou ikonou s šaty) */}
-    <g transform="translate(15, 0)">
-        <circle cx="8" cy="5" r="3.5" />
-        <path d="M8 10 L1 22 L4 22 L4 31 L6.5 31 L6.5 24 L9.5 24 L9.5 31 L12 31 L12 22 L15 22 Z" />
-    </g>
-</svg>
-);
+        // --- Ikony ---
+        const DownloadIcon = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        );
 
-export default function App() {
-const [title, setTitle] = useState('Zastoupení návštěvníků');
-const [individuals, setIndividuals] = useState(45);
-const [couples, setCouples] = useState(62);
-const [isExporting, setIsExporting] = useState(false);
-const chartRef = useRef(null);
+        const BarChart2Icon = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+        );
 
-// Dynamické načtení knihovny pro export do obrázku
-useEffect(() => {
-if (!document.getElementById('html2canvas-script')) {
-const script = document.createElement('script');
-script.id = 'html2canvas-script';
-script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-script.async = true;
-document.body.appendChild(script);
-}
-}, []);
+        // --- Komponenty piktogramů (SVG) ---
+        // Jednotlivec (inspirováno modrou ikonou z předlohy)
+        const IndividualIcon = ({ className }) => (
+            <svg viewBox="0 0 16 32" fill="currentColor" className={className}>
+                <g transform="translate(2, 0)">
+                    <circle cx="6" cy="5" r="3.5" />
+                    <path d="M2.5 10.5 C1 10.5 0 11.5 0 13.5 L0 20 L2 20 L2 31 L4.5 31 L4.5 22.5 L7.5 22.5 L7.5 31 L10 31 L10 20 L12 20 L12 13.5 C12 11.5 11 10.5 9.5 10.5 Z" />
+                </g>
+            </svg>
+        );
 
-const handleExport = async () => {
-if (!window.html2canvas) {
-alert('Knihovna pro export se ještě načítá. Zkuste to prosím za vteřinu znovu.');
-return;
-}
+        // Pár (Muž a Žena vedle sebe)
+        const CoupleIcon = ({ className }) => (
+            <svg viewBox="0 0 32 32" fill="currentColor" className={className}>
+                {/* Muž */}
+                <g transform="translate(1, 0)">
+                    <circle cx="6" cy="5" r="3.5" />
+                    <path d="M2.5 10.5 C1 10.5 0 11.5 0 13.5 L0 20 L2 20 L2 31 L4.5 31 L4.5 22.5 L7.5 22.5 L7.5 31 L10 31 L10 20 L12 20 L12 13.5 C12 11.5 11 10.5 9.5 10.5 Z" />
+                </g>
+                {/* Žena (inspirováno růžovou ikonou s šaty) */}
+                <g transform="translate(15, 0)">
+                    <circle cx="8" cy="5" r="3.5" />
+                    <path d="M8 10 L1 22 L4 22 L4 31 L6.5 31 L6.5 24 L9.5 24 L9.5 31 L12 31 L12 22 L15 22 Z" />
+                </g>
+            </svg>
+        );
 
-setIsExporting(true);
-try {
-const element = chartRef.current;
-const canvas = await window.html2canvas(element, {
-scale: 2, // Vyšší rozlišení pro export
-backgroundColor: '#ffffff',
-});
+        function App() {
+            const [title, setTitle] = useState('Zastoupení návštěvníků');
+            const [individuals, setIndividuals] = useState(45);
+            const [couples, setCouples] = useState(62);
+            const [isExporting, setIsExporting] = useState(false);
+            const chartRef = useRef(null);
 
-const dataURL = canvas.toDataURL('image/png');
-const link = document.createElement('a');
-link.href = dataURL;
-link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'graf'}.png`;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-} catch (err) {
-console.error('Chyba při exportu:', err);
-alert('Při generování obrázku došlo k chybě.');
-} finally {
-setIsExporting(false);
-}
-};
+            const handleExport = async () => {
+                if (!window.html2canvas) {
+                    alert('Knihovna pro export se ještě načítá. Zkuste to prosím za vteřinu znovu.');
+                    return;
+                }
 
-const totalUnits = individuals + couples;
+                setIsExporting(true);
+                try {
+                    const element = chartRef.current;
+                    const canvas = await window.html2canvas(element, {
+                        scale: 2, // Vyšší rozlišení pro export
+                        backgroundColor: '#ffffff',
+                    });
 
-// Výpočet procent s formátováním na české desetinné čárky
-const indPercent = totalUnits > 0
-? (individuals / totalUnits * 100).toFixed(1).replace('.', ',')
-: "0,0";
-const coupPercent = totalUnits > 0
-? (couples / totalUnits * 100).toFixed(1).replace('.', ',')
-: "0,0";
+                    const dataURL = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'graf'}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (err) {
+                    console.error('Chyba při exportu:', err);
+                    alert('Při generování obrázku došlo k chybě.');
+                } finally {
+                    setIsExporting(false);
+                }
+            };
 
-return (
-<div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
-    <div className="max-w-[1400px] mx-auto space-y-6">
+            const totalUnits = individuals + couples;
 
-        <header className="flex items-center gap-3 pb-4 border-b border-slate-200">
-            <BarChart2 className="w-8 h-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-slate-800">Tvůrce piktogramového grafu</h1>
-        </header>
+            // Výpočet procent s formátováním na české desetinné čárky
+            const indPercent = totalUnits > 0
+                ? (individuals / totalUnits * 100).toFixed(1).replace('.', ',')
+                : "0,0";
+            const coupPercent = totalUnits > 0
+                ? (couples / totalUnits * 100).toFixed(1).replace('.', ',')
+                : "0,0";
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+            return (
+                <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
+                    <div className="max-w-[1400px] mx-auto space-y-6">
 
-            {/* LEVÝ PANEL - OVLÁDÁNÍ */}
-            <div className="xl:col-span-3 space-y-6 bg-white p-6 rounded-xl shadow-sm border border-slate-100 h-fit">
-                <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Název grafu</label>
-                    <input type="text" value={title} onChange={(e)=> setTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500
-                    focus:border-blue-500 transition-colors"
-                    placeholder="Zadejte název grafu"
-                    />
-                </div>
+                        <header className="flex items-center gap-3 pb-4 border-b border-slate-200">
+                            <BarChart2Icon className="w-8 h-8 text-blue-600" />
+                            <h1 className="text-2xl font-bold text-slate-800">Tvůrce piktogramového grafu</h1>
+                        </header>
 
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                    <h3 className="text-sm font-semibold text-slate-700">Hodnoty</h3>
+                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
 
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm text-slate-600 mb-1 flex items-center gap-2">
-                                <IndividualIcon className="w-4 h-4 text-[#5b8eec]" /> Jednotlivci
-                            </label>
-                            <input type="number" min="0" value={individuals} onChange={(e)=>
-                            setIndividuals(parseInt(e.target.value) || 0)}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2
-                            focus:ring-blue-500 transition-colors"
-                            />
-                        </div>
+                            {/* LEVÝ PANEL - OVLÁDÁNÍ */}
+                            <div className="xl:col-span-3 space-y-6 bg-white p-6 rounded-xl shadow-sm border border-slate-100 h-fit">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Název grafu</label>
+                                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}
+                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        placeholder="Zadejte název grafu"
+                                    />
+                                </div>
 
-                        <div>
-                            <label className="block text-sm text-slate-600 mb-1 flex items-center gap-2">
-                                <CoupleIcon className="w-6 h-5 text-[#e3699c]" /> Páry (muž+žena)
-                            </label>
-                            <input type="number" min="0" value={couples} onChange={(e)=>
-                            setCouples(parseInt(e.target.value) || 0)}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2
-                            focus:ring-blue-500 transition-colors"
-                            />
+                                <div className="space-y-4 pt-4 border-t border-slate-100">
+                                    <h3 className="text-sm font-semibold text-slate-700">Hodnoty</h3>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm text-slate-600 mb-1 flex items-center gap-2">
+                                                <IndividualIcon className="w-4 h-4 text-[#5b8eec]" /> Jednotlivci
+                                            </label>
+                                            <input type="number" min="0" value={individuals} onChange={(e) => setIndividuals(parseInt(e.target.value) || 0)}
+                                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm text-slate-600 mb-1 flex items-center gap-2">
+                                                <CoupleIcon className="w-6 h-5 text-[#e3699c]" /> Páry (muž+žena)
+                                            </label>
+                                            <input type="number" min="0" value={couples} onChange={(e) => setCouples(parseInt(e.target.value) || 0)}
+                                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button onClick={handleExport} disabled={isExporting}
+                                    className="w-full flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-70 mt-4">
+                                    <DownloadIcon className="w-5 h-5" />
+                                    {isExporting ? 'Generuji PNG...' : 'Exportovat jako PNG'}
+                                </button>
+                            </div>
+
+                            {/* PRAVÝ PANEL - NÁHLED GRAFU */}
+                            <div className="xl:col-span-9 flex justify-center items-start overflow-x-auto pb-4">
+
+                                {/* Obal pro export grafu */}
+                                <div id="chart-container" ref={chartRef}
+                                    className="bg-white py-12 px-8 md:px-16 rounded-2xl shadow-sm border border-slate-200 w-full min-w-[800px] max-w-5xl">
+                                    {title && (
+                                        <h2 className="text-[28px] font-bold text-slate-900 text-center mb-12">{title}</h2>
+                                    )}
+
+                                    <div className="flex flex-col">
+
+                                        {/* Sekce Jednotlivci */}
+                                        <div className="flex items-center bg-[#f8f9fa] rounded-2xl p-8 mb-4">
+                                            <div className="w-32 shrink-0 text-right pr-6 border-r-2 border-slate-200 font-medium text-slate-700 text-lg">
+                                                Jednotlivci
+                                            </div>
+
+                                            <div className="flex-1 flex flex-wrap gap-x-[14px] gap-y-4 px-8">
+                                                {Array.from({ length: individuals }).map((_, i) => (
+                                                    <IndividualIcon key={`indiv-${i}`} className="w-[16px] h-[32px] text-[#5b8eec] shrink-0" />
+                                                ))}
+                                                {individuals === 0 && <span className="text-slate-400 italic text-sm">Žádná data</span>}
+                                            </div>
+
+                                            <div className="w-32 shrink-0 text-right pl-6">
+                                                <div className="text-2xl font-bold text-slate-900 whitespace-nowrap">{indPercent} %</div>
+                                                <div className="text-[15px] text-slate-500 mt-1">({individuals})</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Sekce Páry */}
+                                        <div className="flex items-center p-8">
+                                            <div className="w-32 shrink-0 text-right pr-6 border-r-2 border-slate-200 font-medium text-slate-700 text-lg">
+                                                Páry
+                                            </div>
+
+                                            <div className="flex-1 flex flex-wrap gap-x-5 gap-y-4 px-8">
+                                                {Array.from({ length: couples }).map((_, i) => (
+                                                    <CoupleIcon key={`couple-${i}`} className="w-[36px] h-[32px] text-[#e3699c] shrink-0" />
+                                                ))}
+                                                {couples === 0 && <span className="text-slate-400 italic text-sm">Žádná data</span>}
+                                            </div>
+
+                                            <div className="w-32 shrink-0 text-right pl-6">
+                                                <div className="text-2xl font-bold text-slate-900 whitespace-nowrap">{coupPercent} %</div>
+                                                <div className="text-[15px] text-slate-500 mt-1">({couples})</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            );
+        }
 
-                <button onClick={handleExport} disabled={isExporting}
-                    className="w-full flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-70 mt-4">
-                    <Download className="w-5 h-5" />
-                    {isExporting ? 'Generuji PNG...' : 'Exportovat jako PNG'}
-                </button>
-            </div>
-
-            {/* PRAVÝ PANEL - NÁHLED GRAFU */}
-            <div className="xl:col-span-9 flex justify-center items-start overflow-x-auto pb-4">
-
-                {/* Obal pro export grafu */}
-                <div id="chart-container" ref={chartRef}
-                    className="bg-white py-12 px-8 md:px-16 rounded-2xl shadow-sm border border-slate-200 w-full min-w-[800px] max-w-5xl">
-                    {title && (
-                    <h2 className="text-[28px] font-bold text-slate-900 text-center mb-12">{title}</h2>
-                    )}
-
-                    <div className="flex flex-col">
-
-                        {/* Sekce Jednotlivci */}
-                        <div className="flex items-center bg-[#f8f9fa] rounded-2xl p-8 mb-4">
-                            <div
-                                className="w-32 shrink-0 text-right pr-6 border-r-2 border-slate-200 font-medium text-slate-700 text-lg">
-                                Jednotlivci
-                            </div>
-
-                            <div className="flex-1 flex flex-wrap gap-x-[14px] gap-y-4 px-8">
-                                {Array.from({ length: individuals }).map((_, i) => (
-                                <IndividualIcon key={`indiv-${i}`}
-                                    className="w-[16px] h-[32px] text-[#5b8eec] shrink-0" />
-                                ))}
-                                {individuals === 0 && <span className="text-slate-400 italic text-sm">Žádná data</span>}
-                            </div>
-
-                            <div className="w-32 shrink-0 text-right pl-6">
-                                <div className="text-2xl font-bold text-slate-900 whitespace-nowrap">{indPercent} %
-                                </div>
-                                <div className="text-[15px] text-slate-500 mt-1">({individuals})</div>
-                            </div>
-                        </div>
-
-                        {/* Sekce Páry */}
-                        <div className="flex items-center p-8">
-                            <div
-                                className="w-32 shrink-0 text-right pr-6 border-r-2 border-slate-200 font-medium text-slate-700 text-lg">
-                                Páry
-                            </div>
-
-                            <div className="flex-1 flex flex-wrap gap-x-5 gap-y-4 px-8">
-                                {Array.from({ length: couples }).map((_, i) => (
-                                <CoupleIcon key={`couple-${i}`} className="w-[36px] h-[32px] text-[#e3699c] shrink-0" />
-                                ))}
-                                {couples === 0 && <span className="text-slate-400 italic text-sm">Žádná data</span>}
-                            </div>
-
-                            <div className="w-32 shrink-0 text-right pl-6">
-                                <div className="text-2xl font-bold text-slate-900 whitespace-nowrap">{coupPercent} %
-                                </div>
-                                <div className="text-[15px] text-slate-500 mt-1">({couples})</div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-);
-}
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
