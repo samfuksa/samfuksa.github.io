@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodická a Technická karta: Hladový sběrač (MakeCode Arcade)</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome pro ikony -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <!-- html2pdf.js pro export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+            --secondary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --surface-color: #ffffff;
+            --bg-color: #f3f4f6;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-custom {
+            background: var(--surface-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: none;
+            height: 100%;
+            transition: transform 0.2s;
+        }
+
+        .card-header-custom {
+            background-color: transparent;
+            border-bottom: 2px solid var(--bg-color);
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+
+        .icon-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(245, 158, 11, 0.1);
+            color: #ea580c;
+        }
+
+        .icon-box-tech {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            border-left: 4px solid #10b981;
+        }
+
+        .concept-badge {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            margin-bottom: 0.5rem;
+            margin-right: 0.5rem;
+            display: inline-block;
+        }
+
+        .btn-export {
+            background: var(--text-main);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-export:hover {
+            background: #374151;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Třída aplikovaná na body těsně před exportem, aby se schovalo tlačítko a zrušil background */
+        .pdf-export-mode {
+            background-color: white !important;
+        }
+
+        .pdf-export-mode .btn-export-container {
+            display: none !important;
+        }
+
+        .pdf-export-mode .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .pdf-export-mode .card-custom {
+            box-shadow: none !important;
+            border: 1px solid #e5e7eb !important;
+            page-break-inside: avoid;
+        }
+
+        /* Vynucení zalomení stránky pro zadání žáků při exportu */
+        .pdf-page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+
+<body id="content-to-export">
+
+    <!-- Header -->
+    <div class="header-section">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <span class="badge bg-light text-dark mb-2">Informatika / Programování</span>
+                    <h1 class="mb-0 fw-bold"><i class="fas fa-gamepad me-2"></i>Hladový sběrač</h1>
+                    <p class="mb-0 mt-2 opacity-75 fs-5">Tvorba interaktivní hry v MakeCode Arcade</p>
+                </div>
+                <div class="btn-export-container">
+                    <button class="btn-export shadow" onclick="exportPDF(this)">
+                        <i class="fas fa-file-pdf me-2"></i>Uložit jako PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <div class="row g-4">
+            
+            <!-- LEVÝ SLOUPEC: Metodická karta -->
+            <div class="col-lg-6">
+                <div class="card-custom">
+                    <div class="card-header-custom">
+                        <div class="icon-box"><i class="fas fa-chalkboard-teacher"></i></div>
+                        Metodická karta
+                    </div>
+                    <div class="card-body-custom">
+                        
+                        <!-- Základní info -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <strong class="d-block text-muted text-uppercase" style="font-size: 0.8rem;">Cílová skupina</strong>
+                                <span>2. stupeň ZŠ (11–15 let)</span>
+                            </div>
+                            <div class="col-6">
+                                <strong class="d-block text-muted text-uppercase" style="font-size: 0.8rem;">Časová dotace</strong>
+                                <span>45 min (1 vyuč. hodina)</span>
+                            </div>
+                        </div>
+
+                        <!-- Cíle -->
+                        <h5 class="fw-bold text-primary mt-4 mb-3" style="color: #ea580c !important;">Cíle aktivity (Algoritmické struktury)</h5>
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item bg-transparent border-bottom-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i> <strong>Proměnné:</strong> Žáci pracují se skóre a odpočtem času.
+                            </li>
+                            <li class="list-group-item bg-transparent border-bottom-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i> <strong>Cykly:</strong> Využití časovače, který v nekonečném cyklu mění pozici cíle.
+                            </li>
+                            <li class="list-group-item bg-transparent border-bottom-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i> <strong>Podmínky:</strong> Vyhodnocení kolize (překryvu spritů) a následná akce.
+                            </li>
+                        </ul>
+
+                        <!-- Průběh -->
+                        <h5 class="fw-bold text-primary mb-3" style="color: #ea580c !important;">Průběh vyučovací hodiny</h5>
+                        
+                        <div class="mb-3 d-flex align-items-start">
+                            <div class="step-number">1</div>
+                            <div>
+                                <strong>Úvod a postava:</strong> Založení projektu na <em>arcade.makecode.com</em>. Vytvoření proměnné "hráč" (typ Player). Zapnutí pohybu šipkami a omezení na obrazovku.
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-flex align-items-start">
+                            <div class="step-number">2</div>
+                            <div>
+                                <strong>Stav hry (Proměnné):</strong> V bloku "při spuštění" (on start) nastavíme počáteční stav: skóre na 0 a odpočet času (např. 20 vteřin). Přidáme proměnnou "jídlo" (typ Food).
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-flex align-items-start">
+                            <div class="step-number">3</div>
+                            <div>
+                                <strong>Podmínka (Kolize):</strong> Použijeme událost "při překryvu" (on overlap). Když Hráč chytí Jídlo: přidá se 1 bod, přidají se 2 vteřiny času a Jídlo změní X a Y souřadnice na náhodné.
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-flex align-items-start">
+                            <div class="step-number">4</div>
+                            <div>
+                                <strong>Cyklus (Ztížení hry):</strong> Aby hra nebyla snadná, použijeme událost "každých X milisekund" (on game update interval). Každé 3 vteřiny jídlo samo odskočí na novou pozici, i když ho hráč nechytí.
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-light rounded border-start border-4 border-warning">
+                            <strong><i class="fas fa-lightbulb text-warning me-2"></i>Reflexe na závěr:</strong>
+                            <p class="mb-0 mt-1 small">Společná diskuze: "Kde přesně jsme v kódu použili podmínku IF?" (Skrytá v bloku pro překryv). "Co by se stalo, kdybychom neměli proměnnou pro čas?"</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRAVÝ SLOUPEC: Technická karta -->
+            <div class="col-lg-6">
+                <div class="card-custom border-top border-4" style="border-top-color: #10b981 !important;">
+                    <div class="card-header-custom">
+                        <div class="icon-box icon-box-tech"><i class="fas fa-code"></i></div>
+                        Technická karta
+                    </div>
+                    <div class="card-body-custom">
+
+                        <div class="mb-3">
+                            <strong>Platforma:</strong> 
+                            <a href="https://arcade.makecode.com" target="_blank" class="text-decoration-none">arcade.makecode.com <i class="fas fa-external-link-alt small"></i></a>
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="concept-badge bg-primary text-white">Proměnné (Variables)</span>
+                            <span class="concept-badge bg-success text-white">Podmínky (Logic/Overlap)</span>
+                            <span class="concept-badge bg-info text-dark">Cykly (Loops/Intervals)</span>
+                            <span class="concept-badge bg-warning text-dark">Sprity (Herní objekty)</span>
+                        </div>
+
+                        <h6 class="fw-bold mb-2">Ukázkový kód (JavaScript pro import):</h6>
+                        <p class="small text-muted mb-2">Žáci mohou pracovat v blocích. Tento JS kód lze vložit do editoru (přepínač nahoře) a automaticky se přeloží do plně funkčních vizuálních bloků.</p>
+                        
+                        <div class="code-block mb-4">
+<pre class="mb-0"><code>let jidlo: Sprite = null
+let hrac: Sprite = null
+
+// 1. Proměnné a start
+info.setScore(0)
+info.startCountdown(20)
+
+hrac = sprites.create(img`
+    . . . 5 5 5 5 5 . . .
+    . 5 5 f 5 5 5 f 5 5 .
+    . 5 5 5 5 f 5 5 5 5 .
+    . . . 5 5 5 5 5 . . .
+`, SpriteKind.Player)
+controller.moveSprite(hrac)
+hrac.setStayInScreen(true)
+
+jidlo = sprites.create(img`
+    . . 2 2 2 2 2 2 . .
+    . . 2 2 2 2 2 2 . .
+`, SpriteKind.Food)
+jidlo.setPosition(randint(10, 150), randint(10, 110))
+
+// 2. Cyklus (Odskok jídla)
+game.onUpdateInterval(3000, function () {
+    jidlo.setPosition(randint(10, 150), randint(10, 110))
+})
+
+// 3. Podmínka (Kolize)
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, 
+function (sprite: Sprite, otherSprite: Sprite) {
+    info.changeScoreBy(1)
+    info.changeCountdownBy(2)
+    music.baDing.play()
+    otherSprite.setPosition(randint(10, 150), randint(10, 110))
+})</code></pre>
+                        </div>
+
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="fw-bold text-success mb-2"><i class="fas fa-bug me-2"></i>Tipy pro učitele</h6>
+                            <ul class="mb-0 small ps-3">
+                                <li class="mb-1">Grafiku spritů (hráč, jídlo) jsme zde nechali jednoduchou. Nechte žáky nakreslit si v editoru vlastní (např. pacman a třešeň).</li>
+                                <li class="mb-1">Funkce <code>randint(10, 150)</code> generuje náhodné souřadnice, aby jídlo neskákalo mimo obrazovku.</li>
+                                <li><strong>Rozšíření pro rychlíky:</strong> Přidat druhý objekt (Enemy/Jed), který po dotyku čas nebo skóre ubírá.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ZADÁNÍ PRO ŽÁKY -->
+        <div class="row mt-4 pdf-page-break">
+            <div class="col-12">
+                <div class="card-custom border-top border-4" style="border-top-color: #3b82f6 !important;">
+                    <div class="card-header-custom">
+                        <div class="icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fas fa-user-graduate"></i></div>
+                        Zadání pro žáky: Hladový sběrač
+                    </div>
+                    <div class="card-body-custom">
+                        <p class="lead fw-bold mb-4" style="color: #3b82f6 !important;">Tvůj úkol: Naprogramuj hru, kde tvá postavička sbírá jídlo dřív, než vyprší čas!</p>
+
+                        <!-- PŘIDANÉ CELKOVÉ SHRNUTÍ -->
+                        <div class="mb-4 p-4 rounded-3 shadow-sm" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-crosshairs text-primary me-2"></i>Cíl hry (Jak to má fungovat):</h5>
+                            <ul class="mb-0 fs-6">
+                                <li class="mb-2">Ovládáš postavičku, která má <strong>20 vteřin</strong> na to, aby posbírala co nejvíce jídla.</li>
+                                <li class="mb-2">Když jídlo chytíš, získáš <strong>1 bod</strong> a přidají se ti <strong>2 vteřiny času navíc</strong>.</li>
+                                <li class="mb-2"><strong>Háček:</strong> Jídlo není snadné chytit – <strong>každé 3 vteřiny samo odskočí</strong> na jiné místo na obrazovce!</li>
+                                <li>Hra končí, jakmile ti vyprší veškerý čas. Kdo nahraje největší skóre?</li>
+                            </ul>
+                        </div>
+                        <!-- KONEC SHRNUTÍ -->
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold"><i class="fas fa-hammer text-muted me-2"></i>1. Příprava a pravidla</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-angle-right text-primary me-2"></i><strong>Hráč:</strong> Vytvoř si postavu (typ <code>Player</code>) a nastav jí ovládání šipkami. Nezapomeň zapnout, aby neutíkala z obrazovky (<em>stay in screen</em>).</li>
+                                    <li class="mb-2"><i class="fas fa-angle-right text-primary me-2"></i><strong>Start:</strong> Na začátku hry (v bloku <em>on start</em>) nastav <strong>skóre na 0</strong> a <strong>odpočet času na 20 vteřin</strong> (<em>start countdown</em>).</li>
+                                    <li><i class="fas fa-angle-right text-primary me-2"></i><strong>Cíl:</strong> Přidej do hry jídlo (typ <code>Food</code>) a libovolně si ho nakresli.</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold"><i class="fas fa-bolt text-muted me-2"></i>2. Akce a ztížení</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-angle-right text-primary me-2"></i><strong>Sbírání (Kolize):</strong> Použij blok pro překryv (<em>on overlap</em>). Když hráč chytí jídlo, <strong>získej bod</strong>, <strong>přidej si 2 vteřiny času</strong> a přesuň jídlo na náhodnou pozici (použij matematický blok <code>pick random</code> / <code>randint</code> pro souřadnice X i Y).</li>
+                                    <li><i class="fas fa-angle-right text-primary me-2"></i><strong>Ztížení hry:</strong> Hra je moc lehká! Přidej interval (<em>on game update interval</em>) nastavený na <strong>3000 ms</strong> (3 vteřiny). Jídlo v něm samo uskočí na jinou náhodnou pozici.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded" style="background-color: #f0fdfa; border-left: 4px solid #0d9488;">
+                            <strong><i class="fas fa-star text-warning me-2"></i>Bonusová výzva pro profíky:</strong>
+                            <p class="mb-0 mt-1 small">Přidej do hry novou postavu – nepřítele (typ <code>Enemy</code>). Naprogramuj druhou událost kolize tak, aby po dotyku s nepřítelem hráč ztratil body, ubral se mu čas, nebo přišel o život!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Skript pro generování PDF -->
+    <script>
+        function exportPDF(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generuji...';
+            btn.disabled = true;
+
+            // Přidáme třídu pro úpravu stylů před tiskem
+            document.body.classList.add('pdf-export-mode');
+
+            // Krátké zpoždění, aby prohlížeč aplikoval CSS změny
+            setTimeout(() => {
+                const element = document.getElementById('content-to-export');
+                
+                // Konfigurace pro html2pdf
+                const opt = {
+                    margin: [10, 10, 10, 10], // top, left, bottom, right v mm
+                    filename: 'Metodika_MakeCode_Hladovy_Sberac.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        windowWidth: 1000, // Nastaví viewport pro naši optimalizovanou šířku
+                        width: 1000,
+                        scrollY: 0,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: {
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'landscape' // Pro dvě karty vedle sebe je lepší landscape
+                    },
+                    pagebreak: {
+                        mode: ['css', 'legacy']
+                    }
+                };
+
+                html2pdf().set(opt).from(element).save().then(() => {
+                    document.body.classList.remove('pdf-export-mode');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }).catch(err => {
+                    console.error(err);
+                    document.body.classList.remove('pdf-export-mode');
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Chyba generování';
+                    setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 3000);
+                });
+            }, 500); 
+        }
+    </script>
+
+</body>
+</html>
