@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabule utahovacích momentů</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-main {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto 2rem auto;
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        #searchInput {
+            padding-left: 45px;
+            border-radius: 30px;
+            border: 2px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+        #searchInput:focus {
+            box-shadow: 0 0 0 0.25rem rgba(42, 82, 152, 0.25);
+            border-color: #2a5298;
+        }
+        .table-custom th {
+            background-color: #1e3c72;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(42, 82, 152, 0.05);
+        }
+        .note-cell {
+            font-size: 0.9em;
+            color: #dc3545;
+        }
+        footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header-main text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold">Tabule utahovacích momentů</h1>
+            <p class="lead text-white-50">Rychlý přehled pro ocelové a hliníkové disky</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- Search Filter -->
+        <div class="search-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search search-icon" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+            <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="Zadejte značku auta (např. Škoda, Audi)...">
+        </div>
+
+        <!-- Table Responsive Wrapper -->
+        <div class="card shadow-sm rounded-3 overflow-hidden">
+            <div class="table-responsive mb-0">
+                <table class="table table-hover table-striped table-custom mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Značka</th>
+                            <th scope="col">Model</th>
+                            <th scope="col" class="text-center">Ocel (Nm)</th>
+                            <th scope="col" class="text-center">Alu (Nm)</th>
+                            <th scope="col">Důležité upozornění</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data budou načtena přes JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- No Results Message -->
+        <div id="noResults" class="alert alert-warning mt-4 text-center d-none" role="alert">
+            Nebyla nalezena žádná vozidla pro tento dotaz.
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="mb-2">
+                <strong>Zdroj dat:</strong> 
+                <a href="https://webcdn.intercars.eu/files/316229/tabule-utahovacich-momentu.pdf" target="_blank" style="color: #2a5298; text-decoration: none;">
+                    Tabule utahovacích momentů (PDF)
+                </a>
+            </p>
+            <p class="text-muted">&copy; 2026 | Autor aplikace: <strong>Samuel Fuksa</strong></p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Application Logic -->
+    <script>
+        // Ukázková data inspirovaná seznamem z PDF
+        const torquesData = [
+            { brand: "Alfa Romeo", model: "Většina modelů", steel: "88-108", alu: "108-120", note: "Pravidelně kontrolovat" },
+            { brand: "Audi", model: "A3, A4, A6, Q5", steel: "120", alu: "120", note: "-" },
+            { brand: "BMW", model: "Série 1, 3, 5, X", steel: "120-140", alu: "120-140", note: "Záleží na modelu šroubu M12/M14" },
+            { brand: "Chevrolet", model: "Cruze, Spark", steel: "110-140", alu: "110-140", note: "-" },
+            { brand: "Chrysler", model: "Voyager, 300C", steel: "135", alu: "135", note: "-" },
+            { brand: "Citroen", model: "C3, C4, Berlingo", steel: "90-100", alu: "100", note: "-" },
+            { brand: "Dacia", model: "Logan, Duster, Sandero", steel: "105", alu: "105", note: "-" },
+            { brand: "Fiat", model: "Punto, Tipo, 500", steel: "86-98", alu: "98-120", note: "Pozor na délku šroubů" },
+            { brand: "Ford", model: "Focus, Mondeo, Kuga", steel: "130-135", alu: "130-135", note: "Matice s otočnou podložkou" },
+            { brand: "Honda", model: "Civic, CR-V", steel: "108", alu: "108", note: "-" },
+            { brand: "Hyundai", model: "i20, i30, Tucson", steel: "108-127", alu: "108-127", note: "-" },
+            { brand: "Jaguar", model: "XF, XE", steel: "125-130", alu: "125-130", note: "-" },
+            { brand: "Jeep", model: "Grand Cherokee, Compass", steel: "130-176", alu: "130-176", note: "Vyšší momenty u SUV" },
+            { brand: "Kia", model: "Ceed, Sportage", steel: "108-127", alu: "108-127", note: "-" },
+            { brand: "Land Rover", model: "Discovery, Range Rover", steel: "140-170", alu: "140-170", note: "Pouze originální matice" },
+            { brand: "Mazda", model: "3, 6, CX-5", steel: "108-147", alu: "108-147", note: "-" },
+            { brand: "Mercedes", model: "Třída A, C, E, GLC", steel: "130-150", alu: "130-150", note: "Speciální kulové sedlo" },
+            { brand: "Mini", model: "Cooper, Countryman", steel: "140", alu: "140", note: "-" },
+            { brand: "Mitsubishi", model: "ASX, Outlander", steel: "98-118", alu: "98-118", note: "-" },
+            { brand: "Nissan", model: "Qashqai, Juke", steel: "113", alu: "113", note: "-" },
+            { brand: "Opel", model: "Astra, Insignia", steel: "110-140", alu: "110-140", note: "Insignia M14x1.5 (150 Nm)" },
+            { brand: "Peugeot", model: "208, 308, 3008", steel: "100-115", alu: "100-115", note: "Matice s plochou podložkou" },
+            { brand: "Porsche", model: "911, Cayenne", steel: "130-160", alu: "130-160", note: "Dle typu centrální matice" },
+            { brand: "Renault", model: "Clio, Megane, Captur", steel: "105-110", alu: "105-110", note: "-" },
+            { brand: "Seat", model: "Ibiza, Leon, Ateca", steel: "120", alu: "120", note: "-" },
+            { brand: "Subaru", model: "Impreza, Forester", steel: "120", alu: "120", note: "-" },
+            { brand: "Suzuki", model: "Swift, Vitara", steel: "85-100", alu: "85-100", note: "-" },
+            { brand: "Škoda", model: "Fabia, Octavia, Superb, Kodiaq", steel: "120", alu: "120", note: "Po ujetí 50 km překontrolovat a dotáhnout" },
+            { brand: "Toyota", model: "Yaris, Corolla, RAV4", steel: "103-110", alu: "103-110", note: "-" },
+            { brand: "Volvo", model: "V40, XC60, XC90", steel: "140", alu: "140", note: "-" },
+            { brand: "VW", model: "Golf, Passat, Tiguan", steel: "120", alu: "120", note: "Pro Touareg 180 Nm" }
+        ];
+
+        // Reference na DOM elementy
+        const tableBody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+        const noResultsMsg = document.getElementById('noResults');
+
+        // Funkce pro vykreslení tabulky
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                noResultsMsg.classList.remove('d-none');
+            } else {
+                noResultsMsg.classList.add('d-none');
+                
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td class="fw-bold">${item.brand}</td>
+                        <td>${item.model}</td>
+                        <td class="text-center">${item.steel}</td>
+                        <td class="text-center">${item.alu}</td>
+                        <td class="note-cell">${item.note !== '-' ? '<i class="bi bi-exclamation-triangle"></i> ' + item.note : item.note}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        // Event listener pro vyhledávání
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            const filteredData = torquesData.filter(item => 
+                item.brand.toLowerCase().includes(searchTerm) || 
+                item.model.toLowerCase().includes(searchTerm)
+            );
+            
+            renderTable(filteredData);
+        });
+
+        // Úvodní vykreslení s veškerými daty
+        renderTable(torquesData);
+    </script>
+</body>
+</html>
