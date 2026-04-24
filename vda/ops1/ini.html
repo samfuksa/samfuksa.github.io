@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konfigurace Windows Složky</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 md:p-8 font-sans text-slate-800">
+
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        
+        <!-- Hlavička -->
+        <div class="bg-blue-600 p-6 text-white">
+            <div class="flex items-center gap-3 mb-2">
+                <i data-lucide="folder-cog" class="w-8 h-8"></i>
+                <h1 class="text-2xl font-bold">Přizpůsobení složky ve Windows</h1>
+            </div>
+            <p class="text-blue-100 text-sm">
+                Níže uvedené úryvky kódu slouží k nastavení vlastní ikony a popisku pro složku v operačním systému Windows pomocí souboru desktop.ini.
+            </p>
+        </div>
+
+        <div class="p-6 md:p-8 space-y-8">
+            
+            <!-- Krok 1: Příkazový řádek -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold flex items-center gap-2">
+                        <i data-lucide="terminal" class="w-5 h-5 text-slate-500"></i>
+                        1. Nastavení atributu složky
+                    </h2>
+                </div>
+                <p class="text-sm text-slate-500">
+                    Spusťte tento příkaz v příkazovém řádku (CMD), aby systém věděl, že má ve složce hledat konfigurační soubor.
+                </p>
+                <div class="relative group">
+                    <div class="bg-slate-900 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto border border-slate-700 shadow-inner">
+                        <code id="code-cmd">attrib +s FolderName</code>
+                    </div>
+                    <button onclick="copyToClipboard('code-cmd', this)" class="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-md transition-colors flex items-center gap-2 text-xs opacity-0 group-hover:opacity-100 focus:opacity-100 backdrop-blur-sm">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>Kopírovat</span>
+                    </button>
+                </div>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Krok 2: desktop.ini -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold flex items-center gap-2">
+                        <i data-lucide="file-code" class="w-5 h-5 text-slate-500"></i>
+                        2. Obsah souboru desktop.ini
+                    </h2>
+                </div>
+                <p class="text-sm text-slate-500">
+                    Vytvořte uvnitř složky textový soubor, pojmenujte ho <code>desktop.ini</code> a vložte do něj následující obsah.
+                </p>
+                <div class="relative group">
+                    <div class="bg-slate-900 rounded-lg p-4 font-mono text-sm text-slate-300 overflow-x-auto border border-slate-700 shadow-inner leading-relaxed whitespace-pre">
+<code id="code-ini"><span class="text-blue-400">[.ShellClassInfo]</span>
+<span class="text-purple-400">ConfirmFileOp</span>=0
+<span class="text-purple-400">IconFile</span>=ms.ico
+<span class="text-purple-400">IconIndex</span>=0
+<span class="text-purple-400">InfoTip</span>=Microsoft Wallpapers</code>
+                    </div>
+                    <button onclick="copyToClipboard('code-ini', this)" class="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-md transition-colors flex items-center gap-2 text-xs opacity-0 group-hover:opacity-100 focus:opacity-100 backdrop-blur-sm">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>Kopírovat</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Patička -->
+        <div class="bg-slate-50 p-4 border-t border-slate-200 text-center text-xs text-slate-400">
+            Nezapomeňte, že ikona "ms.ico" se musí nacházet ve stejné složce, nebo musíte uvést absolutní cestu k ní.
+        </div>
+    </div>
+
+    <!-- Toast notifikace pro zkopírování -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 pointer-events-none">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>
+        <span>Zkopírováno do schránky!</span>
+    </div>
+
+    <script>
+        // Inicializace ikon
+        lucide.createIcons();
+
+        // Funkce pro kopírování textu do schránky
+        function copyToClipboard(elementId, buttonElement) {
+            // Získání textu z elementu (ošetření pro pre/code bloky)
+            const el = document.getElementById(elementId);
+            let textToCopy = el.innerText || el.textContent;
+
+            // Odstranění prázdných řádků na konci, pokud nějaké vznikly
+            textToCopy = textToCopy.trim();
+
+            // Použití starší a spolehlivější metody pro iFrame / různá prostředí
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            
+            // Skrytí textarey
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast();
+                    
+                    // Dočasná změna tlačítka
+                    const originalHTML = buttonElement.innerHTML;
+                    buttonElement.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-green-400"></i><span class="text-green-400">OK</span>`;
+                    lucide.createIcons({root: buttonElement});
+                    
+                    setTimeout(() => {
+                        buttonElement.innerHTML = originalHTML;
+                        lucide.createIcons({root: buttonElement});
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Kopírování selhalo', err);
+                alert('Nepodařilo se zkopírovat text.');
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // Zobrazení toast notifikace
+        let toastTimeout;
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
