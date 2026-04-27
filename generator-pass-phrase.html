@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderní Generátor Hesel (Passphrase)</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            color: #334155;
+        }
+
+        .generator-card {
+            background-color: #ffffff;
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-body-custom {
+            padding: 2rem;
+        }
+
+        .passphrase-display-wrapper {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .passphrase-display {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem 3.5rem 1.5rem 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #0f172a;
+            word-break: break-word;
+            text-align: center;
+            min-height: 5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s;
+        }
+
+        .passphrase-display:hover {
+            border-color: #cbd5e1;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 50%;
+            right: 0.75rem;
+            transform: translateY(-50%);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-generate {
+            background-color: #3b82f6;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 100%;
+            font-size: 1.125rem;
+        }
+
+        .btn-generate:hover {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .btn-generate:active {
+            transform: scale(0.98);
+        }
+
+        .form-range::-webkit-slider-thumb {
+            background: #3b82f6;
+        }
+        
+        .form-check-input:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        #copyToast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #10b981;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 1000;
+        }
+
+        #copyToast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .word-count-badge {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 0.25rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="generator-card">
+        <div class="card-header-custom text-center">
+            <h2 class="h3 mb-2 fw-bold text-dark">Generátor Hesel</h2>
+            <p class="text-muted mb-0 small">Vytvořte si bezpečné a snadno zapamatovatelné heslo</p>
+        </div>
+
+        <div class="card-body-custom">
+            <!-- Output Display -->
+            <div class="passphrase-display-wrapper">
+                <div class="passphrase-display" id="passphraseOutput">Načítám...</div>
+                <button class="copy-btn" onclick="copyPassphrase()" title="Zkopírovat do schránky">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Settings Form -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="wordCount" class="form-label mb-0">Počet slov</label>
+                        <span class="word-count-badge" id="wordCountLabel">4</span>
+                    </div>
+                    <input type="range" class="form-range" id="wordCount" min="3" max="10" step="1" value="4">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="separator" class="form-label">Oddělovač</label>
+                    <select class="form-select" id="separator">
+                        <option value="-">Pomlčka (-)</option>
+                        <option value="_">Podtržítko (_)</option>
+                        <option value=" ">Mezera ( )</option>
+                        <option value=".">Tečka (.)</option>
+                        <option value="">Žádný oddělovač</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 d-flex flex-column justify-content-center pt-md-4">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" role="switch" id="capitalize" checked>
+                        <label class="form-check-label" for="capitalize">První písmeno velké</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="addNumber" checked>
+                        <label class="form-check-label" for="addNumber">Přidat číslo na konec</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-generate" onclick="generatePassphrase()">
+                Vygenerovat nové heslo
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="copyToast">Zkopírováno do schránky!</div>
+
+    <script>
+        // Solid list of basic Czech words (Nouns, adjectives, verbs) ~400 words
+        const czechWords = [
+            "adresa", "akce", "aktivní", "anděl", "auto", "autor", "babička", "banán", "banka", "barva",
+            "báseň", "baterie", "bezpečnost", "bílý", "bitva", "bod", "bohatství", "boj", "bolest", "bomba",
+            "bota", "bouře", "bratr", "brána", "brýle", "březen", "břicho", "budova", "bůh", "bunda",
+            "byt", "cesta", "cibule", "cíl", "cit", "cizí", "cukr", "cvičení", "čaj", "čas",
+            "časopis", "část", "čára", "čelo", "černý", "čert", "červený", "čest", "číslo", "čistý",
+            "člen", "člověk", "čtení", "čtverec", "čtvrtek", "čtyři", "daň", "dar", "data", "dav",
+            "dcera", "deka", "délka", "den", "deník", "deska", "déšť", "detail", "děda", "dítě",
+            "divadlo", "divák", "dlaň", "dluh", "doba", "dobro", "dobrý", "dohoda", "dojem", "doktor",
+            "dokument", "doma", "domov", "dotaz", "dovolená", "dozor", "dráha", "drak", "dřevo", "duben",
+            "duch", "důkaz", "dům", "důvod", "dveře", "dvůr", "dýchat", "dým", "efekt", "ekonomika",
+            "elektřina", "energie", "fakt", "farma", "film", "finance", "firma", "fyzika", "galerie", "garáž",
+            "generace", "guma", "had", "hádanka", "hák", "hala", "hlava", "hlas", "hlavní", "hledat",
+            "hloubka", "hmyz", "hnízdo", "hodina", "hodnota", "hoch", "holka", "hora", "hospoda", "host",
+            "hotel", "houba", "housle", "hra", "hrad", "hranice", "hrdina", "hrdlo", "hromada", "hřích",
+            "hubený", "hudba", "hvězda", "chata", "chlapec", "chléb", "chodba", "choroba", "chrám", "chudý",
+            "chuť", "chyba", "chytit", "idea", "identita", "iluze", "inženýr", "jablko", "jazyk", "jedna",
+            "jelen", "jemný", "jeskyně", "jezero", "jídlo", "jih", "jiný", "jistota", "jméno", "kabel",
+            "kabát", "kachna", "kancelář", "kapitola", "kapsa", "karta", "kasa", "katalog", "káva", "každý",
+            "kino", "kladivo", "klec", "klíč", "klid", "klobouk", "klub", "kniha", "kocour", "kočka",
+            "kód", "kolo", "konec", "kontakt", "kopec", "koruna", "kost", "kostel", "koš", "košile",
+            "kov", "koza", "kraj", "král", "krása", "kráva", "krev", "krok", "kruh", "kříž",
+            "kůň", "kus", "kůže", "květina", "kytara", "laboratoř", "láhev", "lampa", "láska", "látka",
+            "lavice", "léčba", "led", "leden", "lékař", "lekce", "les", "léto", "letadlo", "lev",
+            "levý", "lež", "límec", "linka", "list", "litr", "loď", "luk", "luna", "lyže",
+            "magie", "majetek", "majitel", "malba", "malý", "maminka", "manažer", "mapa", "maso", "masáž",
+            "matka", "meč", "med", "měď", "medvěd", "měkký", "melodie", "město", "metoda", "metr",
+            "mezera", "milion", "mince", "minuta", "mír", "míra", "místo", "mistr", "mladý", "mléko",
+            "mlha", "mlýn", "mnoho", "moc", "model", "modrý", "mohutný", "moment", "moře", "most",
+            "motor", "moucha", "moudrost", "mrak", "mráz", "mrtvý", "muzeum", "muž", "myš", "myšlenka",
+            "mzda", "nabídka", "nádoba", "naděje", "nádraží", "náhlý", "náhoda", "náklad", "nápad", "nápoj",
+            "národ", "následek", "nástroj", "návrh", "nebe", "neděle", "nehet", "nemoc", "nerv", "nic",
+            "nit", "nízký", "noc", "noha", "nos", "nouze", "noviny", "nový", "nůž", "nula",
+            "obálka", "občan", "obchod", "obec", "oběd", "oběť", "obhájce", "objekt", "oblak", "oblast",
+            "obličej", "obloha", "obor", "obraz", "obrana", "obrovský", "obsah", "obuv", "obyvatel", "ocas",
+            "ocel", "oči", "odbor", "odchod", "odkaz", "odpad", "odpověď", "odvaha", "oheň", "okamžik",
+            "okno", "oko", "okres", "okraj", "olej", "olovo", "omáčka", "omyl", "opice", "oprava",
+            "orgán", "orel", "ořech", "osa", "oslava", "osoba", "osud", "otázka", "otec", "otrok",
+            "ovce", "ovoce", "pád", "pach", "palác", "palec", "paměť", "pán", "papír", "paprsek",
+            "pár", "park", "partner", "pas", "pás", "past", "pata", "pátek", "pec", "péče",
+            "peklo", "peníze", "penzion", "pepř", "pero", "pes", "pěst", "pět", "pevný", "pila",
+            "pilot", "píseň", "písek", "písmo", "pití", "pivo", "plán", "planeta", "plast", "plátno",
+            "plavba", "pláž", "ples", "pleť", "plíce", "plot", "pluh", "plyn", "pobyt", "počet",
+            "pocit", "počasí", "podíl", "podlaha", "podmínka", "podnik", "podoba", "podpis", "podpora", "podzim",
+            "pohádka", "pohár", "pohled", "pohyb", "pojem", "pokoj", "pokrok", "pokus", "pole", "polévka",
+            "policie", "politika", "polovina", "poměr", "pomoc", "pondělí", "popis", "poplatek", "porada", "porucha",
+            "pořad", "postel", "postoj", "potíž", "potok", "potrava", "potřeba", "poušť", "povaha", "pověst",
+            "povinnost", "povrch", "pozadí", "pozemek", "pozice", "poznámka", "pozor", "práce", "prase", "praxe",
+            "prázdniny", "právo", "pravda", "pravidlo", "prkno", "problém", "proces", "produkt", "profese", "program",
+            "projekt", "prostor", "provoz", "prst", "prsten", "průmysl", "průvodce", "prvek", "první", "přání",
+            "předmět", "předpis", "předseda", "představa", "překlad", "překvapení", "přesný", "přestávka", "přítel", "přístroj",
+            "přístup", "příběh", "příčina", "příklad", "příroda", "přítomnost", "příznak", "psaní", "pták", "půda",
+            "půlnoc", "původ", "pýcha", "pytel", "rada", "rádio", "radost", "raketa", "rameno", "rána",
+            "ráno", "rasa", "rostlina", "ret", "revize", "rezerva", "režim", "rodina", "roh", "rok",
+            "role", "román", "rovina", "rozdíl", "rozhovor", "rozměr", "rozum", "rozvoj", "rty", "ruka",
+            "růst", "ryba", "rychlost", "rytíř", "řada", "řád", "ředitel", "řeč", "řeka", "řešení",
+            "sada", "sál", "samota", "sbor", "sekunda", "sen", "sestra", "setkání", "sever", "seznam",
+            "shoda", "síla", "silnice", "síť", "situace", "skála", "sklo", "sklep", "sklon", "škola",
+            "skok", "skóre", "skupina", "skutečnost", "sláva", "slepý", "sleva", "slib", "slon", "slovo",
+            "slunce", "služba", "směr", "smích", "smlouva", "smrt", "smysl", "snaha", "sníh", "snídaně",
+            "soud", "soused", "soutěž", "spánek", "společnost", "spor", "sport", "správa", "srdce", "srst",
+            "stadium", "stan", "stanice", "starost", "starý", "stát", "stav", "stavba", "stezka", "stín",
+            "stodola", "stoj", "stoka", "stolek", "stopa", "strach", "strana", "ztráta", "stráž", "střed",
+            "střecha", "středa", "střela", "strom", "strýc", "student", "stupeň", "stůl", "styl", "subjekt",
+            "suchý", "sukně", "sůl", "suma", "svatba", "svět", "světlo", "svoboda", "sval", "svaz",
+            "svědek", "svátek", "syn", "sýr", "systém", "šance", "šaty", "šéf", "škoda", "šok",
+            "štěstí", "šťáva", "štít", "šum", "tabule", "tady", "tajemství", "talent", "talíř", "tam",
+            "tanec", "taška", "táta", "tečka", "tehdy", "tělo", "téma", "tempo", "tma", "tón",
+            "touha", "továrna", "tradice", "trať", "tráva", "trh", "třída", "třetí", "tuba", "tuhý",
+            "tuk", "tvar", "tvář", "tvorba", "tvrzení", "týden", "tým", "typ", "účet", "údaj",
+            "úder", "údolí", "úhel", "uhel", "úkol", "ulice", "úloha", "umění", "úmrtí", "únava",
+            "únor", "úřad", "úroveň", "úsek", "úsměv", "úspěch", "ústa", "ústava", "ústav", "útěk",
+            "úterý", "útok", "útvar", "úvěr", "úvod", "váha", "vajíčko", "vak", "válka", "val",
+            "vápno", "varianta", "varování", "vázání", "včela", "včera", "věc", "večer", "věda", "vedení",
+            "věk", "velký", "venkov", "věta", "větev", "více", "víkend", "víno", "vít", "vítr",
+            "vlak", "vlastnost", "vliv", "vlna", "voda", "voják", "vojsko", "volba", "volný", "vozidlo",
+            "vrah", "vrata", "vrba", "vrch", "vrstva", "vstup", "vůle", "výběr", "výbor", "výhoda",
+            "východ", "výkon", "výlet", "výměna", "výraz", "výroba", "výsledek", "výstava", "vývoj", "význam",
+            "vzhled", "vzduch", "vztah", "zahrada", "zájem", "základ", "zákon", "zákaz", "záznam", "zbraň",
+            "zdraví", "zdroj", "zeď", "zelený", "země", "zima", "zlato", "zlo", "změna", "značka",
+            "znak", "znalost", "zpěv", "zpráva", "způsob", "zrak", "zub", "zvěř", "zvíře", "zvuk",
+            "žába", "žal", "žena", "židle", "život", "žízeň"
+        ];
+
+        // Získání kryptograficky bezpečného náhodného čísla
+        function getSecureRandomIndex(max) {
+            if (window.crypto && window.crypto.getRandomValues) {
+                const randomBuffer = new Uint32Array(1);
+                window.crypto.getRandomValues(randomBuffer);
+                return randomBuffer[0] % max;
+            } else {
+                // Fallback pro starší prohlížeče
+                return Math.floor(Math.random() * max);
+            }
+        }
+
+        // Hlavní generovací funkce
+        function generatePassphrase() {
+            const wordCount = parseInt(document.getElementById('wordCount').value);
+            const separator = document.getElementById('separator').value;
+            const capitalize = document.getElementById('capitalize').checked;
+            const addNumber = document.getElementById('addNumber').checked;
+
+            let selectedWords = [];
+
+            for (let i = 0; i < wordCount; i++) {
+                const randomIndex = getSecureRandomIndex(czechWords.length);
+                let word = czechWords[randomIndex];
+
+                // Kapitalizace prvního písmene
+                if (capitalize) {
+                    word = word.charAt(0).toUpperCase() + word.slice(1);
+                }
+
+                selectedWords.push(word);
+            }
+
+            let finalPassphrase = selectedWords.join(separator);
+
+            // Přidání čísla
+            if (addNumber) {
+                const randomNum = getSecureRandomIndex(100); // 0-99
+                finalPassphrase += separator + randomNum;
+            }
+
+            // Zobrazení v UI
+            document.getElementById('passphraseOutput').innerText = finalPassphrase;
+        }
+
+        // Kopírování do schránky (bezpečný způsob s ohledem na omezení iframe)
+        function copyPassphrase() {
+            const textToCopy = document.getElementById('passphraseOutput').innerText;
+            
+            // Vytvoření dočasného textarea elementu
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            
+            // Umístění mimo viditelnou část obrazovky
+            textArea.style.position = "fixed";
+            textArea.style.top = "-9999px";
+            document.body.appendChild(textArea);
+            
+            textArea.select();
+            
+            try {
+                // Použití starší a spolehlivější metody pro iframy
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Kopírování selhalo', err);
+                alert("Nepodařilo se zkopírovat heslo.");
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // Zobrazení "Toast" notifikace
+        function showToast() {
+            const toast = document.getElementById("copyToast");
+            toast.className = "show";
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 2500);
+        }
+
+        // Aktualizace štítku u posuvníku
+        document.getElementById('wordCount').addEventListener('input', function() {
+            document.getElementById('wordCountLabel').innerText = this.value;
+        });
+
+        // Vygenerovat heslo ihned po načtení
+        document.addEventListener('DOMContentLoaded', generatePassphrase);
+    </script>
+</body>
+</html>
