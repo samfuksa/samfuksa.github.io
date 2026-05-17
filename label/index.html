@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generátor a Tisk Štítků</title>
+    <!-- Tailwind CSS pro moderní vzhled -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF.js pro zpracování PDF souborů -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    
+    <style>
+        /* Konfigurace tisku */
+        @page {
+            size: A4;
+            margin: 0; /* Zabrání prohlížeči přidávat vlastní okraje */
+        }
+        
+        body {
+            background-color: #f3f4f6;
+        }
+
+        /* Samotný papír A4 */
+        .a4-sheet {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: grid;
+            margin: 0 auto;
+            box-sizing: border-box;
+            /* Důležité pro přesné zarovnání štítků */
+            align-content: start;
+            justify-content: center;
+        }
+
+        /* Jednotlivý štítek na archu */
+        .label-slot {
+            box-sizing: border-box;
+            border: 1px dashed #cbd5e1;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+        }
+
+        .label-slot:hover {
+            border-color: #3b82f6;
+            background-color: #f8fafc;
+        }
+
+        /* Stylování obsahu štítku */
+        .label-content-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .label-content-text {
+            width: 100%;
+            word-break: break-word;
+            white-space: pre-wrap;
+            pointer-events: none;
+            padding: 2mm;
+        }
+
+        /* Pravidla aplikovaná POUZE při tisku */
+        @media print {
+            body {
+                background-color: white !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .a4-sheet {
+                box-shadow: none !important;
+                margin: 0 !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+            .label-slot {
+                border: none !important; /* Odstraní pomocné přerušované čáry */
+                background-color: transparent !important;
+            }
+            /* Vynutíme přesné rozměry pro tisk */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        /* Loader animace */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen font-sans">
+
+    <!-- Boční panel (Skryto při tisku) -->
+    <aside class="w-full md:w-80 bg-white shadow-md p-6 flex flex-col no-print z-10 overflow-y-auto">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            Tvůrce Štítků
+        </h1>
+
+        <div class="mb-6">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Zvolte formát archu</h2>
+            <div class="grid grid-cols-2 gap-3" id="format-selectors">
+                <!-- Vygenerováno pomocí JS -->
+            </div>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6 text-sm text-blue-800">
+            <p><strong>Tip:</strong> Klikněte na prázdný štítek vpravo pro vložení obsahu.</p>
+        </div>
+        
+        <div class="bg-yellow-50 border border-yellow-100 rounded-lg p-4 mb-auto text-sm text-yellow-800">
+            <p><strong>Důležité pro tisk:</strong> V dialogu tisku nastavte <br><b>Okraje: Žádné</b> a <b>Měřítko: 100% (Výchozí)</b>.</p>
+        </div>
+
+        <button onclick="window.print()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Vytisknout arch
+        </button>
+    </aside>
+
+    <!-- Hlavní pracovní plocha -->
+    <main class="flex-1 overflow-auto p-4 md:p-8 bg-gray-100 print:p-0 print:bg-white print:block print:overflow-visible flex justify-center items-start">
+        <!-- Obal pro A4 aby šlo scrollovat a mělo padding na obrazovce, ale ne v tisku -->
+        <div class="pb-20 print:pb-0">
+            <div id="sheet" class="a4-sheet">
+                <!-- Zde se vygenerují štítky -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modální okno pro úpravu štítku -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center no-print backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Upravit štítek</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <!-- Záložky -->
+                <div class="flex border-b border-gray-200 mb-5">
+                    <button id="tab-text" onclick="switchTab('text')" class="px-4 py-2 border-b-2 font-medium text-sm border-blue-600 text-blue-600">Text</button>
+                    <button id="tab-file" onclick="switchTab('file')" class="px-4 py-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700">Obrázek / PDF</button>
+                </div>
+
+                <!-- Obsah - TEXT -->
+                <div id="content-text" class="space-y-4 block">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Text štítku</label>
+                        <textarea id="inputText" rows="4" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none" placeholder="Zadejte text..."></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Velikost písma (px)</label>
+                            <input type="number" id="inputFontSize" value="16" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Zarovnání</label>
+                            <select id="inputAlign" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                <option value="left">Doleva</option>
+                                <option value="center" selected>Na střed</option>
+                                <option value="right">Doprava</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center mt-2">
+                        <input type="checkbox" id="inputBold" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer">
+                        <label for="inputBold" class="ml-2 block text-sm text-gray-700 cursor-pointer">Tučné písmo</label>
+                    </div>
+                </div>
+
+                <!-- Obsah - SOUBOR -->
+                <div id="content-file" class="space-y-4 hidden">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-50 transition-colors">
+                        <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <p class="text-sm text-gray-600 mb-4">Vyberte soubor ve formátu JPG, PNG nebo PDF.</p>
+                        <input type="file" id="inputFile" accept="image/*, application/pdf" class="hidden" onchange="handleFileUpload(event)">
+                        <button onclick="document.getElementById('inputFile').click()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md shadow-sm text-sm font-medium hover:bg-gray-50">
+                            Procházet soubory
+                        </button>
+                        <div id="fileLoading" class="hidden mt-4 flex items-center justify-center gap-2 text-blue-600 text-sm font-medium">
+                            <div class="loader"></div> Zpracovávám soubor...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-100 bg-gray-50 flex flex-wrap gap-3 justify-end items-center">
+                <button id="btnDelete" onclick="deleteContent()" class="text-red-600 hover:text-red-800 text-sm font-medium px-4 py-2 mr-auto hidden">Odstranit obsah</button>
+                <button onclick="applyToAll()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors">Kopírovat na všechny</button>
+                <button onclick="saveContent()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">Uložit do štítku</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Nastavení workeru pro PDF.js (Nutné pro zpracování PDF v prohlížeči)
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        // Definice dostupných formátů podle krabice v mm
+        const FORMATS = {
+            '1': { name: '1 štítek', desc: '210 x 297mm', cols: 1, rows: 1, count: 1, width: 210, height: 297 },
+            '2': { name: '2 štítky', desc: '210 x 148mm', cols: 1, rows: 2, count: 2, width: 210, height: 148.5 },
+            '4': { name: '4 štítky', desc: '105 x 148mm', cols: 2, rows: 2, count: 4, width: 105, height: 148.5 },
+            '24': { name: '24 štítků', desc: '70 x 37mm', cols: 3, rows: 8, count: 24, width: 70, height: 37 }
+        };
+
+        // Stav aplikace
+        let currentFormat = '24';
+        let labelsData = [];
+        let editingIndex = -1;
+        let currentTempFileData = null; // Dočasná data (base64) nahraného souboru v modalu
+
+        // Inicializace
+        function init() {
+            renderFormatSelectors();
+            changeFormat('24'); // Výchozí formát
+        }
+
+        // Vykreslení tlačítek pro výběr formátu v levém menu
+        function renderFormatSelectors() {
+            const container = document.getElementById('format-selectors');
+            container.innerHTML = '';
+            
+            Object.keys(FORMATS).forEach(key => {
+                const f = FORMATS[key];
+                const btn = document.createElement('button');
+                btn.className = `flex flex-col items-center justify-center p-3 border-2 rounded-xl transition-all text-sm
+                    ${currentFormat === key ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-gray-200 hover:border-blue-300 text-gray-600 bg-white'}`;
+                
+                // Ikonka simulující rozložení
+                let gridHtml = `<div class="grid w-8 h-10 border border-current mb-2 opacity-70" style="grid-template-columns: repeat(${f.cols}, 1fr); grid-template-rows: repeat(${f.rows}, 1fr); gap: 1px; background: currentColor;">`;
+                for(let i=0; i < (f.cols * f.rows); i++) {
+                    gridHtml += `<div class="bg-white"></div>`;
+                }
+                gridHtml += `</div>`;
+
+                btn.innerHTML = `
+                    ${gridHtml}
+                    <span class="font-bold">${f.name}</span>
+                    <span class="text-xs opacity-75">${f.desc}</span>
+                `;
+                btn.onclick = () => changeFormat(key);
+                container.appendChild(btn);
+            });
+        }
+
+        // Změna formátu a reset archu
+        function changeFormat(formatKey) {
+            currentFormat = formatKey;
+            const f = FORMATS[currentFormat];
+            labelsData = Array(f.count).fill(null);
+            renderFormatSelectors();
+            renderSheet();
+        }
+
+        // Vykreslení samotného A4 archu se štítky
+        function renderSheet() {
+            const sheet = document.getElementById('sheet');
+            const f = FORMATS[currentFormat];
+            
+            // Nastavení CSS gridu přesně podle milimetrů
+            sheet.style.gridTemplateColumns = `repeat(${f.cols}, ${f.width}mm)`;
+            sheet.style.gridTemplateRows = `repeat(${f.rows}, ${f.height}mm)`;
+            sheet.innerHTML = '';
+
+            labelsData.forEach((data, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'label-slot group';
+                slot.style.width = `${f.width}mm`;
+                slot.style.height = `${f.height}mm`;
+                slot.onclick = () => openModal(index);
+
+                if (data) {
+                    if (data.type === 'text') {
+                        const txt = document.createElement('div');
+                        txt.className = 'label-content-text';
+                        txt.innerText = data.text;
+                        txt.style.fontSize = data.fontSize + 'px';
+                        txt.style.textAlign = data.align;
+                        txt.style.fontWeight = data.bold ? 'bold' : 'normal';
+                        slot.appendChild(txt);
+                    } else if (data.type === 'image') {
+                        const img = document.createElement('img');
+                        img.className = 'label-content-img';
+                        img.src = data.src;
+                        slot.appendChild(img);
+                    }
+                } else {
+                    // Prázdný stav
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-blue-50 bg-opacity-80 transition-opacity text-blue-600 font-medium text-sm z-10 no-print';
+                    placeholder.innerHTML = '<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Přidat obsah';
+                    slot.appendChild(placeholder);
+                }
+
+                sheet.appendChild(slot);
+            });
+        }
+
+        // LOGIKA MODÁLNÍHO OKNA
+        
+        function openModal(index) {
+            editingIndex = index;
+            const data = labelsData[index];
+            currentTempFileData = null;
+            document.getElementById('fileLoading').classList.add('hidden');
+            
+            // Reset formuláře
+            document.getElementById('inputText').value = '';
+            document.getElementById('inputFontSize').value = '16';
+            document.getElementById('inputAlign').value = 'center';
+            document.getElementById('inputBold').checked = false;
+            document.getElementById('inputFile').value = '';
+
+            const btnDelete = document.getElementById('btnDelete');
+
+            if (data) {
+                btnDelete.classList.remove('hidden');
+                if (data.type === 'text') {
+                    switchTab('text');
+                    document.getElementById('inputText').value = data.text;
+                    document.getElementById('inputFontSize').value = data.fontSize;
+                    document.getElementById('inputAlign').value = data.align;
+                    document.getElementById('inputBold').checked = data.bold;
+                } else if (data.type === 'image') {
+                    switchTab('file');
+                    currentTempFileData = data.src;
+                    // Vizuální indikace nahraného souboru by se hodila, ale pro jednoduchost jen přepneme tab
+                }
+            } else {
+                btnDelete.classList.add('hidden');
+                switchTab('text');
+            }
+
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            editingIndex = -1;
+            currentTempFileData = null;
+        }
+
+        function switchTab(tab) {
+            const tabText = document.getElementById('tab-text');
+            const tabFile = document.getElementById('tab-file');
+            const contentText = document.getElementById('content-text');
+            const contentFile = document.getElementById('content-file');
+
+            if (tab === 'text') {
+                tabText.className = "px-4 py-2 border-b-2 font-medium text-sm border-blue-600 text-blue-600";
+                tabFile.className = "px-4 py-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700";
+                contentText.classList.remove('hidden');
+                contentFile.classList.add('hidden');
+            } else {
+                tabFile.className = "px-4 py-2 border-b-2 font-medium text-sm border-blue-600 text-blue-600";
+                tabText.className = "px-4 py-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700";
+                contentFile.classList.remove('hidden');
+                contentText.classList.add('hidden');
+            }
+        }
+
+        // Zpracování nahrání souboru (Obrázek nebo PDF)
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const loader = document.getElementById('fileLoading');
+            loader.classList.remove('hidden');
+
+            try {
+                if (file.type === 'application/pdf') {
+                    // Zpracování PDF pomocí pdf.js - vykreslí 1. stranu do canvasu a udělá z ní obrázek
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                    const page = await pdf.getPage(1); // Bereme jen 1. stranu
+                    
+                    // Nastavíme vyšší scale pro ostřejší tisk
+                    const viewport = page.getViewport({scale: 3.0}); 
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({canvasContext: context, viewport: viewport}).promise;
+                    currentTempFileData = canvas.toDataURL('image/png');
+                } else if (file.type.startsWith('image/')) {
+                    // Zpracování běžného obrázku pomocí FileReader
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        currentTempFileData = e.target.result;
+                        loader.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                    return; // U konce readeru se loader skryje sám
+                } else {
+                    alert('Nepodporovaný formát souboru.');
+                }
+            } catch (err) {
+                console.error("Chyba při zpracování souboru:", err);
+                alert('Došlo k chybě při načítání souboru.');
+            }
+            
+            loader.classList.add('hidden');
+        }
+
+        // Získání aktuálních dat formuláře
+        function getFormData() {
+            const isTextTab = !document.getElementById('content-text').classList.contains('hidden');
+            
+            if (isTextTab) {
+                const text = document.getElementById('inputText').value.trim();
+                if (!text) return null;
+                return {
+                    type: 'text',
+                    text: text,
+                    fontSize: document.getElementById('inputFontSize').value || 16,
+                    align: document.getElementById('inputAlign').value,
+                    bold: document.getElementById('inputBold').checked
+                };
+            } else {
+                if (!currentTempFileData) return null;
+                return {
+                    type: 'image',
+                    src: currentTempFileData
+                };
+            }
+        }
+
+        // Uložení do konkrétního štítku
+        function saveContent() {
+            if (editingIndex === -1) return;
+            const data = getFormData();
+            if (data) {
+                labelsData[editingIndex] = data;
+                renderSheet();
+            }
+            closeModal();
+        }
+
+        // Zkopírování vytvořeného obsahu na všechny štítky
+        function applyToAll() {
+            const data = getFormData();
+            if (!data && labelsData[editingIndex] === null) {
+                alert('Nejprve zadejte text nebo vložte soubor.');
+                return;
+            }
+            
+            // Pokud aplikuje data z modalu (ještě neuložená)
+            const dataToApply = data || labelsData[editingIndex];
+            
+            if(dataToApply) {
+                labelsData = labelsData.map(() => ({...dataToApply}));
+                renderSheet();
+                closeModal();
+            }
+        }
+
+        // Odstranění obsahu konkrétního štítku
+        function deleteContent() {
+            if (editingIndex !== -1) {
+                labelsData[editingIndex] = null;
+                renderSheet();
+                closeModal();
+            }
+        }
+
+        // Spuštění po načtení
+        window.onload = init;
+
+    </script>
+</body>
+</html>
