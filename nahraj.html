@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odevzdání úkolu - Informatika</title>
+    <!-- Použití Tailwind CSS pro moderní a čistý LMS vzhled -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Světle šedé pozadí typické pro LMS */
+        }
+        /* Zajištění, že se myš neplete do událostí uvnitř drop zóny */
+        #drop-zone * {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Hlavička simulující školní systém -->
+    <header class="bg-[#0f4c81] text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-xl md:text-2xl font-bold">Odevzdání úkolu - Informatika</h1>
+            <div class="hidden sm:flex items-center space-x-2 text-sm">
+                <span class="bg-blue-800 px-3 py-1 rounded-full">Přihlášen(a): Žák Novák</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hlavní obsah stránky -->
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-8">
+        
+        <!-- Vysvětlující box pro žáky -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded-r-lg shadow-sm">
+            <h2 class="font-bold text-blue-800 text-lg mb-1">Cíl této ukázky</h2>
+            <p class="text-blue-900 text-sm">
+                Tato stránka slouží k pochopení dvou základních způsobů, jak nahrát soubor do systému. Vyzkoušejte si oba způsoby níže a sledujte, jak se liší "Klasické nahrání" od moderní "Drop zóny".
+            </p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            
+            <div class="border-b border-gray-200 px-6 py-4 bg-gray-50">
+                <h2 class="text-lg font-semibold text-gray-700">Stav odevzdání</h2>
+            </div>
+
+            <div class="p-6 space-y-10">
+                
+                <!-- SEKCE 1: KLASICKÉ NAHRÁNÍ -->
+                <section>
+                    <h3 class="text-lg font-bold text-blue-700 mb-2">1. Klasické nahrání (Vybrat soubor)</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Při tomto způsobu musíte kliknout na tlačítko, otevře se vám okno průzkumníka souborů a vy musíte "proklikat" složky ve svém počítači, abyste soubor našli.
+                    </p>
+                    
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                            <!-- Standardní file input -->
+                            <input type="file" id="classic-input" class="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-md file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-gray-200 file:text-gray-700
+                                hover:file:bg-gray-300
+                                cursor-pointer border border-gray-300 rounded-md bg-white">
+                            
+                            <button id="classic-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm whitespace-nowrap">
+                                Nahrát
+                            </button>
+                        </div>
+                        
+                        <!-- Zpráva o stavu nahrání (skrytá) -->
+                        <div id="classic-status" class="mt-4 hidden p-3 rounded-md bg-green-50 text-green-800 border border-green-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            <span id="classic-status-text">Úspěšně nahráno</span>
+                        </div>
+                        <!-- Chybová zpráva -->
+                         <div id="classic-error" class="mt-4 hidden p-3 rounded-md bg-red-50 text-red-800 border border-red-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                            <span>Nejprve vyberte soubor pomocí tlačítka výše.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-gray-200">
+
+                <!-- SEKCE 2: DROP ZÓNA -->
+                <section>
+                    <h3 class="text-lg font-bold text-blue-700 mb-2">2. Drop zóna (Táhni a pusť)</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Moderní a rychlejší způsob. Soubor jednoduše chytíte myší (např. rovnou z plochy vašeho počítače) a "pustíte" ho do vyznačeného obdélníku. Zkuste to!
+                    </p>
+                    
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <!-- Vlastní Drop Zóna -->
+                        <div id="drop-zone" class="w-full h-48 border-2 border-dashed border-gray-400 rounded-xl flex items-center justify-center bg-white transition-all duration-300 cursor-pointer hover:border-blue-400">
+                            <div class="text-center">
+                                <svg id="drop-icon" class="mx-auto h-12 w-12 text-gray-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <p id="drop-text" class="mt-2 text-lg font-medium text-gray-600 transition-colors duration-300">Přetáhněte soubory sem</p>
+                                <p class="text-sm text-gray-400 mt-1">nebo klikněte pro výběr</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Skrytý input pro případ, že uživatel na dropzónu jen klikne -->
+                        <input type="file" id="hidden-drop-input" class="hidden">
+
+                        <!-- Zpráva o stavu nahrání (skrytá) -->
+                        <div id="drop-status" class="mt-4 hidden p-3 rounded-md bg-green-50 text-green-800 border border-green-200 flex items-center shadow-sm">
+                            <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            <span id="drop-status-text">Úspěšně nahráno přes Drop zónu</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-auto py-6 text-center text-gray-500 text-sm border-t border-gray-200 bg-white">
+        Edukativní ukázka - Rozdíly v nahrávání souborů
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- LOGIKA PRO KLASICKÉ NAHRÁNÍ ---
+            const classicInput = document.getElementById('classic-input');
+            const classicBtn = document.getElementById('classic-btn');
+            const classicStatus = document.getElementById('classic-status');
+            const classicStatusText = document.getElementById('classic-status-text');
+            const classicError = document.getElementById('classic-error');
+
+            // Reset chybové hlášky, když uživatel změní soubor
+            classicInput.addEventListener('change', () => {
+                classicError.classList.add('hidden');
+                classicStatus.classList.add('hidden');
+            });
+
+            // Tlačítko Nahrát u klasické volby
+            classicBtn.addEventListener('click', () => {
+                if (classicInput.files.length > 0) {
+                    const fileName = classicInput.files[0].name;
+                    classicStatusText.innerHTML = `<strong>Úspěšně nahráno:</strong> ${fileName}`;
+                    classicStatus.classList.remove('hidden');
+                    classicError.classList.add('hidden');
+                } else {
+                    // Nebyl vybrán soubor
+                    classicError.classList.remove('hidden');
+                    classicStatus.classList.add('hidden');
+                }
+            });
+
+
+            // --- LOGIKA PRO DROP ZÓNU ---
+            const dropZone = document.getElementById('drop-zone');
+            const dropStatus = document.getElementById('drop-status');
+            const dropStatusText = document.getElementById('drop-status-text');
+            const hiddenDropInput = document.getElementById('hidden-drop-input');
+            const dropText = document.getElementById('drop-text');
+            const dropIcon = document.getElementById('drop-icon');
+
+            // ZABRÁNĚNÍ VÝCHOZÍMU CHOVÁNÍ PROHLÍŽEČE
+            // Aby se soubor neotevřel v nové záložce, musíme zablokovat defaultní akce na celé stránce i na dropzóně
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                document.body.addEventListener(eventName, preventDefaults, false);
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Vizuální zpětná vazba při najetí myší se souborem (dragover)
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            // Zrušení vizuální zpětné vazby, když myš odjede nebo uživatel pustí soubor
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('bg-blue-50', 'border-blue-500', 'scale-[1.02]');
+                dropZone.classList.remove('bg-white', 'border-gray-400');
+                dropText.classList.add('text-blue-600');
+                dropIcon.classList.add('text-blue-500');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('bg-blue-50', 'border-blue-500', 'scale-[1.02]');
+                dropZone.classList.add('bg-white', 'border-gray-400');
+                dropText.classList.remove('text-blue-600');
+                dropIcon.classList.remove('text-blue-500');
+            }
+
+            // Samotné zpracování "puštění" souboru do zóny
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                processDropFiles(files);
+            }
+
+            // Funkce pro zpracování přijatých souborů a vypsání úspěšné hlášky
+            function processDropFiles(files) {
+                if (files.length > 0) {
+                    const fileName = files[0].name;
+                    dropStatusText.innerHTML = `<strong>Úspěšně nahráno přes Drop zónu:</strong> ${fileName}`;
+                    
+                    // Přidáme malý animační efekt zobrazení zprávy
+                    dropStatus.classList.remove('hidden');
+                    dropStatus.classList.add('animate-pulse');
+                    setTimeout(() => {
+                        dropStatus.classList.remove('animate-pulse');
+                    }, 500);
+                }
+            }
+
+            // Umožníme na drop zónu i kliknout, jako by to bylo klasické tlačítko
+            dropZone.addEventListener('click', () => {
+                hiddenDropInput.click();
+            });
+
+            hiddenDropInput.addEventListener('change', () => {
+                processDropFiles(hiddenDropInput.files);
+            });
+
+        });
+    </script>
+</body>
+</html>
